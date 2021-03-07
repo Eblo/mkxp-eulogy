@@ -82,6 +82,8 @@ public:
 	void blur();
 	void radialBlur(int angle, int divisions);
 
+	void setMode7(const Bitmap &source, double rot, double scale, int x, int y);
+
 	void clear();
 
 	Color getPixel(int x, int y) const;
