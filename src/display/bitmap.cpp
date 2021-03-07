@@ -801,6 +801,92 @@ void Bitmap::radialBlur(int angle, int divisions)
 	p->onModified();
 }
 
+void Bitmap::setMode7(const Bitmap &source, double rot, double scale, int playerX, int playerY)
+{
+	guardDisposed();
+
+	GUARD_MEGA;
+
+	if (source.isDisposed())
+		return;
+	
+	const int _width = width();
+	const int _height = height();
+	const int sourceWidth = source.width();
+	const int sourceHeight = source.height();
+	const int midX = _width >> 1;
+
+	Color color;
+	int pixel;
+	int bpp = p->format->BytesPerPixel;
+	uint8_t newPixels[bpp * _width * _height];
+
+	double px, py;
+    double pxt, pyt;
+    double pz;
+
+	// This defines the point at which the horizon is drawn
+    pz = -_height/4;
+
+	float _rot=((float)rot+180)*0.0174532925f; // Convert angle to radians
+    float rotcos=cos(_rot); // Get X thingy from angle
+	float rotsin=sin(_rot); // Get Y thingy from angle
+
+	// https://gamedev.stackexchange.com/questions/24957/doing-an-snes-mode-7-affine-transform-effect-in-pygame
+    // TODO: Curving the texture with distance?
+    int horizon = _height/4;
+    pz += horizon + 1; // Add 1 to prevent drawing the horizon
+
+	for(int y=horizon; y<_height; y++){
+        py = y / pz;
+        pyt = py;
+
+        // TODO: The closer to the bottom of the screen (y), the more curved the texture
+
+        for(int x=0; x<_width; x++){
+            px = (midX - x) / pz;
+
+            pxt = px;
+            px = pxt * rotcos - pyt * rotsin;
+            px *= scale;
+            px += playerX;
+
+            // "scale" essentially functions as the height above the floor
+            py = pxt * rotsin + pyt * rotcos;
+            py *= scale;
+            // If we wanted the player to move at an angle, we would need to do trig
+            // with the coordinates in RM before passing onto the DLL
+            py += playerY;
+            py = fmod(py, sourceHeight);
+            // Use absolute value to mirror the texture
+            // py = abs(py);
+            // Add the max value to repeat it
+            if (py < 0) py += sourceHeight;
+            
+            px = fmod(px, sourceWidth);
+            // Use absolute value to mirror the texture
+            // px = abs(px);
+            // Add the max value to repeat it
+            if (px < 0) px += sourceWidth;
+
+            // Perspective correction
+            // px = width - px;
+            // py = height - py;
+            color = source.getPixel(int(px), int(py));
+			pixel = (x + y * _width) * bpp;
+			newPixels[pixel] = color.red;
+			newPixels[pixel + 1] = color.green;
+			newPixels[pixel + 2] = color.blue;
+			newPixels[pixel + 3] = color.alpha;
+        }
+        pz++;
+    }
+	TEX::bind(p->gl.tex);
+	TEX::uploadSubImage(0, 0, _width, _height, &newPixels, GL_RGBA);
+	p->addTaintedArea(IntRect(0, horizon, _width, _height - horizon));
+	p->onModified(false);
+}
+
 void Bitmap::clear()
 {
 	guardDisposed();
