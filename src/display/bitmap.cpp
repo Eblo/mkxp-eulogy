@@ -818,8 +818,7 @@ void Bitmap::setMode7(const Bitmap &source, double rot, double scale, int player
 
 	Color color;
 	int pixel;
-	int bpp = p->format->BytesPerPixel;
-	uint8_t newPixels[bpp * _width * _height];
+	uint8_t newPixels[p->format->BytesPerPixel * _width * _height];
 
 	double px, py;
     double pxt, pyt;
@@ -836,6 +835,7 @@ void Bitmap::setMode7(const Bitmap &source, double rot, double scale, int player
     // TODO: Curving the texture with distance?
     int horizon = _height/4;
     pz += horizon + 1; // Add 1 to prevent drawing the horizon
+	pixel = horizon * _width * p->format->BytesPerPixel;
 
 	for(int y=horizon; y<_height; y++){
         py = y / pz;
@@ -873,11 +873,10 @@ void Bitmap::setMode7(const Bitmap &source, double rot, double scale, int player
             // px = width - px;
             // py = height - py;
             color = source.getPixel(int(px), int(py));
-			pixel = (x + y * _width) * bpp;
-			newPixels[pixel] = color.red;
-			newPixels[pixel + 1] = color.green;
-			newPixels[pixel + 2] = color.blue;
-			newPixels[pixel + 3] = color.alpha;
+			newPixels[pixel++] = color.red;
+			newPixels[pixel++] = color.green;
+			newPixels[pixel++] = color.blue;
+			newPixels[pixel++] = color.alpha;
         }
         pz++;
     }
