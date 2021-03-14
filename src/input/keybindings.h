@@ -25,6 +25,7 @@
 #include "input.h"
 
 #include <SDL_scancode.h>
+#include <SDL_keyboard.h>
 #include <SDL_joystick.h>
 #include <stdint.h>
 #include <assert.h>
@@ -98,6 +99,71 @@ struct SourceDesc
 	{
 		return !(*this == o);
 	}
+
+	/* Human readable string representation */
+	std::string sourceDescString() const
+	{
+		char buf[128];
+		char pos;
+
+		switch (type)
+		{
+		case Invalid:
+			return std::string();
+
+		case Key:
+		{
+			if (d.scan == SDL_SCANCODE_LSHIFT)
+				return "Shift";
+
+			SDL_Keycode key = SDL_GetKeyFromScancode(d.scan);
+			const char *str = SDL_GetKeyName(key);
+
+			if (*str == '\0')
+				return "Unknown key";
+			else
+				return str;
+		}
+		case JButton:
+			snprintf(buf, sizeof(buf), "JS %d", d.jb);
+			return buf;
+
+		case JHat:
+			switch(d.jh.pos)
+			{
+			case SDL_HAT_UP:
+				pos = 'U';
+				break;
+
+			case SDL_HAT_DOWN:
+				pos = 'D';
+				break;
+
+			case SDL_HAT_LEFT:
+				pos = 'L';
+				break;
+
+			case SDL_HAT_RIGHT:
+				pos = 'R';
+				break;
+
+			default:
+				pos = '-';
+			}
+			snprintf(buf, sizeof(buf), "Hat %d:%c",
+					d.jh.hat, pos);
+			return buf;
+
+		case JAxis:
+			snprintf(buf, sizeof(buf), "Axis %d%c",
+					d.ja.axis, d.ja.dir == Negative ? '-' : '+');
+			return buf;
+		}
+
+		assert(!"unreachable");
+		return "";
+	}
+
 };
 
 #define JAXIS_THRESHOLD 0x4000
