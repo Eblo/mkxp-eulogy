@@ -84,6 +84,7 @@ public:
 
 	void setMode7(const Bitmap &source, double rot, double scale, int x, int y);
 	void setTransform(const Bitmap &source, int transformType, int time, int amplitude, double frequency, double speed);
+    bool getRawForPNG(char *output, int output_size);
 
 	void clear();
 
