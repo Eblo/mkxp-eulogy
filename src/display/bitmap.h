@@ -80,6 +80,7 @@ public:
 	void radialBlur(int angle, int divisions);
 
 	void setMode7(const Bitmap &source, double rot, double scale, int x, int y);
+	void setTransform(const Bitmap &source, int transformType, int time, int amplitude, double frequency, double speed);
 
 	void clear();
 
@@ -97,6 +98,16 @@ public:
 		Left = 0,
 		Center = 1,
 		Right = 2
+	};
+	
+	enum Transformation
+	{
+		CrossCompress = 0,
+		XCompress = 1,
+		YCompress = 2,
+		CrossSine = 3,
+		XSine = 4,
+		YSine = 5
 	};
 
 	void drawText(int x, int y,

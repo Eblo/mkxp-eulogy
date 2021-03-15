@@ -479,6 +479,22 @@ RB_METHOD(bitmapMode7) {
   return self;
 }
 
+RB_METHOD(bitmapTransform) {
+  Bitmap *b = getPrivateData<Bitmap>(self);
+  
+  VALUE srcObj;
+  int transformType, time, amplitude;
+  double frequency, speed;
+
+  rb_get_args(argc, argv, "oiiiff", &srcObj, &transformType, &time, &amplitude, &frequency, &speed RB_ARG_END);
+
+  Bitmap *srcBitmap = getPrivateDataCheck<Bitmap>(srcObj, BitmapType);
+
+  GUARD_EXC(b->setTransform(*srcBitmap, transformType, time, amplitude, frequency, speed););
+
+  return self;
+}
+
 void bitmapBindingInit() {
   VALUE klass = rb_define_class("Bitmap", rb_cObject);
 #if RAPI_FULL > 187
@@ -518,6 +534,7 @@ void bitmapBindingInit() {
 
   // Eulogy stuff
   _rb_define_method(klass, "mode7", bitmapMode7);
+  _rb_define_method(klass, "transform", bitmapTransform);
 
   rb_define_singleton_method(klass, "max_size", RUBY_METHOD_FUNC(bitmapGetMaxSize), -1);
 
