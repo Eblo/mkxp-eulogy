@@ -495,6 +495,19 @@ RB_METHOD(bitmapTransform) {
   return self;
 }
 
+RB_METHOD(bitmapGetRawPNGData) {
+  RB_UNUSED_PARAM;
+
+  Bitmap *b = getPrivateData<Bitmap>(self);
+	// Three bytes per pixel, plus one byte per row for the filter type
+  int size = (b->width()+1) * b->height() * 3;
+  VALUE ret = rb_str_new(0, size);
+
+  GUARD_EXC(b->getRawForPNG(RSTRING_PTR(ret), size););
+
+  return ret;
+}
+
 void bitmapBindingInit() {
   VALUE klass = rb_define_class("Bitmap", rb_cObject);
 #if RAPI_FULL > 187
@@ -535,6 +548,7 @@ void bitmapBindingInit() {
   // Eulogy stuff
   _rb_define_method(klass, "mode7", bitmapMode7);
   _rb_define_method(klass, "transform", bitmapTransform);
+  _rb_define_method(klass, "raw_png_data", bitmapGetRawPNGData);
 
   rb_define_singleton_method(klass, "max_size", RUBY_METHOD_FUNC(bitmapGetMaxSize), -1);
 
