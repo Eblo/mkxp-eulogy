@@ -989,7 +989,7 @@ double Graphics::getScale() const { return (double)p->scSize.y / p->scRes.y; }
 
 void Graphics::setScale(double factor) {
     p->threadData->rqWindowAdjust.wait();
-    factor = clamp(factor, 0.5, 2.0);
+    factor = clamp(factor, 1.0, 3.0);
     
     if (factor == getScale())
         return;
