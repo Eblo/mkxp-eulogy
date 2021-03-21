@@ -66,6 +66,19 @@ RB_METHOD(fpsRenderSprite)
     return Qnil;
 }
 
+RB_METHOD(fpsCastSingleRay)
+{
+    RB_UNUSED_PARAM;
+
+    double objectX, objectY, spriteScaleX;
+    VALUE coord = rb_ary_new();
+
+    rb_get_args(argc, argv, "fff", &objectX, &objectY, &spriteScaleX RB_ARG_END);
+    shState->firstPerson().castSingleRay(objectX, objectY, spriteScaleX, coord);
+
+    return coord;
+}
+
 #define INIT_GRA_PROP_BIND(PropName, prop_name_s) \
 { \
 _rb_define_module_function(module, prop_name_s, graphics##Get##PropName); \
@@ -80,4 +93,5 @@ void fpsBindingInit()
     _rb_define_module_function(module, "terminate", fpsTerminate);
     _rb_define_module_function(module, "render_3d_walls", fpsRender3dWalls);
     _rb_define_module_function(module, "render_sprite", fpsRenderSprite);
+    _rb_define_module_function(module, "cast_single_ray", fpsCastSingleRay);
 }
