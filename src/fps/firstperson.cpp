@@ -388,7 +388,7 @@ void FirstPerson::renderSprite(Bitmap *sprite, double spriteX, double spriteY, d
 
 	for(int y=drawStartY; y<drawEndY; y++) {
 		d = (y - zMoveScreen) * 256 - p->screenHeight*128 + spriteHeight * 128;
-		if(flags & FLIP_VERTICAL == FLIP_VERTICAL) {
+		if((flags & FLIP_VERTICAL) == FLIP_VERTICAL) {
 			p->texY = spriteTexHeight - abs(((d * spriteTexHeight) / spriteHeight) / 256) + sy;
 		} else {
 			p->texY = abs(((d * spriteTexHeight) / spriteHeight) / 256) + sy;
@@ -415,4 +415,48 @@ void FirstPerson::renderSprite(Bitmap *sprite, double spriteX, double spriteY, d
     // TODO: May want to only write the pixels that were changed
     // drawStartX to drawEndX, drawStartY to drawEndY
     p->bitmap->replaceRaw(p->pixels, p->pixelsSize);
+}
+
+void FirstPerson::castSingleRay(double objectX, double objectY, double spriteScaleX, VALUE coord) {
+    // TODO: May want to have pointers for these values to prevent needing to fetch them every time
+	double playerX = RFLOAT_VALUE(rb_ary_entry(p->playerPosA, 0));
+	double playerY = RFLOAT_VALUE(rb_ary_entry(p->playerPosA, 1));
+	
+	double playerDirX = RFLOAT_VALUE(rb_ary_entry(p->playerDirA, 0));
+	double playerDirY = RFLOAT_VALUE(rb_ary_entry(p->playerDirA, 1));
+	
+	double planeX = RFLOAT_VALUE(rb_ary_entry(p->planeA, 0));
+	double planeY = RFLOAT_VALUE(rb_ary_entry(p->planeA, 1));
+	
+	// Translate sprite position to be relative to camera
+	double spriteX = objectX - playerX + 0.5; // Add 0.5 to center sprite in its tile
+	double spriteY = objectY - playerY + 0.5; // Add 0.5 to center sprite in its tile
+	
+	// Transform sprite with the inverse camera matrix
+	float invDet = 1.0 / (planeX * playerDirY - playerDirX * planeY);
+	
+	float transformX = invDet * (playerDirY * spriteX - playerDirX * spriteY);
+	float transformY = invDet * (-planeY * spriteX + planeX * spriteY);
+	
+	int spriteScreenX = int((p->screenWidth / 2) * (1 + transformX / transformY));
+	
+	int spriteWidth = abs( int (p->screenHeight / (transformY))) * spriteScaleX;
+	int drawStartX = spriteScreenX - spriteWidth/2;
+	if(drawStartX < 0) drawStartX = 0;
+	int drawEndX = spriteWidth/2 + spriteScreenX;
+	if(drawEndX >= p->screenWidth) drawEndX = p->screenWidth; //-1
+	
+	for(int stripe = drawStartX; stripe < drawEndX; stripe++){
+ 		p->texX = abs(int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * p->texWidth / spriteWidth) / 256);
+		
+        // Object is on screen
+		if(transformY > 0 && stripe >= 0 && stripe < p->screenWidth && transformY < p->zBuffer[stripe/p->resolution]){
+            rb_ary_push(coord, INT2FIX(drawStartX));
+            rb_ary_push(coord, INT2FIX(drawEndX));
+            return;
+		}
+	}
+	// Object was not hit
+    rb_ary_push(coord, INT2FIX(-1));
+    rb_ary_push(coord, INT2FIX(-1));
 }

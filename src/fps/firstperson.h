@@ -40,6 +40,7 @@ class FirstPerson
         void terminate();
         void render3dWalls();
         void renderSprite(Bitmap *sprite, double spriteX, double spriteY, double spriteZ, double spriteScaleX, double spriteScaleY, int characterIndex, int direction, int pattern, int dw, int dh, int flags);
+        void castSingleRay(double objectX, double objectY, double spriteScaleX, VALUE coord);
 
     private:
 	
