@@ -22,6 +22,7 @@ binding_source = [files(
     'bitmap-binding.cpp',
     'font-binding.cpp',
     'graphics-binding.cpp',
+    'fps-binding.cpp',
     'input-binding.cpp',
     'sprite-binding.cpp',
     'viewport-binding.cpp',

@@ -61,10 +61,6 @@ struct FirstPersonPrivate {
         unsigned char fogGreen = 31;
         unsigned char fogBlue = 31;
 
-        Bitmap *sprite;
-        double spriteX, spriteY, spriteZ;
-        double spriteScaleX, spriteScaleY;
-
 };
 
 FirstPerson::FirstPerson() {
@@ -291,5 +287,132 @@ void FirstPerson::render3dWalls() {
 		}
 	}
     // Write the pixel data directly to the buffer
+    p->bitmap->replaceRaw(p->pixels, p->pixelsSize);
+}
+
+void FirstPerson::renderSprite(Bitmap *sprite, double spriteX, double spriteY, double spriteZ, double spriteScaleX, double spriteScaleY, int characterIndex, int direction, int pattern, int dw, int dh, int flags) {
+    // TODO: May want to have pointers for these values to prevent needing to fetch them every time
+	double playerX = RFLOAT_VALUE(rb_ary_entry(p->playerPosA, 0));
+	double playerY = RFLOAT_VALUE(rb_ary_entry(p->playerPosA, 1));
+	
+	double playerDirX = RFLOAT_VALUE(rb_ary_entry(p->playerDirA, 0));
+	double playerDirY = RFLOAT_VALUE(rb_ary_entry(p->playerDirA, 1));
+	
+	double planeX = RFLOAT_VALUE(rb_ary_entry(p->planeA, 0));
+	double planeY = RFLOAT_VALUE(rb_ary_entry(p->planeA, 1));
+
+	spriteX = spriteX - playerX + 0.5; // Add 0.5 to center sprite in its tile
+	spriteY = spriteY - playerY + 0.5; // Add 0.5 to center sprite in its tile
+	double spriteAngle = atan2(-spriteY, -spriteX);
+
+    int bitmapWidth = sprite->width();
+    int bitmapHeight = sprite->height();
+
+	// Loop stepping animation
+	pattern = pattern < STEPPING_ANIMATION_FRAMES ? pattern : 1;
+
+	// 8-dir spritesheet format (with animation):
+	/*
+		|	111	|	666	|
+		|	222	|	777	|
+		|	333	|	888	|
+		|	444	|	999	|
+	*/
+	// Without animation:
+	/*
+		|	1	|	6	|
+		|	2	|	7	|
+		|	3	|	8	|
+		|	4	|	9	|
+	*/
+	if ((flags & DIRECTION_FIX) != DIRECTION_FIX) {
+		// Range: -PI to PI
+		if(ANGLE_4_7 < spriteAngle && ANGLE_4_6 >= spriteAngle) {
+			direction = directions[direction][4];
+		} else if(ANGLE_4_6 < spriteAngle && ANGLE_2_6 >= spriteAngle) {
+			direction = directions[direction][1];
+		} else if(ANGLE_2_6 < spriteAngle && ANGLE_2_8 >= spriteAngle) {
+			direction = directions[direction][2];
+		} else if((ANGLE_2_8 < spriteAngle && ANGLE_8_A >= spriteAngle) || (ANGLE_8_B < spriteAngle && ANGLE_8_9 >= spriteAngle)) {
+			direction = directions[direction][3];
+		} else if(ANGLE_8_9 < spriteAngle && ANGLE_3_9 >= spriteAngle) {
+			direction = directions[direction][9];
+		} else if(ANGLE_3_9 < spriteAngle && ANGLE_3_7 >= spriteAngle) {
+			direction = directions[direction][8];
+		} else if(ANGLE_3_7 < spriteAngle && ANGLE_4_7 >= spriteAngle) {
+			direction = directions[direction][7];
+		} else { // +-pi
+			direction = directions[direction][6];
+		}
+	}
+	int frames = (flags & NO_ANIMATION) == NO_ANIMATION ? 1 : STEPPING_ANIMATION_FRAMES;
+	int sx = ((characterIndex % 4 * frames + pattern) + (direction / 5) * frames) * (bitmapWidth / dw);
+	int sy = (characterIndex / 4 * 4) + ((direction - 1) % 5) * (bitmapHeight / dh);
+	
+	//transform sprite with the inverse camera matrix
+	float invDet = 1.0 / (planeX * playerDirY - playerDirX * planeY);
+	
+	float transformX = invDet * (playerDirY * spriteX - playerDirX * spriteY);
+	float transformY = invDet * (-planeY * spriteX + planeX * spriteY);
+	
+	int zMoveScreen = int(spriteZ / transformY);
+	
+	int spriteScreenX = int((p->screenWidth / 2) * (1 + transformX / transformY));
+	
+	int spriteHeight = abs(int(p->screenHeight / (transformY))) * spriteScaleY; // Prevents fisheye effect
+	
+	int drawStartY = (p->screenHeight - spriteHeight) / 2 + zMoveScreen;
+	if (drawStartY > p->screenHeight) return;
+	if(drawStartY < 0) drawStartY = 0;
+	int drawEndY = (p->screenHeight + spriteHeight) / 2 + zMoveScreen;
+	if(drawEndY < 0) return;
+	if(drawEndY >= p->screenHeight) drawEndY = p->screenHeight; //-1
+	
+	int spriteWidth = abs(int (p->screenHeight / (transformY))) * spriteScaleX;
+	int drawStartX = spriteScreenX - spriteWidth/2;
+	if (drawStartX > p->screenWidth) return;
+	if(drawStartX < 0) drawStartX = 0;
+	int drawEndX = spriteWidth/2 + spriteScreenX;
+	if(drawEndX < 0) return;
+	if(drawEndX >= p->screenWidth) drawEndX = p->screenWidth; //-1
+	
+    int pixel;
+	
+	p->fogDist = std::min(float(std::max(transformY * 0.75, 1.0)), p->fogDistCutoff);
+	p->fogWeight = (p->fogDist - 1.0) / (p->fogDistCutoff - 1.0); //5.0
+	p->wallFloorCeilWeight = 1.0 - p->fogWeight;
+	
+	double spriteTexHeight = double(bitmapHeight * 2 / (dh*2));
+	double spriteTexWidth = double(bitmapWidth / dw);
+	int d;
+
+	for(int y=drawStartY; y<drawEndY; y++) {
+		d = (y - zMoveScreen) * 256 - p->screenHeight*128 + spriteHeight * 128;
+		if(flags & FLIP_VERTICAL == FLIP_VERTICAL) {
+			p->texY = spriteTexHeight - abs(((d * spriteTexHeight) / spriteHeight) / 256) + sy;
+		} else {
+			p->texY = abs(((d * spriteTexHeight) / spriteHeight) / 256) + sy;
+		}
+		
+		
+		for(int stripe = drawStartX; stripe < drawEndX; stripe++) {
+            pixel = (stripe + (y * p->screenWidth)) * p->bytesPerPixel;
+ 			p->texX = abs(int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * spriteTexWidth / spriteWidth) / 256) + sx;
+			
+			if(transformY > 0 && stripe >= 0 && stripe < p->screenWidth && transformY < p->zBuffer[stripe/p->resolution]) {
+				p->color = sprite->getPixel(p->texX, p->texY);
+				// If totally transparent, ignore
+				if(p->color.alpha > 0) {
+                    p->pixels[pixel] = (p->pixels[pixel]*(1.0-(p->color.alpha/255.0)) + p->color.red*(p->color.alpha/255.0))*p->wallFloorCeilWeight + (p->fogRed*p->fogWeight);
+                    p->pixels[pixel+1] = (p->pixels[pixel+1]*(1.0-(p->color.alpha/255.0)) + p->color.green*(p->color.alpha/255.0))*p->wallFloorCeilWeight + (p->fogGreen*p->fogWeight);
+                    p->pixels[pixel+2] = (p->pixels[pixel+2]*(1.0-(p->color.alpha/255.0)) + p->color.blue*(p->color.alpha/255.0))*p->wallFloorCeilWeight + (p->fogBlue*p->fogWeight);
+				}
+				
+			}
+            pixel += 4;
+		}
+	}
+    // TODO: May want to only write the pixels that were changed
+    // drawStartX to drawEndX, drawStartY to drawEndY
     p->bitmap->replaceRaw(p->pixels, p->pixelsSize);
 }
