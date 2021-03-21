@@ -24,6 +24,7 @@
 #include "util.h"
 #include "filesystem.h"
 #include "graphics.h"
+#include "fps/firstperson.h"
 #include "input.h"
 #include "audio.h"
 #include "glstate.h"
@@ -74,6 +75,7 @@ struct SharedStatePrivate
 	SharedMidiState midiState;
 
 	Graphics graphics;
+	FirstPerson firstPerson;
 	Input input;
 	Audio audio;
 
@@ -107,6 +109,7 @@ struct SharedStatePrivate
 	      config(threadData->config),
 	      midiState(threadData->config),
 	      graphics(threadData),
+		  firstPerson(),
 	      input(*threadData),
 	      audio(*threadData),
 	      _glState(threadData->config),
@@ -226,6 +229,7 @@ GSATT(EventThread&, eThread)
 GSATT(RGSSThreadData&, rtData)
 GSATT(Config&, config)
 GSATT(Graphics&, graphics)
+GSATT(FirstPerson&, firstPerson)
 GSATT(Input&, input)
 GSATT(Audio&, audio)
 GSATT(GLState&, _glState)

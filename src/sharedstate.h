@@ -40,6 +40,7 @@ class Scene;
 class FileSystem;
 class EventThread;
 class Graphics;
+class FirstPerson;
 class Input;
 class Audio;
 class GLState;
@@ -68,6 +69,7 @@ struct SharedState
 	Config &config() const;
 
 	Graphics &graphics() const;
+	FirstPerson &firstPerson() const;
 	Input &input() const;
 	Audio &audio() const;
 

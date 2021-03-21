@@ -1,0 +1,60 @@
+/*
+ ** fps-binding.cpp
+ */
+
+#include "fps/firstperson.h"
+#include "sharedstate.h"
+#include "binding-util.h"
+#include "binding-types.h"
+#include "exception.h"
+#include "util/debugwriter.h"
+
+RB_METHOD(fpsInitialize)
+{
+    RB_UNUSED_PARAM;
+
+    Bitmap *screen;
+    Bitmap *textures;
+    VALUE screenObj, texturesObj, world,
+            position, direction, plane;
+    int resolution;
+
+    rb_get_args(argc, argv, "ooooooi", &screenObj, &texturesObj, &world,
+                &position, &direction, &plane, &resolution RB_ARG_END);
+                
+    screen = getPrivateDataCheck<Bitmap>(screenObj, BitmapType);
+    textures = getPrivateDataCheck<Bitmap>(texturesObj, BitmapType);
+    shState->firstPerson().initialize(screen, textures, world, position,
+                                    direction, plane, resolution);
+    
+    return Qnil;
+}
+
+RB_METHOD(fpsTerminate)
+{
+    RB_UNUSED_PARAM;
+    shState->firstPerson().terminate();    
+    return Qnil;
+}
+
+RB_METHOD(fpsRender3dWalls)
+{
+    RB_UNUSED_PARAM;
+    shState->firstPerson().render3dWalls();    
+    return Qnil;
+}
+
+#define INIT_GRA_PROP_BIND(PropName, prop_name_s) \
+{ \
+_rb_define_module_function(module, prop_name_s, graphics##Get##PropName); \
+_rb_define_module_function(module, prop_name_s "=", graphics##Set##PropName); \
+}
+
+void fpsBindingInit()
+{
+    VALUE module = rb_define_module("FirstPerson");
+    
+    _rb_define_module_function(module, "initialize", fpsInitialize);
+    _rb_define_module_function(module, "terminate", fpsTerminate);
+    _rb_define_module_function(module, "render_3d_walls", fpsRender3dWalls);
+}
