@@ -44,6 +44,28 @@ RB_METHOD(fpsRender3dWalls)
     return Qnil;
 }
 
+RB_METHOD(fpsRenderSprite)
+{
+    RB_UNUSED_PARAM;
+
+    Bitmap *sprite;
+    VALUE spriteObj;
+    double x, y, z;
+    double scaleX, scaleY;
+    int characterIndex, direction, pattern;
+    int dw, dh;
+    int flags;
+
+    rb_get_args(argc, argv, "offfffiiiiii", &spriteObj, &x, &y,
+                &z, &scaleX, &scaleY, &characterIndex, &direction,
+                &pattern, &dw, &dh, &flags RB_ARG_END);
+    sprite = getPrivateDataCheck<Bitmap>(spriteObj, BitmapType);
+
+    shState->firstPerson().renderSprite(sprite, x, y, z, scaleX, scaleY,
+                            characterIndex, direction, pattern, dw, dh, flags);    
+    return Qnil;
+}
+
 #define INIT_GRA_PROP_BIND(PropName, prop_name_s) \
 { \
 _rb_define_module_function(module, prop_name_s, graphics##Get##PropName); \
@@ -57,4 +79,5 @@ void fpsBindingInit()
     _rb_define_module_function(module, "initialize", fpsInitialize);
     _rb_define_module_function(module, "terminate", fpsTerminate);
     _rb_define_module_function(module, "render_3d_walls", fpsRender3dWalls);
+    _rb_define_module_function(module, "render_sprite", fpsRenderSprite);
 }
