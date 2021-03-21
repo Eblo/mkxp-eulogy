@@ -153,6 +153,8 @@ main_source = files(
 
     'filesystem/filesystem.cpp',
     'filesystem/filesystemImpl.cpp',
+
+    'fps/firstperson.cpp',
     
     'input/input.cpp',
     'input/keybindings.cpp',
