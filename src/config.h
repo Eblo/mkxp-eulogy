@@ -129,6 +129,14 @@ struct Config {
     /* Internal */
     std::string customDataPath;
     std::string commonDataPath;
+
+    struct {
+        std::string metaFile;
+        std::string patchFile;
+        std::string password;
+        int keyMultiplier;
+        int keyAdditive;
+    } encryption;
     
     Config();
     

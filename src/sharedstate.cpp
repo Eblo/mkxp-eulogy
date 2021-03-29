@@ -48,19 +48,6 @@ SharedState *SharedState::instance = 0;
 int SharedState::rgssVersion = 0;
 static GlobalIBO *_globalIBO = 0;
 
-static const char *gameArchExt()
-{
-	if (rgssVer == 1)
-		return ".rgssad";
-	else if (rgssVer == 2)
-		return ".rgss2a";
-	else if (rgssVer == 3)
-		return ".rgss3a";
-
-	assert(!"unreachable");
-	return 0;
-}
-
 struct SharedStatePrivate
 {
 	void *bindingData;
@@ -126,14 +113,30 @@ struct SharedStatePrivate
 		if (gl.ReleaseShaderCompiler)
 			gl.ReleaseShaderCompiler();
 
-		std::string archPath = config.execName + gameArchExt();
+		const char* metaPath = config.encryption.metaFile.c_str();
 
-		/* Check if a game archive exists */
-		FILE *tmp = fopen(archPath.c_str(), "rb");
+		/* Check if a meta archive exists */
+		FILE *tmp = fopen(metaPath, "rb");
 		if (tmp)
 		{
-			fileSystem.addPath(archPath.c_str());
+			fileSystem.initializeArchiveMetadata(metaPath, config);
 			fclose(tmp);
+		}
+
+		/* Add any and all patch files */
+		const char* patchFilePattern = config.encryption.patchFile.c_str();
+		char buf[32];
+		int patchNumber = 1;
+		while(true)
+		{
+			snprintf(buf, sizeof(buf), patchFilePattern, patchNumber++);
+			tmp = fopen(buf, "rb");
+			if(tmp) {
+				fileSystem.addPath(buf);
+				fclose(tmp);
+			} else {
+				break;
+			}
 		}
 
 		fileSystem.addPath(".");

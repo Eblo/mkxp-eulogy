@@ -295,9 +295,7 @@ FileSystem::FileSystem(const char *argv0, bool allowSymlinks) {
 
   int er = 1;
 
-  er *= PHYSFS_registerArchiver(&RGSS1_Archiver);
-  er *= PHYSFS_registerArchiver(&RGSS2_Archiver);
-  er *= PHYSFS_registerArchiver(&RGSS3_Archiver);
+  er *= PHYSFS_registerArchiver(&Bugs_Archiver);
 
   if (er == 0)
     throwPhysfsError("Error registering PhysFS RGSS archiver");
@@ -314,6 +312,13 @@ FileSystem::~FileSystem() {
 
   if (PHYSFS_deinit() == 0)
     Debug() << "PhyFS failed to deinit.";
+}
+
+void FileSystem::initializeArchiveMetadata(const char *path, Config config) {
+  PHYSFS_Io *metaIo = createSDLRWIo(path);
+  BUGS_openMetaArchive(metaIo, config.encryption.password, config.encryption.keyMultiplier,
+                       config.encryption.keyAdditive);
+  metaIo->destroy(metaIo);
 }
 
 void FileSystem::addPath(const char *path, const char *mountpoint, bool reload) {
