@@ -124,6 +124,14 @@ struct Config {
   std::string customDataPath;
   std::string commonDataPath;
 
+  struct {
+    std::string metaFile;
+    std::string patchFile;
+    std::string password;
+    int keyMultiplier;
+    int keyAdditive;
+  } encryption;
+
   Config();
 
   void read(int argc, char *argv[]);
