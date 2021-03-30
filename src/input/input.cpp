@@ -20,11 +20,12 @@
 */
 
 #include "input.h"
+#include "config.h"
 #include "sharedstate.h"
 #include "eventthread.h"
-#include "keybindings.h"
-#include "exception.h"
-#include "util.h"
+#include "input/keybindings.h"
+#include "util/exception.h"
+#include "util/util.h"
 
 #include <SDL_scancode.h>
 #include <SDL_keyboard.h>
@@ -32,6 +33,7 @@
 #include <SDL_clipboard.h>
 
 #include <vector>
+#include <cmath>
 #include <unordered_map>
 #include <string.h>
 #include <assert.h>
@@ -201,12 +203,13 @@ std::unordered_map<int, int> vKeyToScancode{
 };
 #undef m
 #define m(keycode) { #keycode, SDL_SCANCODE_##keycode }
+#define m_number(keycode) { "NUMBER_" #keycode, SDL_SCANCODE_##keycode }
 std::unordered_map<std::string, int> strToScancode{
-    m(0), m(1),
-    m(2), m(3),
-    m(4), m(5),
-    m(6), m(7),
-    m(8), m(9),
+    m_number(0), m_number(1),
+    m_number(2), m_number(3),
+    m_number(4), m_number(5),
+    m_number(6), m_number(7),
+    m_number(8), m_number(9),
     m(A),
     m(AC_BACK),
     m(AC_BOOKMARKS),
@@ -678,6 +681,13 @@ struct InputPrivate
     int rawRepeating;
 	unsigned int repeatCount;
     unsigned int rawRepeatCount;
+    unsigned long long repeatTime;
+    unsigned long long rawRepeatTime;
+    
+    unsigned int repeatStart;
+    unsigned int repeatDelay;
+    
+    unsigned long long last_update;
 
 	struct
 	{
@@ -690,14 +700,30 @@ struct InputPrivate
 		int active;
 	} dir8Data;
 
+    void recalcRepeatTime(unsigned int fps) {
+        double framems = 1.f / fps;
+        
+        // Approximate time in milliseconds
+        double start = (rgssVer >= 2) ? 0.375 : 0.400;
+        double delay = 0.100;
+
+        repeatStart = ceil(start / framems);
+        repeatDelay = ceil(delay / framems);
+    }
 
 	InputPrivate(const RGSSThreadData &rtData)
 	{
+        last_update = 0;
+        
 		initStaticKbBindings();
 		initMsBindings();
 
 		/* Main thread should have these posted by now */
 		checkBindingChange(rtData);
+        
+        int fps = rtData.config.fixedFramerate;
+        if (!fps) fps = (rgssVer >= 2) ? 60 : 40;
+        recalcRepeatTime(fps);
 
 		states    = stateArray;
 		statesOld = stateArray + BUTTON_CODE_COUNT;
@@ -712,7 +738,7 @@ struct InputPrivate
 
 		repeating = Input::None;
 		repeatCount = 0;
-
+        
 		dir4Data.active = 0;
 		dir4Data.previous = Input::None;
 
@@ -789,15 +815,7 @@ struct InputPrivate
         b.triggered = (rawStates[scancode] && !rawStatesOld[scancode]);
         b.released = (!rawStates[scancode] && rawStatesOld[scancode]);
         
-        bool repeated = false;
-        if (scancode == rawRepeating)
-        {
-            if (rgssVer >= 2)
-            repeated = rawRepeatCount >= 23 && ((rawRepeatCount+1) % 6) == 0;
-            else
-            repeated = rawRepeatCount >= 15 && ((rawRepeatCount+1) % 4) == 0;
-        }
-        b.repeated = repeated;
+        b.repeated = rawRepeatCount >= repeatStart && ((rawRepeatCount+1) % repeatDelay) == 0;
         
         return b;
     }
@@ -994,12 +1012,15 @@ struct InputPrivate
                 else
                 {
                     rawRepeatCount = 0;
+                    rawRepeatTime = shState->runTime();
                     rawRepeating = i;
                 }
                 
-                break;
+                return;
             }
         }
+        
+        rawRepeating = -1;
     }
 
 	void updateDir4()
@@ -1090,6 +1111,14 @@ Input::Input(const RGSSThreadData &rtData)
 	p = new InputPrivate(rtData);
 }
 
+unsigned long long Input::getDelta() {
+    return shState->runTime() - p->last_update;
+}
+
+void Input::recalcRepeat(unsigned int fps) {
+    p->recalcRepeatTime(fps);
+}
+
 void Input::update()
 {
 	shState->checkShutdown();
@@ -1111,8 +1140,10 @@ void Input::update()
 	{
 		p->repeating = repeatCand;
 		p->repeatCount = 0;
+        p->repeatTime = shState->runTime();
 		p->getState(repeatCand).repeated = true;
 
+        p->last_update = p->repeatTime;
 		return;
 	}
 
@@ -1121,18 +1152,22 @@ void Input::update()
 	{
 		p->repeatCount++;
 
+        /*
 		bool repeated;
 		if (rgssVer >= 2)
 			repeated = p->repeatCount >= 23 && ((p->repeatCount+1) % 6) == 0;
 		else
 			repeated = p->repeatCount >= 15 && ((p->repeatCount+1) % 4) == 0;
-
+         */
+        bool repeated = p->repeatCount >= p->repeatStart && ((p->repeatCount+1) & p->repeatDelay) == 0;
 		p->getState(p->repeating).repeated |= repeated;
 
+        p->last_update = shState->runTime();
 		return;
 	}
-
+    
 	p->repeating = None;
+    p->last_update = shState->runTime();
 }
 
 std::vector<std::string> Input::getBindings(ButtonCode code) {
@@ -1186,6 +1221,13 @@ unsigned int Input::count(int button) {
     return p->repeatCount;
 }
 
+unsigned long long Input::repeatTime(int button) {
+    if (button != p->repeating)
+        return 0;
+    
+    return shState->runTime() - p->repeatTime;
+}
+
 bool Input::isPressedEx(int code, bool isVKey)
 {
     return p->getStateRaw(code, isVKey).pressed;
@@ -1220,6 +1262,19 @@ unsigned int Input::repeatcount(int code, bool isVKey) {
         return 0;
     
     return p->rawRepeatCount;
+}
+
+unsigned long long Input::repeatTimeEx(int code, bool isVKey) {
+    int c = code;
+    if (isVKey) {
+        try { c = vKeyToScancode[code]; }
+        catch (...) { return 0; }
+    }
+    
+    if (c != p->rawRepeating)
+        return 0;
+    
+    return shState->runTime() - p->rawRepeatTime;
 }
 
 int Input::dir4Value()

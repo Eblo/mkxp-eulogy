@@ -52,7 +52,10 @@ public:
 		/* Non-standard extensions */
 		MouseLeft = 38, MouseMiddle = 39, MouseRight = 40
 	};
+    
+    void recalcRepeat(unsigned int fps);
 
+    unsigned long long getDelta();
 	void update();
     
     std::vector<std::string> getBindings(ButtonCode code);
@@ -62,11 +65,13 @@ public:
 	bool isRepeated(int button);
     bool isReleased(int button);
     unsigned int count(int button);
+    unsigned long long repeatTime(int button);
     bool isPressedEx(int code, bool isVKey);
     bool isTriggeredEx(int code, bool isVKey);
     bool isRepeatedEx(int code, bool isVKey);
     bool isReleasedEx(int code, bool isVKey);
     unsigned int repeatcount(int code, bool isVKey);
+    unsigned long long repeatTimeEx(int code, bool isVKey);
 
 	int dir4Value();
 	int dir8Value();
