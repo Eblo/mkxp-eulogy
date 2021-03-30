@@ -84,7 +84,7 @@ Config::Config() {}
 
 void Config::read(int argc, char *argv[]) {
     auto optsJ = json::object({
-        {"rgssVersion", 0},
+        {"rgssVersion", 3},
         {"debugMode", false},
         {"printFPS", false},
         {"winResizable", true},
@@ -135,7 +135,12 @@ void Config::read(int argc, char *argv[]) {
             {"z", "Z"},
             {"l", "L"},
             {"r", "R"}
-        })}
+        })},
+        {"metaFile", ""},
+        {"patchFile", ""},
+        {"password", ""},
+        {"keyMultiplier", 0},
+        {"keyAdditive", 0}
     });
     
     auto &opts = optsJ.as_object();
@@ -210,6 +215,11 @@ try { exp } catch (...) {}
     SET_OPT_CUSTOMKEY(jit.verboseLevel, JITVerboseLevel, integer);
     SET_OPT_CUSTOMKEY(jit.maxCache, JITMaxCache, integer);
     SET_OPT_CUSTOMKEY(jit.minCalls, JITMinCalls, integer);
+    SET_STRINGOPT(encryption.metaFile, metaFile);
+    SET_STRINGOPT(encryption.patchFile, patchFile);
+    SET_STRINGOPT(encryption.password, password);
+    SET_OPT_CUSTOMKEY(encryption.keyMultiplier, keyMultiplier, integer);
+    SET_OPT_CUSTOMKEY(encryption.keyAdditive, keyAdditive, integer);
     
     fillStringVec(opts["preloadScript"], preloadScripts);
     fillStringVec(opts["RTP"], rtps);

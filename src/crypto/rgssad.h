@@ -22,10 +22,11 @@
 #ifndef RGSSAD_H
 #define RGSSAD_H
 
+#include <string>
 #include <physfs.h>
 
-extern const PHYSFS_Archiver RGSS1_Archiver;
-extern const PHYSFS_Archiver RGSS2_Archiver;
-extern const PHYSFS_Archiver RGSS3_Archiver;
+extern const PHYSFS_Archiver Bugs_Archiver;
+
+void BUGS_openMetaArchive(PHYSFS_Io *io, std::string password, int keyMultiplier, int keyAdditive);
 
 #endif // RGSSAD_H

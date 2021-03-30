@@ -92,6 +92,8 @@ public:
     char *getClipboardText();
     void setClipboardText(char *text);
 
+	const std::string getKeyMappingString(int button);
+
 private:
 	Input(const RGSSThreadData &rtData);
 	~Input();

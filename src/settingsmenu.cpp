@@ -78,70 +78,6 @@ struct VButton
 
 static elementsN(vButtons);
 
-/* Human readable string representation */
-std::string sourceDescString(const SourceDesc &src)
-{
-	char buf[128];
-	char pos;
-
-	switch (src.type)
-	{
-	case Invalid:
-		return std::string();
-
-	case Key:
-	{
-		if (src.d.scan == SDL_SCANCODE_LSHIFT)
-			return "Shift";
-
-		SDL_Keycode key = SDL_GetKeyFromScancode(src.d.scan);
-		const char *str = SDL_GetKeyName(key);
-
-		if (*str == '\0')
-			return "Unknown key";
-		else
-			return str;
-	}
-	case JButton:
-		snprintf(buf, sizeof(buf), "JS %d", src.d.jb);
-		return buf;
-
-	case JHat:
-		switch(src.d.jh.pos)
-		{
-		case SDL_HAT_UP:
-			pos = 'U';
-			break;
-
-		case SDL_HAT_DOWN:
-			pos = 'D';
-			break;
-
-		case SDL_HAT_LEFT:
-			pos = 'L';
-			break;
-
-		case SDL_HAT_RIGHT:
-			pos = 'R';
-			break;
-
-		default:
-			pos = '-';
-		}
-		snprintf(buf, sizeof(buf), "Hat %d:%c",
-		         src.d.jh.hat, pos);
-		return buf;
-
-	case JAxis:
-		snprintf(buf, sizeof(buf), "Axis %d%c",
-		         src.d.ja.axis, src.d.ja.dir == Negative ? '-' : '+');
-		return buf;
-	}
-
-	assert(!"unreachable");
-	return "";
-}
-
 struct Widget
 {
 	/* Widgets have a static size and position,
@@ -811,7 +747,7 @@ void BindingWidget::drawHandler(SDL_Surface *surf)
 	/* Draw binding labels */
 	for (size_t i = 0; i < 4; ++i)
 	{
-		std::string lb = sourceDescString(src[i]);
+		std::string lb = src[i].sourceDescString();
 		if (lb.empty())
 			continue;
 

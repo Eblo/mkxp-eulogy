@@ -952,17 +952,17 @@ void Graphics::setShowCursor(bool value) {
 double Graphics::getScale() const { return (double)p->scSize.y / p->scRes.y; }
 
 void Graphics::setScale(double factor) {
-    factor = clamp(factor, 0.5, 2.0);
-    
-    if (factor == getScale())
-        return;
-    
-    int widthpx = p->scRes.x * factor;
-    int heightpx = p->scRes.y * factor;
-    
-    shState->eThread().requestWindowResize(widthpx, heightpx);
-    usleep(50000);
-    update();
+  factor = clamp(factor, 1.0, 3.0);
+
+  if (factor == getScale())
+    return;
+
+  int widthpx = p->scRes.x * factor;
+  int heightpx = p->scRes.y * factor;
+
+  shState->eThread().requestWindowResize(widthpx, heightpx);
+  usleep(50000);
+  update();
 }
 
 bool Graphics::getFrameskip() const { return p->useFrameSkip; }

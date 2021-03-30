@@ -463,6 +463,51 @@ RB_METHOD(bitmapInitializeCopy) {
   return self;
 }
 
+RB_METHOD(bitmapMode7) {
+  Bitmap *b = getPrivateData<Bitmap>(self);
+  
+  VALUE srcObj;
+  double rotation, scale;
+  int x, y;
+
+  rb_get_args(argc, argv, "offii", &srcObj, &rotation, &scale, &x, &y RB_ARG_END);
+
+  Bitmap *srcBitmap = getPrivateDataCheck<Bitmap>(srcObj, BitmapType);
+
+  GUARD_EXC(b->setMode7(*srcBitmap, rotation, scale, x, y););
+
+  return self;
+}
+
+RB_METHOD(bitmapTransform) {
+  Bitmap *b = getPrivateData<Bitmap>(self);
+  
+  VALUE srcObj;
+  int transformType, time, amplitude;
+  double frequency, speed;
+
+  rb_get_args(argc, argv, "oiiiff", &srcObj, &transformType, &time, &amplitude, &frequency, &speed RB_ARG_END);
+
+  Bitmap *srcBitmap = getPrivateDataCheck<Bitmap>(srcObj, BitmapType);
+
+  GUARD_EXC(b->setTransform(*srcBitmap, transformType, time, amplitude, frequency, speed););
+
+  return self;
+}
+
+RB_METHOD(bitmapGetRawPNGData) {
+  RB_UNUSED_PARAM;
+
+  Bitmap *b = getPrivateData<Bitmap>(self);
+	// Three bytes per pixel, plus one byte per row for the filter type
+  int size = (b->width()+1) * b->height() * 3;
+  VALUE ret = rb_str_new(0, size);
+
+  GUARD_EXC(b->getRawForPNG(RSTRING_PTR(ret), size););
+
+  return ret;
+}
+
 void bitmapBindingInit() {
   VALUE klass = rb_define_class("Bitmap", rb_cObject);
 #if RAPI_FULL > 187
@@ -499,6 +544,12 @@ void bitmapBindingInit() {
   _rb_define_method(klass, "radial_blur", bitmapRadialBlur);
 
   _rb_define_method(klass, "mega?", bitmapGetMega);
+
+  // Eulogy stuff
+  _rb_define_method(klass, "mode7", bitmapMode7);
+  _rb_define_method(klass, "transform", bitmapTransform);
+  _rb_define_method(klass, "raw_png_data", bitmapGetRawPNGData);
+
   rb_define_singleton_method(klass, "max_size", RUBY_METHOD_FUNC(bitmapGetMaxSize), -1);
 
   INIT_PROP_BIND(Bitmap, Font, "font");

@@ -801,6 +801,168 @@ void Bitmap::radialBlur(int angle, int divisions)
 	p->onModified();
 }
 
+void Bitmap::setMode7(const Bitmap &source, double rot, double scale, int playerX, int playerY)
+{
+	guardDisposed();
+
+	GUARD_MEGA;
+
+	if (source.isDisposed())
+		return;
+	
+	const int _width = width();
+	const int _height = height();
+	const int sourceWidth = source.width();
+	const int sourceHeight = source.height();
+	const int midX = _width >> 1;
+
+	Color color;
+	int pixel;
+	uint8_t newPixels[p->format->BytesPerPixel * _width * _height];
+
+	double px, py;
+    double pxt, pyt;
+    double pz;
+
+	// This defines the point at which the horizon is drawn
+    pz = -_height/4;
+
+	float _rot=((float)rot+180)*0.0174532925f; // Convert angle to radians
+    float rotcos=cos(_rot); // Get X thingy from angle
+	float rotsin=sin(_rot); // Get Y thingy from angle
+
+	// https://gamedev.stackexchange.com/questions/24957/doing-an-snes-mode-7-affine-transform-effect-in-pygame
+    // TODO: Curving the texture with distance?
+    int horizon = _height/4;
+    pz += horizon + 1; // Add 1 to prevent drawing the horizon
+	pixel = horizon * _width * p->format->BytesPerPixel;
+
+	for(int y=horizon; y<_height; y++)
+	{
+        py = y / pz;
+        pyt = py;
+
+        // TODO: The closer to the bottom of the screen (y), the more curved the texture
+
+        for(int x=0; x<_width; x++)
+		{
+            px = (midX - x) / pz;
+
+            pxt = px;
+            px = pxt * rotcos - pyt * rotsin;
+            px *= scale;
+            px += playerX;
+
+            // "scale" essentially functions as the height above the floor
+            py = pxt * rotsin + pyt * rotcos;
+            py *= scale;
+            // If we wanted the player to move at an angle, we would need to do trig
+            // with the coordinates in RM before passing onto the DLL
+            py += playerY;
+            py = fmod(py, sourceHeight);
+            // Use absolute value to mirror the texture
+            // py = abs(py);
+            // Add the max value to repeat it
+            if (py < 0) py += sourceHeight;
+            
+            px = fmod(px, sourceWidth);
+            // Use absolute value to mirror the texture
+            // px = abs(px);
+            // Add the max value to repeat it
+            if (px < 0) px += sourceWidth;
+
+            // Perspective correction
+            // px = width - px;
+            // py = height - py;
+            color = source.getPixel(int(px), int(py));
+			newPixels[pixel++] = color.red;
+			newPixels[pixel++] = color.green;
+			newPixels[pixel++] = color.blue;
+			newPixels[pixel++] = color.alpha;
+        }
+        pz++;
+    }
+	TEX::bind(p->gl.tex);
+	TEX::uploadSubImage(0, 0, _width, _height, &newPixels, GL_RGBA);
+	p->addTaintedArea(IntRect(0, horizon, _width, _height - horizon));
+	p->onModified(false);
+}
+
+void Bitmap::setTransform(const Bitmap &source, int transformType, int time, int amplitude, double frequency, double speed)
+{
+	guardDisposed();
+
+	GUARD_MEGA;
+
+	if (source.isDisposed())
+		return;
+
+	int transX;
+	int transY;
+	int newX;
+	int newY;
+
+	int battlebackWidth = width();
+	int battlebackHeight = height();
+	float phase = time * (speed / 180.0);
+
+	Color color;
+	int pixel = 0;
+	uint8_t newPixels[p->format->BytesPerPixel * battlebackWidth * battlebackHeight];
+	
+	bool xCompress = transformType == Transformation::CrossCompress || transformType == Transformation::XCompress;
+	bool yCompress = transformType == Transformation::CrossCompress || transformType == Transformation::YCompress;
+	bool xSine = transformType == Transformation::CrossSine || transformType == Transformation::XSine;
+	bool ySine = transformType == Transformation::CrossSine || transformType == Transformation::YSine;
+
+	for (int y = 0; y < battlebackHeight; y++)
+	{
+		if(xSine) transX = (amplitude * sin(phase + (frequency * float(y) / speed) * (6.2831853)));
+
+		for (int x = 0; x < battlebackWidth; x++)
+		{
+			// Set pixel of _dest based on function taking _source's arguments
+			// Offset (y, t) = A sin ( F*y + S*t )
+			if(yCompress) transX = (amplitude * sin(phase + (frequency * float(x) / speed) * (6.2831853)));
+			
+			newX = x + transX;
+
+			if(newX < 0) newX += battlebackWidth;
+			if(newX < 0) newX = 0;
+
+			if(newX >= battlebackWidth) newX -= battlebackWidth;
+			if(newX >= battlebackWidth) newX = battlebackWidth - 1;
+
+			if(xCompress) {
+				transY = (amplitude * sin(phase + (frequency * float(y) / speed) * (6.2831853)));
+			} else if (ySine) {
+				transY = (amplitude * sin(phase + (frequency * float(x) / speed) * (6.2831853)));
+			}
+			newY = y + transY;
+
+			if(newY < 0) newY += battlebackHeight;
+			if(newY < 0) newX = 0;
+
+			if(newY >= battlebackHeight) newY -= battlebackHeight;
+			if(newY >= battlebackHeight) newY = battlebackHeight - 1;
+
+			if((xCompress && !yCompress) || (!xSine && ySine)) newX = x;
+			if((xSine && !ySine) || (!xCompress && yCompress)) newY = y;
+
+
+			color = source.getPixel(newX, newY);
+			newPixels[pixel++] = color.red;
+			newPixels[pixel++] = color.green;
+			newPixels[pixel++] = color.blue;
+			newPixels[pixel++] = color.alpha;
+		}
+	}
+	TEX::bind(p->gl.tex);
+	TEX::uploadSubImage(0, 0, battlebackWidth, battlebackHeight, &newPixels, GL_RGBA);
+	p->addTaintedArea(IntRect(0, 0, battlebackWidth, battlebackHeight));
+	p->onModified(false);
+}
+
 void Bitmap::clear()
 {
 	guardDisposed();
@@ -916,6 +1078,37 @@ void Bitmap::replaceRaw(void *pixel_data, int size)
 
     taintArea(IntRect(0,0,w,h));
     p->onModified();
+}
+
+bool Bitmap::getRawForPNG(char *output, int output_size)
+{
+    if (output_size != (width()+1)*height()*3) return false;
+    
+    guardDisposed();
+    
+    GUARD_MEGA;
+
+	Color color;
+
+	int width_ = width();
+	int height_ = height();
+	int index = 0;
+
+	for(int y = 0; y < height_ ; y++)
+	{	
+		// Write scanline byte
+		output[index++] = 0;
+		for(int x = 0; x < width_; x++)
+		{
+			// Write pixel data
+			color = getPixel(x, y);
+			output[index++] = char(color.red);
+			output[index++] = char(color.green);
+			output[index++] = char(color.blue);
+		}
+	}
+    
+    return true;
 }
 
 void Bitmap::saveToFile(const char *filename)
