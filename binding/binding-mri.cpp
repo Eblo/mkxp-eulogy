@@ -47,6 +47,10 @@ extern "C" {
 #endif
 }
 
+#ifdef __WINDOWS__
+#include <fcntl.h>
+#endif
+
 #include <assert.h>
 #include <string>
 #include <zlib.h>
@@ -54,12 +58,6 @@ extern "C" {
 #include <SDL_cpuinfo.h>
 #include <SDL_filesystem.h>
 #include <SDL_power.h>
-
-#ifdef __WIN32__
-#define NULL_IO "NUL"
-#else
-#define NULL_IO "/dev/null"
-#endif
 
 #define MACRO_STRINGIFY(x) #x
 
@@ -70,6 +68,7 @@ extern const char module_rpg3[];
 static void mriBindingExecute();
 static void mriBindingTerminate();
 static void mriBindingReset();
+static void configureWindowsStreams();
 
 ScriptBinding scriptBindingImpl = {mriBindingExecute, mriBindingTerminate,
     mriBindingReset};
@@ -212,7 +211,9 @@ static void mriBindingInit() {
     
     /* Load global constants */
     rb_gv_set("MKXP", Qtrue);
-    rb_const_set(mod, rb_intern("VERSION"), rb_utf8_str_new_cstr(MACRO_STRINGIFY(MKXPZ_VERSION)));
+    VALUE vers = rb_utf8_str_new_cstr(MACRO_STRINGIFY(MKXPZ_VERSION));
+    rb_str_freeze(vers);
+    rb_const_set(mod, rb_intern("VERSION"), vers);
     
     VALUE debug = rb_bool_new(shState->config().editor.debug);
     if (rgssVer == 1)
@@ -221,6 +222,12 @@ static void mriBindingInit() {
         rb_gv_set("TEST", debug);
     
     rb_gv_set("BTEST", rb_bool_new(shState->config().editor.battleTest));
+
+    // Set $stdout and its ilk accordingly on Windows
+#ifdef __WIN32__
+    if (shState->config().editor.debug)
+        configureWindowsStreams();
+#endif
     
     // Load zlib, if it's present. Requires --with-static-linked-ext or zlib.so.
     // It's okay if it fails, normally it wouldn't be defined anyway.
@@ -677,18 +684,7 @@ static void runRMXPScripts(BacktraceData &btData) {
     if (exc != Qnil)
         return;
     
-#ifdef MKXPZ_ESSENTIALS_DEBUG
-    // Used to try and fix Essentials garbage later if it's detected
-    int minimonsters = 0;
-#endif
-    
     while (true) {
-#if RAPI_FULL < 200 && defined(MKXPZ_DISABLE_CONSOLE)
-        VALUE iostr = rb_str_new2(NULL_IO);
-        // Sysinit isn't a thing yet, so send io to /dev/null instead
-        rb_funcall(rb_gv_get("$stderr"), rb_intern("reopen"), 1, iostr);
-        rb_funcall(rb_gv_get("$stdout"), rb_intern("reopen"), 1, iostr);
-#endif
         for (long i = 0; i < scriptCount; ++i) {
             VALUE script = rb_ary_entry(scriptArray, i);
             VALUE scriptDecoded = rb_ary_entry(script, 3);
@@ -747,6 +743,41 @@ static void runRMXPScripts(BacktraceData &btData) {
     }
 }
 #endif
+
+// Attempts to set $stdout and $stdin accordingly on Windows. Only
+// called when debug mode is on, since that's when the console
+// should be active.
+#ifdef __WIN32__
+static void configureWindowsStreams() {
+    #define HANDLE_VALID(handle) handle && handle != INVALID_HANDLE_VALUE
+
+    const HANDLE outputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    // Configure $stdout
+    if (HANDLE_VALID(outputHandle)) {
+        const int stdoutFD = _open_osfhandle((intptr_t)outputHandle, _O_TEXT);
+
+        VALUE winStdout = rb_funcall(rb_cIO, rb_intern("new"), 2,
+            INT2NUM(stdoutFD), rb_str_new_cstr("w"));
+
+        rb_gv_set("stdout", winStdout);
+    }
+
+    const HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
+
+    // Configure $stdin
+    if (HANDLE_VALID(inputHandle)) {
+        const int stdinFD = _open_osfhandle((intptr_t)inputHandle, _O_TEXT);
+
+        VALUE winStdin = rb_funcall(rb_cIO, rb_intern("new"), 2,
+            INT2NUM(stdinFD), rb_str_new_cstr("r"));
+
+        rb_gv_set("stdin", winStdin);
+    }
+
+    #undef HANDLE_VALID
+}
+#endif // #ifdef __WINDOWS__
 
 static void showExc(VALUE exc, const BacktraceData &btData) {
     VALUE bt = rb_funcall2(exc, rb_intern("backtrace"), 0, NULL);
@@ -823,9 +854,15 @@ static void mriBindingExecute() {
     /* Normally only a ruby executable would do a sysinit,
      * but not doing it will lead to crashes due to closed
      * stdio streams on some platforms (eg. Windows) */
+#ifdef __WINDOWS__
+    if (!conf.editor.debug) {
+#endif
     int argc = 0;
     char **argv = 0;
     ruby_sysinit(&argc, &argv);
+#ifdef __WINDOWS__
+    }
+#endif
     
     RUBY_INIT_STACK;
     ruby_init();
@@ -871,6 +908,14 @@ static void mriBindingExecute() {
 #else
     ruby_init();
     rb_eval_string("$KCODE='U'");
+#ifdef __WIN32__
+    if (!conf.editor.debug) {
+        VALUE iostr = rb_str_new2("NUL");
+        // Sysinit isn't a thing yet, so send io to /dev/null instead
+        rb_funcall(rb_gv_get("$stderr"), rb_intern("reopen"), 1, iostr);
+        rb_funcall(rb_gv_get("$stdout"), rb_intern("reopen"), 1, iostr);
+    }
+#endif
 #endif
     
 #if defined(MKXPZ_ESSENTIALS_DEBUG) && !defined(__WIN32__)

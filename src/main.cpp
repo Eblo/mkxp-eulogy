@@ -48,6 +48,7 @@
 #if defined(__WINDOWS__)
 #include "resource.h"
 #include <Winsock2.h>
+#include "util/win-consoleutils.h"
 #endif
 
 #ifdef MKXPZ_STEAM
@@ -199,7 +200,6 @@ int main(int argc, char *argv[]) {
 #endif
     if (!dataDir[0]) {
         strncpy(dataDir, mkxp_fs::getDefaultGameRoot().c_str(), sizeof(dataDir));
-        SDL_free(tmp);
     }
     mkxp_fs::setCurrentDirectory(dataDir);
 #endif
@@ -275,9 +275,6 @@ int main(int argc, char *argv[]) {
       return 0;
     }
 #if defined(__WINDOWS__)
-    // Init winsock, allows socket ops in Ruby to work
-    // MKXP itself doesn't need it so it's a little
-    // hands-off
     WSAData wsadata = {0};
     if (WSAStartup(0x101, &wsadata) || wsadata.wVersion != 0x101) {
       char buf[200];
@@ -285,6 +282,20 @@ int main(int argc, char *argv[]) {
                WSAGetLastError());
       showInitError(
           std::string(buf)); // Not an error worth ending the program over
+    }
+
+    // Create a debug console in debug mode
+    if (conf.editor.debug) {
+      HANDLE winConsoleHandle;
+
+      if (setupWindowsConsole(winConsoleHandle)) {
+        reopenWindowsStreams();
+      } else {
+        char buf[200];
+        snprintf(buf, sizeof(buf), "Error allocating console: %lu",
+                GetLastError());
+        showInitError(std::string(buf));
+      }
     }
 #endif
 
