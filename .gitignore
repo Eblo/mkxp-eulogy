@@ -73,3 +73,6 @@ DerivedData/
 
 ## Gcc Patch
 /*.gcno
+
+# Meson logs
+*.tlog
