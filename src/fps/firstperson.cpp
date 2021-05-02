@@ -291,63 +291,73 @@ void FirstPerson::render3dWalls() {
 }
 
 void FirstPerson::renderSprite(Bitmap *sprite, double spriteX, double spriteY, double spriteZ, double spriteScaleX, double spriteScaleY, int characterIndex, int direction, int pattern, int dw, int dh, int flags) {
-    // TODO: May want to have pointers for these values to prevent needing to fetch them every time
+	// TODO: May want to have pointers for these values to prevent needing to fetch them every time
 	double playerX = RFLOAT_VALUE(rb_ary_entry(p->playerPosA, 0));
 	double playerY = RFLOAT_VALUE(rb_ary_entry(p->playerPosA, 1));
-	
+
 	double playerDirX = RFLOAT_VALUE(rb_ary_entry(p->playerDirA, 0));
 	double playerDirY = RFLOAT_VALUE(rb_ary_entry(p->playerDirA, 1));
 	
 	double planeX = RFLOAT_VALUE(rb_ary_entry(p->planeA, 0));
 	double planeY = RFLOAT_VALUE(rb_ary_entry(p->planeA, 1));
 
-	spriteX = spriteX - playerX + 0.5; // Add 0.5 to center sprite in its tile
-	spriteY = spriteY - playerY + 0.5; // Add 0.5 to center sprite in its tile
-	double spriteAngle = atan2(-spriteY, -spriteX);
-
     int bitmapWidth = sprite->width();
     int bitmapHeight = sprite->height();
 
-	// Loop stepping animation
-	pattern = pattern < STEPPING_ANIMATION_FRAMES ? pattern : 1;
+	spriteX = spriteX - playerX + 0.5; // Add 0.5 to center sprite in its tile
+	spriteY = spriteY - playerY + 0.5; // Add 0.5 to center sprite in its tile
+	int sx, sy;
 
-	// 8-dir spritesheet format (with animation):
-	/*
-		|	111	|	666	|
-		|	222	|	777	|
-		|	333	|	888	|
-		|	444	|	999	|
-	*/
-	// Without animation:
-	/*
-		|	1	|	6	|
-		|	2	|	7	|
-		|	3	|	8	|
-		|	4	|	9	|
-	*/
-	if ((flags & DIRECTION_FIX) != DIRECTION_FIX) {
-		// Range: -PI to PI
-		if(ANGLE_4_7 < spriteAngle && ANGLE_4_6 >= spriteAngle) {
-			direction = directions[direction][4];
-		} else if(ANGLE_4_6 < spriteAngle && ANGLE_2_6 >= spriteAngle) {
-			direction = directions[direction][1];
-		} else if(ANGLE_2_6 < spriteAngle && ANGLE_2_8 >= spriteAngle) {
-			direction = directions[direction][2];
-		} else if((ANGLE_2_8 < spriteAngle && ANGLE_8_A >= spriteAngle) || (ANGLE_8_B < spriteAngle && ANGLE_8_9 >= spriteAngle)) {
-			direction = directions[direction][3];
-		} else if(ANGLE_8_9 < spriteAngle && ANGLE_3_9 >= spriteAngle) {
-			direction = directions[direction][9];
-		} else if(ANGLE_3_9 < spriteAngle && ANGLE_3_7 >= spriteAngle) {
-			direction = directions[direction][8];
-		} else if(ANGLE_3_7 < spriteAngle && ANGLE_4_7 >= spriteAngle) {
-			direction = directions[direction][7];
-		} else { // +-pi
-			direction = directions[direction][6];
+	if ((flags & IS_ANIMATION) == IS_ANIMATION) {
+		// Rendering animation sprite, ignore angle and character logic
+		sx = (pattern % 5) * (bitmapWidth / dw); //(pattern) * (sprite->width() / dw);
+		sy = (pattern / 5) * (bitmapHeight / dh); //(sprite->height() / dh);
+	} else {
+
+		// 8-dir spritesheet format (with stepping animation):
+		/*
+			|	111	|	666	|
+			|	222	|	777	|
+			|	333	|	888	|
+			|	444	|	999	|
+		*/
+		// Without animation:
+		/*
+			|	1	|	6	|
+			|	2	|	7	|
+			|	3	|	8	|
+			|	4	|	9	|
+		*/
+
+		if ((flags & DIRECTION_FIX) != DIRECTION_FIX) {
+			double spriteAngle = atan2(-spriteY, -spriteX);
+			// Range: -PI to PI
+			if(ANGLE_4_7 < spriteAngle && ANGLE_4_6 >= spriteAngle) {
+				direction = directions[direction][4];
+			} else if(ANGLE_4_6 < spriteAngle && ANGLE_2_6 >= spriteAngle) {
+				direction = directions[direction][1];
+			} else if(ANGLE_2_6 < spriteAngle && ANGLE_2_8 >= spriteAngle) {
+				direction = directions[direction][2];
+			} else if((ANGLE_2_8 < spriteAngle && ANGLE_8_A >= spriteAngle) || (ANGLE_8_B < spriteAngle && ANGLE_8_9 >= spriteAngle)) {
+				direction = directions[direction][3];
+			} else if(ANGLE_8_9 < spriteAngle && ANGLE_3_9 >= spriteAngle) {
+				direction = directions[direction][9];
+			} else if(ANGLE_3_9 < spriteAngle && ANGLE_3_7 >= spriteAngle) {
+				direction = directions[direction][8];
+			} else if(ANGLE_3_7 < spriteAngle && ANGLE_4_7 >= spriteAngle) {
+				direction = directions[direction][7];
+			} else { // +-pi
+				direction = directions[direction][6];
+			}
 		}
+
+		// Loop stepping animation
+		pattern = pattern < STEPPING_ANIMATION_FRAMES ? pattern : 1;
+
+		int frames = (flags & NO_ANIMATION) == NO_ANIMATION ? 1 : STEPPING_ANIMATION_FRAMES;
+		sx = ((characterIndex % 4 * frames + pattern) + (direction / 5) * frames) * (sprite->width() / dw);
+		sy = (characterIndex / 4 * 4) + ((direction - 1) % 5) * (sprite->height() / dh);
 	}
-	int frames = (flags & NO_ANIMATION) == NO_ANIMATION ? 1 : STEPPING_ANIMATION_FRAMES;
-	int sx = ((characterIndex % 4 * frames + pattern) + (direction / 5) * frames) * (bitmapWidth / dw);
-	int sy = (characterIndex / 4 * 4) + ((direction - 1) % 5) * (bitmapHeight / dh);
 	
 	//transform sprite with the inverse camera matrix
 	float invDet = 1.0 / (planeX * playerDirY - playerDirX * planeY);
