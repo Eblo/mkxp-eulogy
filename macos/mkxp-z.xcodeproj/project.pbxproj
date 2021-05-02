@@ -286,6 +286,14 @@
 		3B97F77625E6182100A569B5 /* libSDL2_sound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B97F77525E6182100A569B5 /* libSDL2_sound.a */; };
 		3B97F77725E6182100A569B5 /* libSDL2_sound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B97F77525E6182100A569B5 /* libSDL2_sound.a */; };
 		3BA08E9B256638C900449CFF /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD2B46925651C1B003DAD8A /* AudioToolbox.framework */; };
+		3BA69454263DAB53004194EB /* libnsgif.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944E263DAB53004194EB /* libnsgif.c */; };
+		3BA69455263DAB53004194EB /* libnsgif.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944E263DAB53004194EB /* libnsgif.c */; };
+		3BA69456263DAB53004194EB /* libnsgif.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944E263DAB53004194EB /* libnsgif.c */; };
+		3BA69457263DAB53004194EB /* libnsgif.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944E263DAB53004194EB /* libnsgif.c */; };
+		3BA69458263DAB53004194EB /* lzw.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944F263DAB53004194EB /* lzw.c */; };
+		3BA69459263DAB53004194EB /* lzw.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944F263DAB53004194EB /* lzw.c */; };
+		3BA6945A263DAB53004194EB /* lzw.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944F263DAB53004194EB /* lzw.c */; };
+		3BA6945B263DAB53004194EB /* lzw.c in Sources */ = {isa = PBXBuildFile; fileRef = 3BA6944F263DAB53004194EB /* lzw.c */; };
 		3BC65CCD2584EDC60063AFF1 /* tilemapvx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B10ED7D2568E95D00372D13 /* tilemapvx.cpp */; };
 		3BC65CCF2584EDC60063AFF1 /* rgssad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B10ED382568E95D00372D13 /* rgssad.cpp */; };
 		3BC65CD02584EDC60063AFF1 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B10ED462568E95D00372D13 /* input.cpp */; };
@@ -749,6 +757,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3B012198261544A0001E574A /* string-util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "string-util.h"; sourceTree = "<group>"; };
 		3B10EC832568E78400372D13 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = ../assets/icon.png; sourceTree = "<group>"; };
 		3B10EC842568E78400372D13 /* liberation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = liberation.ttf; path = ../assets/liberation.ttf; sourceTree = "<group>"; };
 		3B10EC852568E78400372D13 /* wqymicrohei.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = wqymicrohei.ttf; path = ../assets/wqymicrohei.ttf; sourceTree = "<group>"; };
@@ -891,7 +900,6 @@
 		3B10EDE02568E96A00372D13 /* sceneelement-binding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "sceneelement-binding.h"; sourceTree = "<group>"; };
 		3B10EDE12568E96A00372D13 /* tilemapvx-binding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "tilemapvx-binding.cpp"; sourceTree = "<group>"; };
 		3B10EDE22568E96A00372D13 /* module_rpg2.rb.xxd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = module_rpg2.rb.xxd; sourceTree = "<group>"; };
-		3B10EDE32568E96A00372D13 /* meson.build */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = meson.build; sourceTree = "<group>"; };
 		3B10EDE42568E96A00372D13 /* bitmap-binding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "bitmap-binding.cpp"; sourceTree = "<group>"; };
 		3B10EDE52568E96A00372D13 /* table-binding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "table-binding.cpp"; sourceTree = "<group>"; };
 		3B10EDE62568E96A00372D13 /* etc-binding.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "etc-binding.cpp"; sourceTree = "<group>"; };
@@ -954,6 +962,7 @@
 		3B522DDB259C1E53003301C4 /* http-binding.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "http-binding.cpp"; sourceTree = "<group>"; };
 		3B522DE3259C2017003301C4 /* LUrlParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LUrlParser.h; sourceTree = "<group>"; };
 		3B522DE4259C2039003301C4 /* LUrlParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LUrlParser.cpp; sourceTree = "<group>"; };
+		3B58E90F26293A9D001F9031 /* shim.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = shim.entitlements; sourceTree = "<group>"; };
 		3B5A84052569B56F00BAF2E5 /* config.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = config.cpp; sourceTree = "<group>"; };
 		3B5A840C2569BE7C00BAF2E5 /* filesystemImplApple.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = filesystemImplApple.mm; sourceTree = "<group>"; };
 		3B5A84132569C28B00BAF2E5 /* filesystemImpl.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = filesystemImpl.cpp; sourceTree = "<group>"; };
@@ -970,6 +979,11 @@
 		3B97F77525E6182100A569B5 /* libSDL2_sound.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_sound.a; path = "Dependencies/build-macosx-x86_64/lib/libSDL2_sound.a"; sourceTree = "<group>"; };
 		3BA08EA4256641ED00449CFF /* Assets.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Assets.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BA08EA6256641EE00449CFF /* Assets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Assets.plist; sourceTree = "<group>"; };
+		3BA6944E263DAB53004194EB /* libnsgif.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = libnsgif.c; sourceTree = "<group>"; };
+		3BA6944F263DAB53004194EB /* lzw.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lzw.c; sourceTree = "<group>"; };
+		3BA69451263DAB53004194EB /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		3BA69452263DAB53004194EB /* lzw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lzw.h; sourceTree = "<group>"; };
+		3BA69453263DAB53004194EB /* libnsgif.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libnsgif.h; sourceTree = "<group>"; };
 		3BC65D442584EDC60063AFF1 /* Z.arm.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Z.arm.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3BC65D4A2584EED10063AFF1 /* libvorbis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbis.a; path = "Dependencies/build-macosx-arm64/lib/libvorbis.a"; sourceTree = "<group>"; };
 		3BC65D4B2584EED10063AFF1 /* libpixman-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libpixman-1.a"; path = "Dependencies/build-macosx-arm64/lib/libpixman-1.a"; sourceTree = "<group>"; };
@@ -1001,7 +1015,7 @@
 		3BC65D882584F3780063AFF1 /* libpixman-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libpixman-1.a"; path = "Dependencies/build-macosx-universal/lib/libpixman-1.a"; sourceTree = "<group>"; };
 		3BC65D892584F3910063AFF1 /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2main.a; path = "Dependencies/build-macosx-universal/lib/libSDL2main.a"; sourceTree = "<group>"; };
 		3BC65E152584F3AD0063AFF1 /* Z.universal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Z.universal.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BD2B3AF25651885003DAD8A /* entitlements.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = entitlements.plist; sourceTree = "<group>"; };
+		3BD2B3AF25651885003DAD8A /* mkxp.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = mkxp.entitlements; sourceTree = "<group>"; };
 		3BD2B46525651BF3003DAD8A /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		3BD2B46625651BFC003DAD8A /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		3BD2B46725651C00003DAD8A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1321,6 +1335,7 @@
 				3B10ED3D2568E95D00372D13 /* serializable.h */,
 				3B10ED3E2568E95D00372D13 /* disposable.h */,
 				3B10ED3F2568E95D00372D13 /* serial-util.h */,
+				3B012198261544A0001E574A /* string-util.h */,
 				3B10ED402568E95D00372D13 /* util.h */,
 				3B10ED412568E95D00372D13 /* exception.h */,
 				3B10ED422568E95D00372D13 /* debugwriter.h */,
@@ -1404,6 +1419,7 @@
 		3B10ED6F2568E95D00372D13 /* display */ = {
 			isa = PBXGroup;
 			children = (
+				3BA6944D263DAB53004194EB /* libnsgif */,
 				3B10ED7E2568E95D00372D13 /* gl */,
 				3B10ED702568E95D00372D13 /* tilemap.h */,
 				3B10ED712568E95D00372D13 /* tilemap-common.h */,
@@ -1483,7 +1499,6 @@
 				3B10EDE02568E96A00372D13 /* sceneelement-binding.h */,
 				3B10EDE12568E96A00372D13 /* tilemapvx-binding.cpp */,
 				3B10EDE22568E96A00372D13 /* module_rpg2.rb.xxd */,
-				3B10EDE32568E96A00372D13 /* meson.build */,
 				3B10EDE42568E96A00372D13 /* bitmap-binding.cpp */,
 				3B10EDE52568E96A00372D13 /* table-binding.cpp */,
 				3B10EDE62568E96A00372D13 /* etc-binding.cpp */,
@@ -1602,6 +1617,26 @@
 			path = misc;
 			sourceTree = "<group>";
 		};
+		3BA6944D263DAB53004194EB /* libnsgif */ = {
+			isa = PBXGroup;
+			children = (
+				3BA6944E263DAB53004194EB /* libnsgif.c */,
+				3BA6944F263DAB53004194EB /* lzw.c */,
+				3BA69450263DAB53004194EB /* utils */,
+				3BA69452263DAB53004194EB /* lzw.h */,
+				3BA69453263DAB53004194EB /* libnsgif.h */,
+			);
+			path = libnsgif;
+			sourceTree = "<group>";
+		};
+		3BA69450263DAB53004194EB /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				3BA69451263DAB53004194EB /* log.h */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
 		3BC65D492584EE690063AFF1 /* ARM64 */ = {
 			isa = PBXGroup;
 			children = (
@@ -1662,7 +1697,8 @@
 				3B1C240B25A1A43B0075EF5D /* steam */,
 				3B1C231D25A15F8F0075EF5D /* mkxp */,
 				3BD2B7282565B35D003DAD8A /* mkxp.json */,
-				3BD2B3AF25651885003DAD8A /* entitlements.plist */,
+				3BD2B3AF25651885003DAD8A /* mkxp.entitlements */,
+				3B58E90F26293A9D001F9031 /* shim.entitlements */,
 				3BDB25C52565184600C4A63D /* Info.plist */,
 			);
 			name = Configuration;
@@ -1908,7 +1944,7 @@
 		3BDB22EC25644FBF00C4A63D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1250;
 				TargetAttributes = {
 					3B1C235525A199370075EF5D = {
 						CreatedOnToolsVersion = 12.3;
@@ -2037,6 +2073,7 @@
 				3B1C239425A19C600075EF5D /* etc.cpp in Sources */,
 				3B1C239525A19C600075EF5D /* shader.cpp in Sources */,
 				3B1C239625A19C600075EF5D /* tilemap.cpp in Sources */,
+				3BA6945B263DAB53004194EB /* lzw.c in Sources */,
 				3B1C239825A19C600075EF5D /* window.cpp in Sources */,
 				3B1C239A25A19C600075EF5D /* input-binding.cpp in Sources */,
 				3B1C239B25A19C600075EF5D /* keybindings.cpp in Sources */,
@@ -2050,6 +2087,7 @@
 				3B1C23A525A19C600075EF5D /* tilemapvx-binding.cpp in Sources */,
 				3B1C23A625A19C600075EF5D /* window-binding.cpp in Sources */,
 				3B1C23A725A19C600075EF5D /* midisource.cpp in Sources */,
+				3BA69457263DAB53004194EB /* libnsgif.c in Sources */,
 				3B1C23A825A19C600075EF5D /* graphics-binding.cpp in Sources */,
 				3B1C23A925A19C600075EF5D /* plane.cpp in Sources */,
 				3B1C23AA25A19C600075EF5D /* tilequad.cpp in Sources */,
@@ -2089,6 +2127,7 @@
 				3B522DDE259C1E53003301C4 /* http-binding.cpp in Sources */,
 				3BC65CCD2584EDC60063AFF1 /* tilemapvx.cpp in Sources */,
 				3BC65CCF2584EDC60063AFF1 /* rgssad.cpp in Sources */,
+				3BA6945A263DAB53004194EB /* lzw.c in Sources */,
 				3BC65CD02584EDC60063AFF1 /* input.cpp in Sources */,
 				3BC65CD12584EDC60063AFF1 /* tilemap-binding.cpp in Sources */,
 				3BC65CD22584EDC60063AFF1 /* audio.cpp in Sources */,
@@ -2101,6 +2140,7 @@
 				3BC65CD82584EDC60063AFF1 /* bitmap-binding.cpp in Sources */,
 				3BC65CD92584EDC60063AFF1 /* vorbissource.cpp in Sources */,
 				3BC65CDB2584EDC60063AFF1 /* filesystem-binding.cpp in Sources */,
+				3BA69456263DAB53004194EB /* libnsgif.c in Sources */,
 				3BC65CDD2584EDC60063AFF1 /* glstate.cpp in Sources */,
 				3BC65CDE2584EDC60063AFF1 /* gl-fun.cpp in Sources */,
 				3BC65CDF2584EDC60063AFF1 /* sprite-binding.cpp in Sources */,
@@ -2165,6 +2205,7 @@
 				3B522DDC259C1E53003301C4 /* http-binding.cpp in Sources */,
 				3BC65D8E2584F3AD0063AFF1 /* tilemapvx.cpp in Sources */,
 				3BC65D902584F3AD0063AFF1 /* rgssad.cpp in Sources */,
+				3BA69458263DAB53004194EB /* lzw.c in Sources */,
 				3BC65D912584F3AD0063AFF1 /* input.cpp in Sources */,
 				3BC65D922584F3AD0063AFF1 /* tilemap-binding.cpp in Sources */,
 				3BC65D932584F3AD0063AFF1 /* audio.cpp in Sources */,
@@ -2177,6 +2218,7 @@
 				3BC65D992584F3AD0063AFF1 /* bitmap-binding.cpp in Sources */,
 				3BC65D9A2584F3AD0063AFF1 /* vorbissource.cpp in Sources */,
 				3BC65D9C2584F3AD0063AFF1 /* filesystem-binding.cpp in Sources */,
+				3BA69454263DAB53004194EB /* libnsgif.c in Sources */,
 				3BC65D9E2584F3AD0063AFF1 /* glstate.cpp in Sources */,
 				3BC65D9F2584F3AD0063AFF1 /* gl-fun.cpp in Sources */,
 				3BC65DA02584F3AD0063AFF1 /* sprite-binding.cpp in Sources */,
@@ -2241,6 +2283,7 @@
 				3B522DDD259C1E53003301C4 /* http-binding.cpp in Sources */,
 				3B10EDC22568E95E00372D13 /* tilemapvx.cpp in Sources */,
 				3B10EDA72568E95E00372D13 /* rgssad.cpp in Sources */,
+				3BA69459263DAB53004194EB /* lzw.c in Sources */,
 				3B10EDA82568E95E00372D13 /* input.cpp in Sources */,
 				3B10EE022568E96A00372D13 /* tilemap-binding.cpp in Sources */,
 				3B10EDB72568E95E00372D13 /* audio.cpp in Sources */,
@@ -2253,6 +2296,7 @@
 				3B10EDFF2568E96A00372D13 /* bitmap-binding.cpp in Sources */,
 				3B10EDBA2568E95E00372D13 /* vorbissource.cpp in Sources */,
 				3B10EDF62568E96A00372D13 /* filesystem-binding.cpp in Sources */,
+				3BA69455263DAB53004194EB /* libnsgif.c in Sources */,
 				3B10EDC92568E95E00372D13 /* glstate.cpp in Sources */,
 				3B10EDCC2568E95E00372D13 /* gl-fun.cpp in Sources */,
 				3B10EDFB2568E96A00372D13 /* sprite-binding.cpp in Sources */,
@@ -2376,10 +2420,12 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = shim.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -2445,10 +2491,12 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_ENTITLEMENTS = shim.entitlements;
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -2510,10 +2558,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -2542,7 +2589,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.1.2;
 				MKXPZ_EXECUTABLE_NAME = shim;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -2589,10 +2636,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -2619,7 +2665,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.1.2;
 				MKXPZ_EXECUTABLE_NAME = shim;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -2802,10 +2848,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -2830,7 +2875,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-arm64/lib",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.1.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -2875,10 +2920,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -2901,7 +2945,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-arm64/lib",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
@@ -2944,10 +2988,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -2985,7 +3028,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-universal/lib",
 				);
-				MARKETING_VERSION = 2.1.1;
+				MARKETING_VERSION = 2.1.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3029,10 +3072,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3068,7 +3110,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-universal/lib",
 				);
-				MARKETING_VERSION = 2.1.1;
+				MARKETING_VERSION = 2.1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
@@ -3111,10 +3153,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3139,7 +3180,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.1.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -3183,10 +3224,9 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_ENTITLEMENTS = "$(PROJECT_DIR)/entitlements.plist";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.1;
+				CURRENT_PROJECT_VERSION = 2.1.2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -3209,7 +3249,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
