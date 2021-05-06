@@ -42,7 +42,9 @@ public:
 	Bitmap(int width, int height);
     Bitmap(void *pixeldata, int width, int height);
 	/* Clone constructor */
-	Bitmap(const Bitmap &other);
+    
+    // frame is -2 for "any and all", -1 for "current", anything else for a specific frame
+	Bitmap(const Bitmap &other, int frame = -2);
 	~Bitmap();
 
 	int width()  const;
@@ -82,7 +84,6 @@ public:
 
 	void setMode7(const Bitmap &source, double rot, double scale, int x, int y);
 	void setTransform(const Bitmap &source, int transformType, int time, int amplitude, double frequency, double speed);
-    bool getRawForPNG(char *output, int output_size);
 
 	void clear();
 
@@ -128,26 +129,38 @@ public:
 	void setInitFont(Font *value);
 
 	/* <internal> */
-	TEXFBO &getGLTypes();
+	TEXFBO &getGLTypes() const;
+    SDL_Surface *surface() const;
 	SDL_Surface *megaSurface() const;
 	void ensureNonMega() const;
     void ensureNonAnimated() const;
+    void ensureAnimated() const;
     
-    // GIF functions
+    // Animation functions
     void stop();
     void play();
-    bool isPlaying();
+    bool isPlaying() const;
     void gotoAndStop(int frame);
     void gotoAndPlay(int frame);
-    int numFrames();
+    int numFrames() const;
     int currentFrameI() const;
     
+    int addFrame(Bitmap &source, int position = -1);
+    void removeFrame(int position = -1);
+    
+    void nextFrame();
+    void previousFrame();
+    std::vector<TEXFBO> &getFrames() const;
+    
     void setAnimationFPS(float FPS);
-    float getAnimationFPS();
+    float getAnimationFPS() const;
     
     void setLooping(bool loop);
-    bool getLooping();
+    bool getLooping() const;
 
+    void ensureNotPlaying() const;
+    // ----------
+    
 	/* Binds the backing texture and sets the correct
 	 * texture size uniform in shader */
 	void bindTex(ShaderBase &shader);
