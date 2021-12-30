@@ -1311,37 +1311,6 @@ void Bitmap::replaceRaw(void *pixel_data, int size)
     p->onModified();
 }
 
-bool Bitmap::getRawForPNG(char *output, int output_size)
-{
-    if (output_size != (width()+1)*height()*3) return false;
-    
-    guardDisposed();
-    
-    GUARD_MEGA;
-
-	Color color;
-
-	int width_ = width();
-	int height_ = height();
-	int index = 0;
-
-	for(int y = 0; y < height_ ; y++)
-	{	
-		// Write scanline byte
-		output[index++] = 0;
-		for(int x = 0; x < width_; x++)
-		{
-			// Write pixel data
-			color = getPixel(x, y);
-			output[index++] = char(color.red);
-			output[index++] = char(color.green);
-			output[index++] = char(color.blue);
-		}
-	}
-    
-    return true;
-}
-
 void Bitmap::saveToFile(const char *filename)
 {
     guardDisposed();
