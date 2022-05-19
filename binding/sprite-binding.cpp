@@ -81,6 +81,7 @@ DEF_GFX_PROP_F(Sprite, PatternZoomX)
 DEF_GFX_PROP_F(Sprite, PatternZoomY)
 
 DEF_GFX_PROP_B(Sprite, Mirror)
+DEF_GFX_PROP_B(Sprite, VMirror)
 DEF_GFX_PROP_B(Sprite, PatternTile)
 DEF_GFX_PROP_B(Sprite, Invert)
 
@@ -130,6 +131,7 @@ void spriteBindingInit() {
     INIT_PROP_BIND(Sprite, ZoomY, "zoom_y");
     INIT_PROP_BIND(Sprite, Angle, "angle");
     INIT_PROP_BIND(Sprite, Mirror, "mirror");
+    INIT_PROP_BIND(Sprite, VMirror, "v_mirror");
     INIT_PROP_BIND(Sprite, BushDepth, "bush_depth");
     INIT_PROP_BIND(Sprite, Opacity, "opacity");
     INIT_PROP_BIND(Sprite, BlendType, "blend_type");

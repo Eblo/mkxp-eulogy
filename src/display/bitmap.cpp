@@ -1838,8 +1838,8 @@ void Bitmap::setMode7(const Bitmap &source, double rot, double scale, int player
     pz = -_height/4;
 
 	float _rot=((float)rot+180)*0.0174532925f; // Convert angle to radians
-    float rotcos=cos(_rot); // Get X thingy from angle
-	float rotsin=sin(_rot); // Get Y thingy from angle
+    float rotcos=FASTCOS(_rot); // Get X thingy from angle
+	float rotsin=FASTSIN(_rot); // Get Y thingy from angle
 
 	// https://gamedev.stackexchange.com/questions/24957/doing-an-snes-mode-7-affine-transform-effect-in-pygame
     // TODO: Curving the texture with distance?
@@ -1927,13 +1927,21 @@ void Bitmap::setTransform(const Bitmap &source, int transformType, int time, int
 
 	for (int y = 0; y < battlebackHeight; y++)
 	{
-		if(xSine) transX = (amplitude * sin(phase + (frequency * float(y) / speed) * (6.2831853)));
+		if(xSine) {
+            transX = (amplitude * FASTSIN(phase + (frequency * float(y) / speed) * (6.2831853)));
+        } else if (xCompress) {
+            transY = (amplitude * FASTSIN(phase + (frequency * float(y) / speed) * (6.2831853)));
+        }
 
 		for (int x = 0; x < battlebackWidth; x++)
 		{
 			// Set pixel of _dest based on function taking _source's arguments
 			// Offset (y, t) = A sin ( F*y + S*t )
-			if(yCompress) transX = (amplitude * sin(phase + (frequency * float(x) / speed) * (6.2831853)));
+			if(ySine) {
+				transY = (amplitude * FASTSIN(phase + (frequency * float(x) / speed) * (6.2831853)));
+			}else if(yCompress) {
+                transX = (amplitude * FASTSIN(phase + (frequency * float(x) / speed) * (6.2831853)));
+            }
 			
 			newX = x + transX;
 
@@ -1942,12 +1950,6 @@ void Bitmap::setTransform(const Bitmap &source, int transformType, int time, int
 
 			if(newX >= battlebackWidth) newX -= battlebackWidth;
 			if(newX >= battlebackWidth) newX = battlebackWidth - 1;
-
-			if(xCompress) {
-				transY = (amplitude * sin(phase + (frequency * float(y) / speed) * (6.2831853)));
-			} else if (ySine) {
-				transY = (amplitude * sin(phase + (frequency * float(x) / speed) * (6.2831853)));
-			}
 			newY = y + transY;
 
 			if(newY < 0) newY += battlebackHeight;

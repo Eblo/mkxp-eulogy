@@ -258,6 +258,11 @@ struct FloatRect
 	{
 		return FloatRect(x+w, y, -w, h);
 	}
+
+	FloatRect vFlipped() const
+	{
+		return FloatRect(x, y+h, w, -h);
+	}
 };
 
 /* Value between 0 and 255 with internal

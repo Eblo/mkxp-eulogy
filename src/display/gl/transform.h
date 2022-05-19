@@ -48,8 +48,8 @@
 #define TRANSFORM_H
 
 #include "etc-internal.h"
+#include "trig.h"
 
-#include <math.h>
 #include <string.h>
 
 class Transform
@@ -133,8 +133,8 @@ private:
 		//	rotation += 360;
 
 		float angle  = rotation * 3.141592654f / 180.0f;
-		float cosine = (float) cos(angle);
-		float sine   = (float) sin(angle);
+		float cosine = float(FASTCOS(angle));
+		float sine   = float(FASTSIN(angle));
 		float sxc    = scale.x * cosine;
 		float syc    = scale.y * cosine;
 		float sxs    = scale.x * sine;
