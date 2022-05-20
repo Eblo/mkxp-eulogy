@@ -34,6 +34,8 @@
 #include "glstate.h"
 #include "quadarray.h"
 
+#include "binding-util.h"
+
 #include <math.h>
 #ifndef M_PI
 # define M_PI 3.14159265358979323846
@@ -88,6 +90,8 @@ struct SpritePrivate
     
     Color *color;
     Tone *tone;
+
+    VALUE* shaderArr;
     
     struct
     {
@@ -123,7 +127,8 @@ struct SpritePrivate
     invert(false),
     isVisible(false),
     color(&tmp.color),
-    tone(&tmp.tone)
+    tone(&tmp.tone),
+	shaderArr(0)
     
     {
         sceneRect.x = sceneRect.y = 0;
@@ -363,6 +368,7 @@ DEF_ATTR_RD_SIMPLE(Sprite, WaveAmp,    int,     p->wave.amp)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveLength, int,     p->wave.length)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveSpeed,  int,     p->wave.speed)
 DEF_ATTR_RD_SIMPLE(Sprite, WavePhase,  float,   p->wave.phase)
+DEF_ATTR_RD_SIMPLE(Sprite, ShaderArr,  VALUE*,  p->shaderArr)
 
 DEF_ATTR_SIMPLE(Sprite, BushOpacity, int,     p->bushOpacity)
 DEF_ATTR_SIMPLE(Sprite, Opacity,     int,     p->opacity)

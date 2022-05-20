@@ -27,6 +27,7 @@
 #include "sharedstate.h"
 #include "sprite.h"
 #include "viewportelement-binding.h"
+#include "shadable-element-binding.h"
 
 #if RAPI_FULL > 187
 DEF_TYPE(Sprite);
@@ -37,6 +38,8 @@ DEF_ALLOCFUNC(Sprite);
 RB_METHOD(spriteInitialize) {
     GFX_LOCK;
     Sprite *s = viewportElementInitialize<Sprite>(argc, argv, self);
+
+    shadableElementIntialize<Sprite>(self, s);
     
     setPrivateData(self, s);
     
@@ -125,6 +128,7 @@ void spriteBindingInit() {
     disposableBindingInit<Sprite>(klass);
     flashableBindingInit<Sprite>(klass);
     viewportElementBindingInit<Sprite>(klass);
+	shadableElementBindingInit(klass);
     
     _rb_define_method(klass, "initialize", spriteInitialize);
     
