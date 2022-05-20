@@ -121,7 +121,7 @@ void FirstPerson::render3dWalls() {
 
     double distX, distY;
     double sideDistX, sideDistY;
-    double perpWallDist, distWall, currentDist;
+    double perpWallDist, currentDist;
     
     double drawStart, drawEnd;
     double weight;
@@ -146,8 +146,8 @@ void FirstPerson::render3dWalls() {
 		rayDirX = p->playerDirX + p->planeX*cameraX;
 		rayDirY = p->playerDirY + p->planeY*cameraX;
 		
-		distX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
-		distY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
+		distX = (rayDirX == 0) ? 1e30 : abs(1 / rayDirX);
+		distY = (rayDirY == 0) ? 1e30 : abs(1 / rayDirY);
 		
 		if(rayDirX < 0) {
 			stepX = -1;
@@ -182,17 +182,17 @@ void FirstPerson::render3dWalls() {
 		}
         
 		if(side == 0) {
-			perpWallDist = (mapX - p->playerX + (1-stepX) / 2) / rayDirX;
+			perpWallDist = sideDistX - distX;
 			wallX = p->playerY + perpWallDist * rayDirY;			
 		} else {
-			perpWallDist = (mapY - p->playerY + (1-stepY) / 2) / rayDirY;
+			perpWallDist = sideDistY - distY;
 			wallX = p->playerX + perpWallDist * rayDirX;
-		}		
+		}
  		p->zBuffer[column/p->resolution] = perpWallDist;
-		
-		wallX -= floor(wallX);		
+		wallX -= floor(wallX);
+		// If wallX is a whole number, we get 0, which throws off calculations
+		if(wallX == 0) wallX = 0.999;
 		p->texX = int(double(p->texWidth) * (1 - wallX));
-		
 		// Calculate direction hitting wall for floor purposes
 		if(side == 0 && rayDirX > 0) {
 			floorXWall = mapX;
@@ -231,7 +231,6 @@ void FirstPerson::render3dWalls() {
 		p->wallFloorCeilWeight = 1.0-p->fogWeight;
 		p->shade = side == 1 ? 0.8 : 1.0;
         
-		distWall = perpWallDist;
 		for(int y = 0; y < p->screenHeight; y++) {
             if(y <= drawEnd && y >= drawStart) { // Wall
 				p->texY = std::min(p->texHeight - 1, int((float(y-drawStart) / lineHeight) * p->texHeight));
@@ -248,7 +247,7 @@ void FirstPerson::render3dWalls() {
                     textureFormat = 0xFF0000;
                     textureShift = 16;
                 }
-				weight = currentDist / distWall;
+				weight = currentDist / perpWallDist;
 				currentFloorX = weight*floorXWall + (1.0 - weight) * p->playerX;
 				currentFloorY = weight*floorYWall + (1.0 - weight) * p->playerY;
 				
