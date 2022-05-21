@@ -368,7 +368,6 @@ DEF_ATTR_RD_SIMPLE(Sprite, WaveAmp,    int,     p->wave.amp)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveLength, int,     p->wave.length)
 DEF_ATTR_RD_SIMPLE(Sprite, WaveSpeed,  int,     p->wave.speed)
 DEF_ATTR_RD_SIMPLE(Sprite, WavePhase,  float,   p->wave.phase)
-DEF_ATTR_RD_SIMPLE(Sprite, ShaderArr,  VALUE*,  p->shaderArr)
 
 DEF_ATTR_SIMPLE(Sprite, BushOpacity, int,     p->bushOpacity)
 DEF_ATTR_SIMPLE(Sprite, Opacity,     int,     p->opacity)
@@ -388,6 +387,7 @@ DEF_ATTR_RD_SIMPLE(Sprite, TransformAmplitudeY, float, p->transformation.amplitu
 DEF_ATTR_RD_SIMPLE(Sprite, TransformFrequency, float, p->transformation.frequency)
 DEF_ATTR_RD_SIMPLE(Sprite, TransformSpeed, float, p->transformation.speed)
 DEF_ATTR_SIMPLE(Sprite, Invert,      bool,    p->invert)
+DEF_ATTR_RD_SIMPLE(Sprite, ShaderArr,  VALUE*,  p->shaderArr)
 
 void Sprite::setBitmap(Bitmap *bitmap)
 {

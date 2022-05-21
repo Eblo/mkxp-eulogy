@@ -25,6 +25,7 @@ embedded_shaders = [
     'blurH.vert',
     'blurV.vert',
     'simpleMatrix.vert'
+    'rb_simple.vert'
 ]
 
 embedded_shaders_f = files(embedded_shaders)
