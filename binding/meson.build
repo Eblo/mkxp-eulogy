@@ -15,6 +15,7 @@ endif
 global_include_dirs += include_directories('.')
 
 binding_source = [files(
+    'compiled-shader-binding.cpp',
     'binding-mri.cpp',
     'binding-util.cpp',
     'table-binding.cpp',
