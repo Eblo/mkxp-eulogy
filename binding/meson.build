@@ -21,6 +21,7 @@ binding_source = [files(
     'table-binding.cpp',
     'etc-binding.cpp',
     'bitmap-binding.cpp',
+    'etc-internal-binding.cpp',
     'font-binding.cpp',
     'graphics-binding.cpp',
     'fps-binding.cpp',
