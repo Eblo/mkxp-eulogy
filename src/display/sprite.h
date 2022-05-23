@@ -83,7 +83,7 @@ public:
     DECL_ATTR( TransformAmplitudeY, float)
 	DECL_ATTR( TransformFrequency,  float)
 	DECL_ATTR( TransformSpeed, float)
-	DECL_ATTR( ShaderArr,   VALUE*  )
+	DECL_ATTR( ShaderArr,   VALUE  )
 
 	void initDynAttribs();
 
