@@ -38,6 +38,17 @@ enum BlendType
 	BlendSubstraction = 2
 };
 
+enum TransformationType
+{
+	None = 0,
+	XCompress = 1,
+	YCompress = 2,
+	CrossCompress = 3,
+	XSine = 4,
+	YSine = 5,
+	CrossSine = 6
+};
+
 struct Color : public Serializable
 {
 	Color()

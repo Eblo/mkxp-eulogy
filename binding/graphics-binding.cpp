@@ -24,7 +24,6 @@
 #include "binding-util.h"
 #include "binding-types.h"
 #include "exception.h"
-#include "trig.h"
 
 #if RAPI_MAJOR >= 2
 #include <ruby/thread.h>
@@ -261,22 +260,6 @@ RB_METHOD(graphicsCenter)
     return Qnil;
 }
 
-RB_METHOD(graphicsSine) {
-    RB_UNUSED_PARAM;
-    
-    double input;
-    rb_get_args(argc, argv, "f", &input RB_ARG_END);
-    return rb_float_new(FASTSIN(input));
-}
-
-RB_METHOD(graphicsCosine) {
-    RB_UNUSED_PARAM;
-    
-    double input;
-    rb_get_args(argc, argv, "f", &input RB_ARG_END);
-    return rb_float_new(FASTCOS(input));
-}
-
 RB_METHOD(graphicsPlayMovie)
 {
     RB_UNUSED_PARAM;
@@ -353,8 +336,6 @@ void graphicsBindingInit()
     _rb_define_module_function(module, "snap_to_bitmap", graphicsSnapToBitmap);
     _rb_define_module_function(module, "resize_screen", graphicsResizeScreen);
     _rb_define_module_function(module, "center", graphicsCenter);
-    _rb_define_module_function(module, "sin", graphicsSine);
-    _rb_define_module_function(module, "cos", graphicsCosine);
         
     INIT_GRA_PROP_BIND( Brightness, "brightness" );
 

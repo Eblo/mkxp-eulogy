@@ -73,6 +73,13 @@ DEF_GFX_PROP_I(Sprite, WaveAmp)
 DEF_GFX_PROP_I(Sprite, WaveLength)
 DEF_GFX_PROP_I(Sprite, WaveSpeed)
 
+DEF_GFX_PROP_I(Sprite, TransformType)
+DEF_GFX_PROP_I(Sprite, TransformPhase)
+DEF_GFX_PROP_F(Sprite, TransformAmplitudeX)
+DEF_GFX_PROP_F(Sprite, TransformAmplitudeY)
+DEF_GFX_PROP_F(Sprite, TransformFrequency)
+DEF_GFX_PROP_F(Sprite, TransformSpeed)
+
 DEF_GFX_PROP_F(Sprite, ZoomX)
 DEF_GFX_PROP_F(Sprite, ZoomY)
 DEF_GFX_PROP_F(Sprite, Angle)
@@ -157,4 +164,11 @@ void spriteBindingInit() {
     INIT_PROP_BIND(Sprite, WaveLength, "wave_length");
     INIT_PROP_BIND(Sprite, WaveSpeed, "wave_speed");
     INIT_PROP_BIND(Sprite, WavePhase, "wave_phase");
+    
+    INIT_PROP_BIND(Sprite, TransformType, "transform_type");
+    INIT_PROP_BIND(Sprite, TransformPhase, "transform_phase");
+    INIT_PROP_BIND(Sprite, TransformAmplitudeX, "transform_amplitude_x");
+    INIT_PROP_BIND(Sprite, TransformAmplitudeY, "transform_amplitude_y");
+    INIT_PROP_BIND(Sprite, TransformFrequency, "transform_frequency");
+    INIT_PROP_BIND(Sprite, TransformSpeed, "transform_speed");
 }
