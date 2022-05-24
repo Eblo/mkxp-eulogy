@@ -27,6 +27,7 @@
 #include "etc.h"
 
 #include "sigslot/signal.hpp"
+#include "rb_shader.h"
 
 class Font;
 class ShaderBase;
@@ -81,6 +82,8 @@ public:
 
 	void blur();
 	void radialBlur(int angle, int divisions);
+	
+	void shade(CustomShader* shader);
 
 	void setMode7(const Bitmap &source, double rot, double scale, int x, int y);
 

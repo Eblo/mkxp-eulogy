@@ -51,6 +51,8 @@
 
 #include "sigslot/signal.hpp"
 
+#include "rb_shader.h"
+
 #include <math.h>
 #include <algorithm>
 
@@ -1181,6 +1183,36 @@ void Bitmap::radialBlur(int angle, int divisions)
     p->gl = newTex;
     
     p->onModified();
+}
+
+void Bitmap::shade(CustomShader *shader) {
+	guardDisposed();
+
+	GUARD_MEGA;
+
+	Quad &quad = shState->gpQuad();
+	FloatRect rect(0, 0, width(), height());
+	quad.setTexPosRect(rect, rect);
+
+	glState.blend.pushSet(false);
+	glState.viewport.pushSet(IntRect(0, 0, width(), height()));
+
+	TEX::bind(p->gl.tex);
+	p->bindFBO();
+
+	CompiledShader* compiled = shader->getShader();
+
+	compiled->bind();
+	compiled->setTexSize(Vec2i(width(), height()));
+	compiled->applyViewportProj();
+	shader->applyArgs();
+
+	quad.draw();
+
+	glState.viewport.pop();
+	glState.blend.pop();
+
+	p->onModified();
 }
 
 void Bitmap::clear()

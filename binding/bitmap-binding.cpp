@@ -28,6 +28,8 @@
 #include "sharedstate.h"
 #include "graphics.h"
 
+#include "rb_shader.h"
+
 #if RAPI_FULL > 187
 DEF_TYPE(Bitmap);
 #else
@@ -734,6 +736,20 @@ RB_METHOD(bitmapMode7) {
   return self;
 }
 
+RB_METHOD(bitmapShade)
+{
+	Bitmap *b = getPrivateData<Bitmap>(self);
+
+	VALUE shaderObj;
+	rb_get_args(argc, argv, "o", &shaderObj RB_ARG_END);
+
+	CustomShader *shader = getPrivateDataCheck<CustomShader>(shaderObj, CustomShaderType);
+
+	b->shade(shader);
+
+	return Qnil;
+}
+
 void bitmapBindingInit() {
     VALUE klass = rb_define_class("Bitmap", rb_cObject);
 #if RAPI_FULL > 187
@@ -790,6 +806,8 @@ void bitmapBindingInit() {
     _rb_define_method(klass, "looping", bitmapGetLooping);
     _rb_define_method(klass, "looping=", bitmapSetLooping);
     _rb_define_method(klass, "snap_to_bitmap", bitmapSnapToBitmap);
+
+	_rb_define_method(klass, "shade", bitmapShade);
 
     // Eulogy stuff
     _rb_define_method(klass, "mode7", bitmapMode7);
