@@ -24,7 +24,7 @@ embedded_shaders = [
     'blur.frag',
     'blurH.vert',
     'blurV.vert',
-    'simpleMatrix.vert'
+    'simpleMatrix.vert',
     'rb_simple.vert'
 ]
 

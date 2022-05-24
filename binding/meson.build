@@ -26,6 +26,7 @@ binding_source = [files(
     'graphics-binding.cpp',
     'fps-binding.cpp',
     'input-binding.cpp',
+    'shader-binding.cpp',
     'sprite-binding.cpp',
     'viewport-binding.cpp',
     'plane-binding.cpp',
