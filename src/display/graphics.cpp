@@ -55,9 +55,11 @@
 
 #include <algorithm>
 #include <errno.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
+
+#include "rb_shader.h"
 
 
 #define DEF_SCREEN_W (rgssVer == 1 ? 640 : 544)
@@ -157,7 +159,7 @@ public:
         }
     }
     
-    void requestViewportRender(const Vec4 &c, const Vec4 &f, const Vec4 &t) {
+    void requestViewportRender(const Vec4 &c, const Vec4 &f, const Vec4 &t, const VALUE &shaderArr) {
         const IntRect &viewpRect = glState.scissorBox.get();
         const IntRect &screenRect = geometry.rect;
         
@@ -195,6 +197,50 @@ public:
             screenQuad.draw();
             glState.blend.pop();
         }
+
+		if (shaderArr)
+		{
+			long size = rb_array_len(shaderArr);
+
+			for (long i = 0; i < size; i++)
+			{
+				VALUE value = rb_ary_entry(shaderArr, i);
+
+				if (rb_obj_class(value) != rb_const_get(rb_cObject, rb_intern("Shader")))
+					rb_raise(rb_eTypeError, "Wrong argument type (expected Shader), got %s", rb_obj_classname(value));
+
+				pp.swapRender();
+
+				if (!viewpRect.encloses(screenRect))
+				{
+					/* Scissor test _does_ affect FBO blit operations,
+					 * and since we're inside the draw cycle, it will
+					 * be turned on, so turn it off temporarily */
+					glState.scissorTest.pushSet(false);
+
+					GLMeta::blitBegin(pp.frontBuffer());
+					GLMeta::blitSource(pp.backBuffer());
+					GLMeta::blitRectangle(geometry.rect, Vec2i());
+					GLMeta::blitEnd();
+
+					glState.scissorTest.pop();
+				}
+
+				CustomShader *shader = getPrivateData<CustomShader>(value);
+				CompiledShader *compiled = shader->getShader();
+
+				compiled->bind();
+				shader->applyArgs();
+				compiled->applyViewportProj();
+				compiled->setTexSize(screenRect.size());
+
+				TEX::bind(pp.backBuffer().tex);
+
+				glState.blend.pushSet(false);
+				screenQuad.draw();
+				glState.blend.pop();
+			}
+		}
         
         if (!toneRGBEffect && !colorEffect && !flashEffect)
             return;
