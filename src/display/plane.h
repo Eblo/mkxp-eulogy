@@ -46,6 +46,7 @@ public:
 	DECL_ATTR( BlendType, int     )
 	DECL_ATTR( Color,     Color&  )
 	DECL_ATTR( Tone,      Tone&   )
+	DECL_ATTR( ShaderArr, VALUE   )
 
 	void initDynAttribs();
 
