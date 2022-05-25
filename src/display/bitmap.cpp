@@ -19,6 +19,12 @@
  ** along with mkxp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+	For whatever reason, the includes in this file result in a Ruby 3.0.0 build error if this is not defined.
+	See ruby/missing.h for this check.
+*/
+# define HAVE_ISFINITE 1
+
 #include "bitmap.h"
 
 #include <SDL.h>
