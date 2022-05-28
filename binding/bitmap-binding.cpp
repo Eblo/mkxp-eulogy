@@ -720,22 +720,6 @@ RB_METHOD(bitmapInitializeCopy) {
     return self;
 }
 
-RB_METHOD(bitmapMode7) {
-  Bitmap *b = getPrivateData<Bitmap>(self);
-  
-  VALUE srcObj;
-  double rotation, scale;
-  int x, y;
-
-  rb_get_args(argc, argv, "offii", &srcObj, &rotation, &scale, &x, &y RB_ARG_END);
-
-  Bitmap *srcBitmap = getPrivateDataCheck<Bitmap>(srcObj, BitmapType);
-
-  GUARD_EXC(b->setMode7(*srcBitmap, rotation, scale, x, y););
-
-  return self;
-}
-
 RB_METHOD(bitmapShade)
 {
 	Bitmap *b = getPrivateData<Bitmap>(self);
@@ -808,9 +792,6 @@ void bitmapBindingInit() {
     _rb_define_method(klass, "snap_to_bitmap", bitmapSnapToBitmap);
 
 	_rb_define_method(klass, "shade", bitmapShade);
-
-    // Eulogy stuff
-    _rb_define_method(klass, "mode7", bitmapMode7);
     
     INIT_PROP_BIND(Bitmap, Font, "font");
 }
