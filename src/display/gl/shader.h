@@ -198,18 +198,11 @@ public:
     void setPatternOpacity(float value);
     void setPatternScroll(const Vec2 &scroll);
     void setPatternZoom(const Vec2 &zoom);
-	void setTransformationType(int transformationType);
-	void setTransformationPhase(int transformationPhase);
-	void setTransformationAmplitude(const Vec2 &transformationAmplitude);
-	void setTransformationFrequency(float transformationFrequency);
-	void setTransformationSpeed(float transformationSpeed);
     void setInvert(bool value);
 
 private:
 	GLint u_spriteMat, u_tone, u_opacity, u_color, u_bushDepth, u_bushOpacity, u_pattern, u_renderPattern,
-    u_patternBlendType, u_patternSizeInv, u_patternTile, u_patternOpacity, u_patternScroll, u_patternZoom,
-	u_transformationType, u_transformationPhase, u_transformationAmplitude, u_transformationFrequency,
-	u_transformationSpeed, u_invert;
+    u_patternBlendType, u_patternSizeInv, u_patternTile, u_patternOpacity, u_patternScroll, u_patternZoom, u_invert;
 };
 
 class PlaneShader : public ShaderBase

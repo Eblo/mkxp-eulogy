@@ -14,12 +14,6 @@ uniform int patternBlendType;
 uniform lowp float patternOpacity;
 uniform bool renderPattern;
 
-uniform int transformationType;
-varying vec2 v_transformationAmplitude;
-varying float transformationDisplace;
-varying vec2 v_transformationFactor;
-varying float transformationTime;
-
 uniform bool invert;
 
 varying vec2 v_texCoord;
@@ -73,30 +67,6 @@ void main()
 {
 	/* Sample source color */
 	vec4 frag = texture2D(texture, v_texCoord);
-
-    /* Apply transformationation */
-    if (transformationType) {
-        float x = v_texCoord.x;
-        float y = v_texCoord.y;
-
-        /* Compress effect */
-        if (transformationType == 3 || transformationType == 2) {
-            x = mod(v_texCoord.x + (v_transformationAmplitude.x * sin(transformationDisplace + v_transformationFactor.x * transformationTime)), 1);
-        }
-        if (transformationType == 3 || transformationType == 1) {
-            y = mod(v_texCoord.y + (v_transformationAmplitude.y * sin(transformationDisplace + v_transformationFactor.y * transformationTime)), 1);
-        }
-
-        /* Sine effect */
-        if (transformationType == 6 || transformationType == 5) {
-            x = mod(v_texCoord.x + (v_transformationAmplitude.x * sin(transformationDisplace + v_transformationFactor.y * transformationTime)), 1);
-        }
-        if (transformationType == 6 || transformationType == 4) {
-            y = mod(v_texCoord.y + (v_transformationAmplitude.y * sin(transformationDisplace + v_transformationFactor.x * transformationTime)), 1);
-        }
-
-        frag = texture2D(texture, vec2(x, y));
-    }
     
     /* Apply pattern */
     if (renderPattern) {
