@@ -28,6 +28,8 @@
 #include "sharedstate.h"
 #include "graphics.h"
 
+#include "rb_shader.h"
+
 #if RAPI_FULL > 187
 DEF_TYPE(Bitmap);
 #else
@@ -718,20 +720,18 @@ RB_METHOD(bitmapInitializeCopy) {
     return self;
 }
 
-RB_METHOD(bitmapMode7) {
-  Bitmap *b = getPrivateData<Bitmap>(self);
-  
-  VALUE srcObj;
-  double rotation, scale;
-  int x, y;
+RB_METHOD(bitmapShade)
+{
+	Bitmap *b = getPrivateData<Bitmap>(self);
 
-  rb_get_args(argc, argv, "offii", &srcObj, &rotation, &scale, &x, &y RB_ARG_END);
+	VALUE shaderObj;
+	rb_get_args(argc, argv, "o", &shaderObj RB_ARG_END);
 
-  Bitmap *srcBitmap = getPrivateDataCheck<Bitmap>(srcObj, BitmapType);
+	CustomShader *shader = getPrivateDataCheck<CustomShader>(shaderObj, CustomShaderType);
 
-  GUARD_EXC(b->setMode7(*srcBitmap, rotation, scale, x, y););
+	b->shade(shader);
 
-  return self;
+	return Qnil;
 }
 
 void bitmapBindingInit() {
@@ -791,8 +791,7 @@ void bitmapBindingInit() {
     _rb_define_method(klass, "looping=", bitmapSetLooping);
     _rb_define_method(klass, "snap_to_bitmap", bitmapSnapToBitmap);
 
-    // Eulogy stuff
-    _rb_define_method(klass, "mode7", bitmapMode7);
+	_rb_define_method(klass, "shade", bitmapShade);
     
     INIT_PROP_BIND(Bitmap, Font, "font");
 }

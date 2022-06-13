@@ -109,6 +109,11 @@ void CUSLBindingInit();
 
 void httpBindingInit();
 
+void compiledShaderBindingInit();
+void shaderBindingInit();
+
+void etc_internalBindingInit();
+
 RB_METHOD(mkxpDelta);
 RB_METHOD(mriPrint);
 RB_METHOD(mriP);
@@ -184,6 +189,11 @@ static void mriBindingInit() {
 #endif
     
     httpBindingInit();
+
+	shaderBindingInit();
+	compiledShaderBindingInit();
+	
+	etc_internalBindingInit();
     
     if (rgssVer >= 3) {
         _rb_define_module_function(rb_mKernel, "rgss_main", mriRgssMain);

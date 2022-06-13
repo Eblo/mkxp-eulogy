@@ -15,15 +15,18 @@ endif
 global_include_dirs += include_directories('.')
 
 binding_source = [files(
+    'compiled-shader-binding.cpp',
     'binding-mri.cpp',
     'binding-util.cpp',
     'table-binding.cpp',
     'etc-binding.cpp',
     'bitmap-binding.cpp',
+    'etc-internal-binding.cpp',
     'font-binding.cpp',
     'graphics-binding.cpp',
     'fps-binding.cpp',
     'input-binding.cpp',
+    'shader-binding.cpp',
     'sprite-binding.cpp',
     'viewport-binding.cpp',
     'plane-binding.cpp',

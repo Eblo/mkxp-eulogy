@@ -27,6 +27,7 @@
 #include "disposable.h"
 #include "viewport.h"
 #include "util.h"
+#include "binding-util.h"
 
 class Bitmap;
 struct Color;
@@ -76,12 +77,7 @@ public:
 	DECL_ATTR( WaveLength,  int     )
 	DECL_ATTR( WaveSpeed,   int     )
 	DECL_ATTR( WavePhase,   float   )
-	DECL_ATTR( TransformType,  int  )
-	DECL_ATTR( TransformPhase, int  )
-    DECL_ATTR( TransformAmplitudeX, float)
-    DECL_ATTR( TransformAmplitudeY, float)
-	DECL_ATTR( TransformFrequency,  float)
-	DECL_ATTR( TransformSpeed, float)
+	DECL_ATTR( ShaderArr,   VALUE  )
 
 	void initDynAttribs();
 

@@ -34,6 +34,11 @@
 #include "glstate.h"
 #include "quadarray.h"
 
+#include "binding-util.h"
+
+#include "rb_shader.h"
+#include "binding-types.h"
+
 #include <math.h>
 #ifndef M_PI
 # define M_PI 3.14159265358979323846
@@ -66,16 +71,7 @@ struct SpritePrivate
     bool patternTile;
     NormValue patternOpacity;
     Vec2 patternScroll;
-    Vec2 patternZoom;
-
-    struct
-    {
-        TransformationType type;
-        int phase;
-        Vec2 amplitude;
-        float frequency;
-        float speed;
-    } transformation;    
+    Vec2 patternZoom; 
 
     bool invert;
     
@@ -88,6 +84,8 @@ struct SpritePrivate
     
     Color *color;
     Tone *tone;
+
+    VALUE shaderArr;
     
     struct
     {
@@ -123,7 +121,8 @@ struct SpritePrivate
     invert(false),
     isVisible(false),
     color(&tmp.color),
-    tone(&tmp.tone)
+    tone(&tmp.tone),
+	shaderArr(0)
     
     {
         sceneRect.x = sceneRect.y = 0;
@@ -141,12 +140,6 @@ struct SpritePrivate
         wave.speed = 360;
         wave.phase = 0.0f;
         wave.dirty = false;
-
-        transformation.type = None;
-        transformation.phase = 0;
-        transformation.amplitude = Vec2(1, 1);
-        transformation.frequency = 1;
-        transformation.speed = 1;
     }
     
     ~SpritePrivate()
@@ -375,13 +368,8 @@ DEF_ATTR_SIMPLE(Sprite, PatternScrollX, int, p->patternScroll.x)
 DEF_ATTR_SIMPLE(Sprite, PatternScrollY, int, p->patternScroll.y)
 DEF_ATTR_SIMPLE(Sprite, PatternZoomX, float, p->patternZoom.x)
 DEF_ATTR_SIMPLE(Sprite, PatternZoomY, float, p->patternZoom.y)
-DEF_ATTR_RD_SIMPLE(Sprite, TransformType, int, p->transformation.type)
-DEF_ATTR_RD_SIMPLE(Sprite, TransformPhase, int, p->transformation.phase)
-DEF_ATTR_RD_SIMPLE(Sprite, TransformAmplitudeX, float, p->transformation.amplitude.x)
-DEF_ATTR_RD_SIMPLE(Sprite, TransformAmplitudeY, float, p->transformation.amplitude.y)
-DEF_ATTR_RD_SIMPLE(Sprite, TransformFrequency, float, p->transformation.frequency)
-DEF_ATTR_RD_SIMPLE(Sprite, TransformSpeed, float, p->transformation.speed)
 DEF_ATTR_SIMPLE(Sprite, Invert,      bool,    p->invert)
+DEF_ATTR_SIMPLE(Sprite, ShaderArr,  VALUE, p->shaderArr)
 
 void Sprite::setBitmap(Bitmap *bitmap)
 {
@@ -568,72 +556,6 @@ void Sprite::setPatternBlendType(int type)
     }
 }
 
-void Sprite::setTransformType(int type)
-{
-    guardDisposed();
-    
-    switch (type)
-    {
-        default :
-        case None:
-            p->transformation.type = None;
-            return;
-        case CrossCompress :
-            p->transformation.type = CrossCompress;
-            return;
-        case XCompress :
-            p->transformation.type = XCompress;
-            return;
-        case YCompress :
-            p->transformation.type = YCompress;
-            return;
-        case CrossSine :
-            p->transformation.type = CrossSine;
-            return;
-        case XSine :
-            p->transformation.type = XSine;
-            return;
-        case YSine :
-            p->transformation.type = YSine;
-            return;
-    }
-}
-
-void Sprite::setTransformPhase(int phase)
-{
-    guardDisposed();
-
-    p->transformation.phase = phase;
-}
-
-void Sprite::setTransformAmplitudeX(float amplitude)
-{
-    guardDisposed();
-
-    p->transformation.amplitude.x = amplitude;
-}
-
-void Sprite::setTransformAmplitudeY(float amplitude)
-{
-    guardDisposed();
-
-    p->transformation.amplitude.y = amplitude;
-}
-
-void Sprite::setTransformFrequency(float frequency)
-{
-    guardDisposed();
-
-    p->transformation.frequency = frequency;
-}
-
-void Sprite::setTransformSpeed(float speed)
-{
-    guardDisposed();
-
-    p->transformation.speed = speed;
-}
-
 #define DEF_WAVE_SETTER(Name, name, type) \
 void Sprite::setWave##Name(type value) \
 { \
@@ -666,8 +588,7 @@ void Sprite::update()
     guardDisposed();
     
     Flashable::update();
-    
-    p->transformation.phase += 1;
+
     p->wave.phase += p->wave.speed / 180;
     p->wave.dirty = true;
 }
@@ -715,14 +636,6 @@ void Sprite::draw()
         else {
             shader.setShouldRenderPattern(false);
         }
-
-        shader.setTransformationType(p->transformation.type);
-        if(p->transformation.type) {
-            shader.setTransformationPhase(p->transformation.phase);
-            shader.setTransformationAmplitude(p->transformation.amplitude);
-            shader.setTransformationFrequency(p->transformation.frequency);
-            shader.setTransformationSpeed(p->transformation.speed);
-        }
         
         shader.setInvert(p->invert);
         
@@ -754,6 +667,26 @@ void Sprite::draw()
         shader.applyViewportProj();
         base = &shader;
     }
+	
+	if (p->shaderArr) {
+		long size = rb_array_len(p->shaderArr);
+
+		for (long i = 0; i < size; i++) {
+			VALUE value = rb_ary_entry(p->shaderArr, i);
+
+			CustomShader* shader = getPrivateDataCheck<CustomShader>(value, CustomShaderType);
+			CompiledShader* compiled = shader->getShader();
+
+			compiled->bind();
+			compiled->applyViewportProj();
+			shader->applyArgs();
+
+			if (shader->supportsSpriteMat()) 
+				shader->setSpriteMat(p->trans.getMatrix());
+
+			base = compiled;
+		}
+	}
     
     glState.blendMode.pushSet(p->blendType);
     

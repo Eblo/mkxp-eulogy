@@ -24,6 +24,7 @@
 #include "disposable-binding.h"
 #include "plane.h"
 #include "viewportelement-binding.h"
+#include "shadable-element-binding.h"
 
 #if RAPI_FULL > 187
 DEF_TYPE(Plane);
@@ -33,6 +34,7 @@ DEF_ALLOCFUNC(Plane);
 
 RB_METHOD(planeInitialize) {
   Plane *p = viewportElementInitialize<Plane>(argc, argv, self);
+	shadableElementInitialize<Plane>(self, p);
 
   setPrivateData(self, p);
 
@@ -68,6 +70,7 @@ void planeBindingInit() {
 
   disposableBindingInit<Plane>(klass);
   viewportElementBindingInit<Plane>(klass);
+	shadableElementBindingInit(klass);
 
   _rb_define_method(klass, "initialize", planeInitialize);
 

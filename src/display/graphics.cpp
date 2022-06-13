@@ -19,6 +19,12 @@
  ** along with mkxp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+	For whatever reason, the includes in this file result in a Ruby 3.0.0 build error if this is not defined.
+	See ruby/missing.h for this check.
+*/
+# define HAVE_ISFINITE 1
+
 #include "graphics.h"
 
 #include "theoraplay/theoraplay.h"
@@ -55,9 +61,12 @@
 
 #include <algorithm>
 #include <errno.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
+
+#include "rb_shader.h"
+#include "binding-types.h"
 
 
 #define DEF_SCREEN_W (rgssVer == 1 ? 640 : 544)
@@ -157,7 +166,7 @@ public:
         }
     }
     
-    void requestViewportRender(const Vec4 &c, const Vec4 &f, const Vec4 &t) {
+    void requestViewportRender(const Vec4 &c, const Vec4 &f, const Vec4 &t, const VALUE &shaderArr) {
         const IntRect &viewpRect = glState.scissorBox.get();
         const IntRect &screenRect = geometry.rect;
         
@@ -195,6 +204,47 @@ public:
             screenQuad.draw();
             glState.blend.pop();
         }
+
+		if (shaderArr)
+		{
+			long size = rb_array_len(shaderArr);
+
+			for (long i = 0; i < size; i++)
+			{
+				VALUE value = rb_ary_entry(shaderArr, i);
+
+				pp.swapRender();
+
+				if (!viewpRect.encloses(screenRect))
+				{
+					/* Scissor test _does_ affect FBO blit operations,
+					 * and since we're inside the draw cycle, it will
+					 * be turned on, so turn it off temporarily */
+					glState.scissorTest.pushSet(false);
+
+					GLMeta::blitBegin(pp.frontBuffer());
+					GLMeta::blitSource(pp.backBuffer());
+					GLMeta::blitRectangle(geometry.rect, Vec2i());
+					GLMeta::blitEnd();
+
+					glState.scissorTest.pop();
+				}
+
+				CustomShader *shader = getPrivateDataCheck<CustomShader>(value, CustomShaderType);
+				CompiledShader *compiled = shader->getShader();
+
+				compiled->bind();
+				compiled->applyViewportProj();
+				shader->applyArgs();
+				compiled->setTexSize(screenRect.size());
+
+				TEX::bind(pp.backBuffer().tex);
+
+				glState.blend.pushSet(false);
+				screenQuad.draw();
+				glState.blend.pop();
+			}
+		}
         
         if (!toneRGBEffect && !colorEffect && !flashEffect)
             return;

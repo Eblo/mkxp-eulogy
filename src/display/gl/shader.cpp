@@ -476,11 +476,6 @@ SpriteShader::SpriteShader()
     GET_U(patternOpacity);
     GET_U(patternScroll);
     GET_U(patternZoom);
-    GET_U(transformationType);
-    GET_U(transformationPhase);
-    GET_U(transformationAmplitude);
-    GET_U(transformationFrequency);
-    GET_U(transformationSpeed);
     GET_U(invert);
 }
 
@@ -523,31 +518,6 @@ void SpriteShader::setPattern(const TEX::ID pattern, const Vec2 &dimensions)
 void SpriteShader::setPatternBlendType(int blendType)
 {
     gl.Uniform1i(u_patternBlendType, blendType);
-}
-
-void SpriteShader::setTransformationType(int transformationType)
-{
-    gl.Uniform1i(u_transformationType, transformationType);
-}
-
-void SpriteShader::setTransformationPhase(int transformationPhase)
-{
-    gl.Uniform1i(u_transformationPhase, transformationPhase);
-}
-
-void SpriteShader::setTransformationAmplitude(const Vec2 &transformationAmplitude)
-{
-	setVec2Uniform(u_transformationAmplitude, transformationAmplitude);
-}
-
-void SpriteShader::setTransformationFrequency(float transformationFrequency)
-{
-    gl.Uniform1f(u_transformationFrequency, transformationFrequency);
-}
-
-void SpriteShader::setTransformationSpeed(float transformationSpeed)
-{
-    gl.Uniform1f(u_transformationSpeed, transformationSpeed);
 }
 
 void SpriteShader::setPatternTile(bool value)

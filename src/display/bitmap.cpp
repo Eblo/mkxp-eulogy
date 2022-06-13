@@ -19,6 +19,12 @@
  ** along with mkxp.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+	For whatever reason, the includes in this file result in a Ruby 3.0.0 build error if this is not defined.
+	See ruby/missing.h for this check.
+*/
+# define HAVE_ISFINITE 1
+
 #include "bitmap.h"
 
 #include <SDL.h>
@@ -50,6 +56,8 @@
 #include "debugwriter.h"
 
 #include "sigslot/signal.hpp"
+
+#include "rb_shader.h"
 
 #include <math.h>
 #include <algorithm>
@@ -1183,6 +1191,36 @@ void Bitmap::radialBlur(int angle, int divisions)
     p->onModified();
 }
 
+void Bitmap::shade(CustomShader *shader) {
+	guardDisposed();
+
+	GUARD_MEGA;
+
+	Quad &quad = shState->gpQuad();
+	FloatRect rect(0, 0, width(), height());
+	quad.setTexPosRect(rect, rect);
+
+	glState.blend.pushSet(false);
+	glState.viewport.pushSet(IntRect(0, 0, width(), height()));
+
+	TEX::bind(p->gl.tex);
+	p->bindFBO();
+
+	CompiledShader* compiled = shader->getShader();
+
+	compiled->bind();
+	compiled->setTexSize(Vec2i(width(), height()));
+	compiled->applyViewportProj();
+	shader->applyArgs();
+
+	quad.draw();
+
+	glState.viewport.pop();
+	glState.blend.pop();
+
+	p->onModified();
+}
+
 void Bitmap::clear()
 {
     guardDisposed();
@@ -1809,93 +1847,6 @@ DEF_ATTR_RD_SIMPLE(Bitmap, Font, Font&, *p->font)
 void Bitmap::setFont(Font &value)
 {
     *p->font = value;
-}
-
-void Bitmap::setMode7(const Bitmap &source, double rot, double scale, int playerX, int playerY)
-{
-	guardDisposed();
-
-	GUARD_MEGA;
-
-	if (source.isDisposed())
-		return;
-	
-	const int _width = width();
-	const int _height = height();
-	const int sourceWidth = source.width();
-	const int sourceHeight = source.height();
-	const int midX = _width >> 1;
-
-	Color color;
-	int pixel;
-	uint8_t newPixels[p->format->BytesPerPixel * _width * _height];
-
-	double px, py;
-    double pxt, pyt;
-    double pz;
-
-	// This defines the point at which the horizon is drawn
-    pz = -_height/4;
-
-	float _rot=((float)rot+180)*0.0174532925f; // Convert angle to radians
-    float rotcos=cos(_rot); // Get X thingy from angle
-	float rotsin=sin(_rot); // Get Y thingy from angle
-
-	// https://gamedev.stackexchange.com/questions/24957/doing-an-snes-mode-7-affine-transform-effect-in-pygame
-    // TODO: Curving the texture with distance?
-    int horizon = _height/4;
-    pz += horizon + 1; // Add 1 to prevent drawing the horizon
-	pixel = horizon * _width * p->format->BytesPerPixel;
-
-	for(int y=horizon; y<_height; y++)
-	{
-        py = y / pz;
-        pyt = py;
-
-        // TODO: The closer to the bottom of the screen (y), the more curved the texture
-
-        for(int x=0; x<_width; x++)
-		{
-            px = (midX - x) / pz;
-
-            pxt = px;
-            px = pxt * rotcos - pyt * rotsin;
-            px *= scale;
-            px += playerX;
-
-            // "scale" essentially functions as the height above the floor
-            py = pxt * rotsin + pyt * rotcos;
-            py *= scale;
-            // If we wanted the player to move at an angle, we would need to do trig
-            // with the coordinates in RM before passing onto the DLL
-            py += playerY;
-            py = fmod(py, sourceHeight);
-            // Use absolute value to mirror the texture
-            // py = abs(py);
-            // Add the max value to repeat it
-            if (py < 0) py += sourceHeight;
-            
-            px = fmod(px, sourceWidth);
-            // Use absolute value to mirror the texture
-            // px = abs(px);
-            // Add the max value to repeat it
-            if (px < 0) px += sourceWidth;
-
-            // Perspective correction
-            // px = width - px;
-            // py = height - py;
-            color = source.getPixel(int(px), int(py));
-			newPixels[pixel++] = color.red;
-			newPixels[pixel++] = color.green;
-			newPixels[pixel++] = color.blue;
-			newPixels[pixel++] = color.alpha;
-        }
-        pz++;
-    }
-	TEX::bind(p->gl.tex);
-	TEX::uploadSubImage(0, 0, _width, _height, &newPixels, GL_RGBA);
-	p->addTaintedArea(IntRect(0, horizon, _width, _height - horizon));
-	p->onModified(false);
 }
 
 void Bitmap::setInitFont(Font *value)
