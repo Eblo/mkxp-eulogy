@@ -415,6 +415,7 @@ void FirstPerson::renderSprite(Bitmap *sprite, double spriteX, double spriteY, d
                     p->pixels[pixel] = (p->pixels[pixel]*(1.0-(p->color.alpha/255.0)) + p->color.red*(p->color.alpha/255.0))*p->wallFloorCeilWeight + (p->fogRed*p->fogWeight);
                     p->pixels[pixel+1] = (p->pixels[pixel+1]*(1.0-(p->color.alpha/255.0)) + p->color.green*(p->color.alpha/255.0))*p->wallFloorCeilWeight + (p->fogGreen*p->fogWeight);
                     p->pixels[pixel+2] = (p->pixels[pixel+2]*(1.0-(p->color.alpha/255.0)) + p->color.blue*(p->color.alpha/255.0))*p->wallFloorCeilWeight + (p->fogBlue*p->fogWeight);
+                    p->pixels[pixel+3] = 255;
 				}
 				
 			}
