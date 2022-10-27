@@ -94,7 +94,9 @@ RB_METHOD(httpGet) {
     rb_scan_args(argc, argv, "12", &path, &rheaders, &redirect);
     SafeStringValue(path);
     
-    mkxp_net::HTTPRequest req(RSTRING_PTR(path), RTEST(redirect));
+    bool rd;
+    rb_bool_arg(redirect, &rd);
+    mkxp_net::HTTPRequest req(RSTRING_PTR(path), rd);
     if (rheaders != Qnil) {
         auto headers = hash2StringMap(rheaders);
         req.headers().insert(headers.begin(), headers.end());
@@ -135,7 +137,9 @@ RB_METHOD(httpPost) {
     rb_scan_args(argc, argv, "22", &path, &postDataHash, &rheaders, &redirect);
     SafeStringValue(path);
     
-    mkxp_net::HTTPRequest req(RSTRING_PTR(path), RTEST(redirect));
+    bool rd;
+    rb_bool_arg(redirect, &rd);
+    mkxp_net::HTTPRequest req(RSTRING_PTR(path), rd);
     if (rheaders != Qnil) {
         auto headers = hash2StringMap(rheaders);
         req.headers().insert(headers.begin(), headers.end());
@@ -307,7 +311,7 @@ RB_METHOD(httpJsonStringify) {
     rb_scan_args(argc, argv, "1", &obj);
     
     json5pp::value v = rb2json(obj);
-    return rb_utf8_str_new_cstr(v.stringify().c_str());
+    return rb_utf8_str_new_cstr(v.stringify5(json5pp::rule::space_indent<>()).c_str());
 }
 
 void httpBindingInit() {

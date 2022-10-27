@@ -45,23 +45,23 @@ struct KbBindingData
 	}
 };
 
-struct JsBindingData
+struct CtrlBindingData
 {
-	int source;
-	Input::ButtonCode target;
-
-	void add(BDescVec &d) const
-	{
-		SourceDesc src;
-		src.type = JButton;
-		src.d.jb = source;
-
-		BindingDesc desc;
-		desc.src = src;
-		desc.target = target;
-
-		d.push_back(desc);
-	}
+    SDL_GameControllerButton source;
+    Input::ButtonCode target;
+    
+    void add(BDescVec &d) const
+    {
+        SourceDesc src;
+        src.type = CButton;
+        src.d.cb = source;
+        
+        BindingDesc desc;
+        desc.src = src;
+        desc.target = target;
+        
+        d.push_back(desc);
+    }
 };
 
 /* Common */
@@ -72,13 +72,13 @@ static const KbBindingData defaultKbBindings[] =
 	{ SDL_SCANCODE_UP,     Input::Up    },
 	{ SDL_SCANCODE_DOWN,   Input::Down  },
     
-	{ SDL_SCANCODE_SPACE,  Input::ZL    },
-	{ SDL_SCANCODE_RETURN, Input::ZL    },
+	{ SDL_SCANCODE_SPACE,  Input::C     },
+	{ SDL_SCANCODE_RETURN, Input::C     },
 	{ SDL_SCANCODE_ESCAPE, Input::B     },
 	{ SDL_SCANCODE_KP_0,   Input::B     },
 	{ SDL_SCANCODE_LSHIFT, Input::A     },
 	{ SDL_SCANCODE_X,      Input::B     },
-	{ SDL_SCANCODE_D,      Input::ZR    },
+	{ SDL_SCANCODE_D,      Input::Z     },
 	{ SDL_SCANCODE_Q,      Input::L     },
 	{ SDL_SCANCODE_W,      Input::R     },
 	{ SDL_SCANCODE_A,      Input::X     },
@@ -89,53 +89,44 @@ static const KbBindingData defaultKbBindings[] =
 static const KbBindingData defaultKbBindings1[] =
 {
 	{ SDL_SCANCODE_Z,      Input::A     },
-	{ SDL_SCANCODE_C,      Input::ZL     },
+	{ SDL_SCANCODE_C,      Input::C     },
 };
 
 /* RGSS2 and higher */
 static const KbBindingData defaultKbBindings2[] =
 {
-	{ SDL_SCANCODE_Z,      Input::ZL     }
+	{ SDL_SCANCODE_Z,      Input::C     }
 };
 
 static elementsN(defaultKbBindings);
 static elementsN(defaultKbBindings1);
 static elementsN(defaultKbBindings2);
 
-static const JsBindingData defaultJsBindings[] =
+static const CtrlBindingData defaultCtrlBindings[] =
 {
-	{ 3, Input::A  },
-	{ 0, Input::B  },
-	{ 1, Input::ZL },
-	{ 2, Input::X  },
-	{ 4, Input::Y  },
-	{ 5, Input::ZR },
-	{ 9, Input::L  },
-	{ 10, Input::R  }
+	{ SDL_CONTROLLER_BUTTON_X, Input::A  },
+	{ SDL_CONTROLLER_BUTTON_B, Input::B  },
+	{ SDL_CONTROLLER_BUTTON_A, Input::C },
+	{ SDL_CONTROLLER_BUTTON_Y, Input::X  },
+	{ SDL_CONTROLLER_BUTTON_LEFTSTICK, Input::Y  },
+	{ SDL_CONTROLLER_BUTTON_RIGHTSTICK, Input::Z },
+	{ SDL_CONTROLLER_BUTTON_LEFTSHOULDER, Input::L  },
+	{ SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, Input::R  },
+    
+    { SDL_CONTROLLER_BUTTON_DPAD_UP, Input::Up },
+    { SDL_CONTROLLER_BUTTON_DPAD_DOWN, Input::Down },
+    { SDL_CONTROLLER_BUTTON_DPAD_LEFT, Input::Left },
+    { SDL_CONTROLLER_BUTTON_DPAD_RIGHT, Input::Right }
 };
 
-static elementsN(defaultJsBindings);
+static elementsN(defaultCtrlBindings);
 
-static void addAxisBinding(BDescVec &d, uint8_t axis, AxisDir dir, Input::ButtonCode target)
+static void addAxisBinding(BDescVec &d, SDL_GameControllerAxis axis, AxisDir dir, Input::ButtonCode target)
 {
 	SourceDesc src;
-	src.type = JAxis;
-	src.d.ja.axis = axis;
-	src.d.ja.dir = dir;
-
-	BindingDesc desc;
-	desc.src = src;
-	desc.target = target;
-
-	d.push_back(desc);
-}
-
-static void addHatBinding(BDescVec &d, uint8_t hat, uint8_t pos, Input::ButtonCode target)
-{
-	SourceDesc src;
-	src.type = JHat;
-	src.d.jh.hat = hat;
-	src.d.jh.pos = pos;
+	src.type = CAxis;
+	src.d.ca.axis = axis;
+	src.d.ca.dir = dir;
 
 	BindingDesc desc;
 	desc.src = src;
@@ -158,23 +149,18 @@ BDescVec genDefaultBindings(const Config &conf)
 		for (size_t i = 0; i < defaultKbBindings2N; ++i)
 			defaultKbBindings2[i].add(d);
 
-	for (size_t i = 0; i < defaultJsBindingsN; ++i)
-		defaultJsBindings[i].add(d);
+	for (size_t i = 0; i < defaultCtrlBindingsN; ++i)
+		defaultCtrlBindings[i].add(d);
 
-	addAxisBinding(d, 0, Negative, Input::Left );
-	addAxisBinding(d, 0, Positive, Input::Right);
-	addAxisBinding(d, 1, Negative, Input::Up   );
-	addAxisBinding(d, 1, Positive, Input::Down );
-	
-	addHatBinding(d, 0, SDL_HAT_LEFT,  Input::Left );
-	addHatBinding(d, 0, SDL_HAT_RIGHT, Input::Right);
-	addHatBinding(d, 0, SDL_HAT_UP,    Input::Up   );
-	addHatBinding(d, 0, SDL_HAT_DOWN,  Input::Down );
+	addAxisBinding(d, SDL_CONTROLLER_AXIS_LEFTX, Negative, Input::Left );
+	addAxisBinding(d, SDL_CONTROLLER_AXIS_LEFTX, Positive, Input::Right);
+	addAxisBinding(d, SDL_CONTROLLER_AXIS_LEFTY, Negative, Input::Up   );
+	addAxisBinding(d, SDL_CONTROLLER_AXIS_LEFTY, Positive, Input::Down );
 
 	return d;
 }
 
-#define FORMAT_VER 2
+#define FORMAT_VER 3
 
 struct Header
 {
@@ -226,10 +212,7 @@ static bool writeBindings(const BDescVec &d, const std::string &dir,
 
 void storeBindings(const BDescVec &d, const Config &conf)
 {
-	if (writeBindings(d, conf.customDataPath, conf.rgssVersion))
-		return;
-
-	writeBindings(d, conf.commonDataPath, conf.rgssVersion);
+    writeBindings(d, conf.customDataPath, conf.rgssVersion);
 }
 
 #define READ(ptr, size, n, f) if (fread(ptr, size, n, f) < n) return false
@@ -240,8 +223,8 @@ static bool verifyDesc(const BindingDesc &desc)
 	{
 	    Input::None,
 	    Input::Down, Input::Left, Input::Right, Input::Up,
-	    Input::A, Input::B, Input::ZL,
-	    Input::X, Input::Y, Input::ZR,
+	    Input::A, Input::B, Input::C,
+	    Input::X, Input::Y, Input::Z,
 	    Input::L, Input::R,
 	    Input::Shift, Input::Ctrl, Input::Alt,
 	    Input::F5, Input::F6, Input::F7, Input::F8, Input::F9
@@ -265,14 +248,12 @@ static bool verifyDesc(const BindingDesc &desc)
 		return true;
 	case Key:
 		return src.d.scan < SDL_NUM_SCANCODES;
-	case JButton:
-		return true;
-	case JHat:
-		/* Only accept single directional binds */
-		return src.d.jh.pos == SDL_HAT_LEFT || src.d.jh.pos == SDL_HAT_RIGHT ||
-		       src.d.jh.pos == SDL_HAT_UP   || src.d.jh.pos == SDL_HAT_DOWN;
-	case JAxis:
-		return src.d.ja.dir == Negative || src.d.ja.dir == Positive;
+            
+    case CButton:
+        return true;
+
+	case CAxis:
+		return src.d.ca.dir == Negative || src.d.ca.dir == Positive;
 	default:
 		return false;
 	}
@@ -326,9 +307,6 @@ BDescVec loadBindings(const Config &conf)
 	BDescVec d;
 
 	if (readBindings(d, conf.customDataPath, conf.rgssVersion))
-		return d;
-
-	if (readBindings(d, conf.commonDataPath, conf.rgssVersion))
 		return d;
 
 	return genDefaultBindings(conf);

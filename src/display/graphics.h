@@ -30,6 +30,8 @@ class Disposable;
 struct RGSSThreadData;
 struct GraphicsPrivate;
 struct AtomicFlag;
+struct THEORAPLAY_VideoFrame;
+struct Movie;
 
 class Graphics
 {
@@ -37,7 +39,7 @@ public:
     unsigned long long getDelta();
     unsigned long long lastUpdate();
     
-	void update();
+	void update(bool checkForShutdown = true);
 	void freeze();
 	void transition(int duration = 8,
 	                const char *filename = "",
@@ -56,18 +58,28 @@ public:
 
 	int width() const;
 	int height() const;
+    int displayWidth() const;
+    int displayHeight() const;
 	void resizeScreen(int width, int height);
-	void playMovie(const char *filename);
+    void resizeWindow(int width, int height, bool center=false);
+	void drawMovieFrame(const THEORAPLAY_VideoFrame* video, Bitmap *videoBitmap);
+	bool updateMovieInput(Movie *movie);
+	void playMovie(const char *filename, int volume, bool skippable);
 	void screenshot(const char *filename);
 
 	void reset();
     void center();
 
-	/* Non-standard extension */
-	DECL_ATTR( Fullscreen, bool )
-	DECL_ATTR( ShowCursor, bool )
-  DECL_ATTR( Scale,    double )
-	DECL_ATTR( Frameskip, bool )
+    /* Non-standard extension */
+    DECL_ATTR( Fullscreen, bool )
+    DECL_ATTR( ShowCursor, bool )
+    DECL_ATTR( Scale,    double )
+    DECL_ATTR( Frameskip, bool )
+    DECL_ATTR( FixedAspectRatio, bool )
+    DECL_ATTR( SmoothScaling, bool )
+    DECL_ATTR( IntegerScaling, bool )
+    DECL_ATTR( LastMileScaling, bool )
+    DECL_ATTR( Threadsafe, bool )
     double averageFrameRate();
 
 	/* <internal> */
@@ -78,8 +90,8 @@ public:
 	void repaintWait(const AtomicFlag &exitCond,
 	                 bool checkReset = true);
     
-    void lock();
-    void unlock();
+    void lock(bool force = false);
+    void unlock(bool force = false);
 
 private:
 	Graphics(RGSSThreadData *data);

@@ -12,14 +12,13 @@ LIBDIR := $(BUILD_PREFIX)/lib
 INCLUDEDIR := $(BUILD_PREFIX)/include
 DOWNLOADS := ${PWD}/downloads/$(ARCH)
 NPROC := $(shell nproc)
-CFLAGS := -I$(INCLUDEDIR)
+CFLAGS := -I$(INCLUDEDIR) -flax-vector-conversions -O3
 LDFLAGS := -L$(LIBDIR)
 CC      := gcc
 PKG_CONFIG_LIBDIR := $(BUILD_PREFIX)/lib/pkgconfig
 GIT := git
 CLONE := $(GIT) clone -q
 GITHUB := https://github.com
-GITLAB := https://gitlab.com
 
 CONFIGURE_ENV := \
 	PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR) \
@@ -29,7 +28,9 @@ CONFIGURE_ARGS := --prefix="$(BUILD_PREFIX)"
 
 CMAKE_ARGS := \
 	-DCMAKE_INSTALL_PREFIX="$(BUILD_PREFIX)" \
-	-DCMAKE_C_FLAGS="$(CFLAGS)"
+	-DCMAKE_PREFIX_PATH="$(BUILD_PREFIX)" \
+	-DCMAKE_C_FLAGS="$(CFLAGS)" \
+	-DCMAKE_BUILD_TYPE=Release
 
 RUBY_CONFIGURE_ARGS := \
 	--enable-install-static-library \
@@ -80,7 +81,7 @@ $(DOWNLOADS)/vorbis/configure: $(DOWNLOADS)/vorbis/autogen.sh
 	./autogen.sh
 
 $(DOWNLOADS)/vorbis/autogen.sh:
-	$(CLONE) $(GITLAB)/mkxp-z/vorbis $(DOWNLOADS)/vorbis
+	$(CLONE) $(GITHUB)/mkxp-z/vorbis $(DOWNLOADS)/vorbis
 
 
 # Ogg, dependency of Vorbis
@@ -98,7 +99,7 @@ $(DOWNLOADS)/ogg/configure: $(DOWNLOADS)/ogg/autogen.sh
 	cd $(DOWNLOADS)/ogg; ./autogen.sh
 
 $(DOWNLOADS)/ogg/autogen.sh:
-	$(CLONE) $(GITLAB)/mkxp-z/ogg $(DOWNLOADS)/ogg
+	$(CLONE) $(GITHUB)/mkxp-z/ogg $(DOWNLOADS)/ogg
 
 # Pixman
 pixman: init_dirs libpng $(LIBDIR)/libpixman-1.a
@@ -110,26 +111,25 @@ $(LIBDIR)/libpixman-1.a: $(DOWNLOADS)/pixman/Makefile
 
 $(DOWNLOADS)/pixman/Makefile: $(DOWNLOADS)/pixman/autogen.sh
 	cd $(DOWNLOADS)/pixman; \
-	$(AUTOGEN) --enable-static=yes --enable-shared=no --disable-sse2
+	$(AUTOGEN) --enable-static=yes --enable-shared=no
 
 $(DOWNLOADS)/pixman/autogen.sh:
-	$(CLONE) $(GITLAB)/mkxp-z/pixman $(DOWNLOADS)/pixman
+	$(CLONE) $(GITHUB)/mkxp-z/pixman $(DOWNLOADS)/pixman
 
 
 # iconv
 iconv: init_dirs $(LIBDIR)/libiconv.a
 
-$(LIBDIR)/libiconv.a: $(DOWNLOADS)/iconv/Makefile
-	cd $(DOWNLOADS)/iconv; make; make install
+$(LIBDIR)/libiconv.a: $(DOWNLOADS)/libiconv-1.16/Makefile
+	cd $(DOWNLOADS)/libiconv-1.16; make; make install
 
-$(DOWNLOADS)/iconv/Makefile: $(DOWNLOADS)/iconv/configure
-	cd $(DOWNLOADS)/iconv; \
+$(DOWNLOADS)/libiconv-1.16/Makefile: $(DOWNLOADS)/libiconv-1.16/configure
+	cd $(DOWNLOADS)/libiconv-1.16; \
 	$(CONFIGURE) --enable-static=true --enable-shared=false
 
-$(DOWNLOADS)/iconv/configure: $(DOWNLOADS)/libiconv-1.16.tar.gz
+$(DOWNLOADS)/libiconv-1.16/configure: $(DOWNLOADS)/libiconv-1.16.tar.gz
 	cd $(DOWNLOADS); \
-	tar -xzf libiconv-1.16.tar.gz; \
-	mv libiconv-1.16 iconv
+	tar -xzf libiconv-1.16.tar.gz;
 
 $(DOWNLOADS)/libiconv-1.16.tar.gz:
 	wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz -P $(DOWNLOADS)
@@ -164,7 +164,7 @@ $(DOWNLOADS)/physfs/cmakebuild/Makefile: $(DOWNLOADS)/physfs/CMakeLists.txt
 	$(CMAKE) -DPHYSFS_BUILD_STATIC=true -DPHYSFS_BUILD_SHARED=false
 
 $(DOWNLOADS)/physfs/CMakeLists.txt:
-	$(CLONE) $(GITLAB)/mkxp-z/physfs $(DOWNLOADS)/physfs
+	$(CLONE) $(GITHUB)/mkxp-z/physfs $(DOWNLOADS)/physfs
 
 # libpng
 libpng: init_dirs $(LIBDIR)/libpng.a
@@ -179,7 +179,7 @@ $(DOWNLOADS)/libpng/Makefile: $(DOWNLOADS)/libpng/configure
 	--enable-shared=no --enable-static=yes
 
 $(DOWNLOADS)/libpng/configure:
-	$(CLONE) $(GITLAB)/mkxp-z/libpng $(DOWNLOADS)/libpng
+	$(CLONE) $(GITHUB)/mkxp-z/libpng $(DOWNLOADS)/libpng
 
 # libjpeg
 libjpeg: init_dirs $(LIBDIR)/libjpeg.a
@@ -193,7 +193,7 @@ $(DOWNLOADS)/libjpeg/cmakebuild/Makefile: $(DOWNLOADS)/libjpeg/CMakeLists.txt
 	$(CMAKE) -DENABLE_SHARED=no -DENABLE_STATIC=yes
 
 $(DOWNLOADS)/libjpeg/CMakeLists.txt:
-	$(CLONE) $(GITLAB)/mkxp-z/libjpeg-turbo $(DOWNLOADS)/libjpeg
+	$(CLONE) $(GITHUB)/mkxp-z/libjpeg-turbo $(DOWNLOADS)/libjpeg
 
 # SDL2
 sdl2: init_dirs $(LIBDIR)/libSDL2.a
@@ -210,7 +210,7 @@ $(DOWNLOADS)/sdl2/configure: $(DOWNLOADS)/sdl2/autogen.sh
 	cd $(DOWNLOADS)/sdl2; ./autogen.sh
 
 $(DOWNLOADS)/sdl2/autogen.sh:
-	$(CLONE) $(GITLAB)/mkxp-z/SDL $(DOWNLOADS)/sdl2 -b mkxp-z; cd $(DOWNLOADS)/sdl2
+	$(CLONE) $(GITHUB)/mkxp-z/SDL $(DOWNLOADS)/sdl2 -b mkxp-z; cd $(DOWNLOADS)/sdl2
 
 # SDL2 (Image)
 sdl2image: init_dirs sdl2 libpng libjpeg $(LIBDIR)/libSDL2_image.a
@@ -223,7 +223,6 @@ $(DOWNLOADS)/sdl2_image/Makefile: $(DOWNLOADS)/sdl2_image/configure
 	cd $(DOWNLOADS)/sdl2_image; \
 	LIBPNG_LIBS="-L$(LIBDIR) -lpng" LIBPNG_CFLAGS="-I$(INCLUDEDIR)" \
 	$(CONFIGURE) --enable-static=true --enable-shared=false \
-	--disable-imageio \
 	--enable-png=yes --enable-png-shared=no \
 	--enable-jpg=yes --enable-jpg-shared=no \
 	--enable-webp=no $(SDL2_IMAGE_FLAGS)
@@ -232,7 +231,7 @@ $(DOWNLOADS)/sdl2_image/configure: $(DOWNLOADS)/sdl2_image/autogen.sh
 	cd $(DOWNLOADS)/sdl2_image; ./autogen.sh
 
 $(DOWNLOADS)/sdl2_image/autogen.sh:
-	$(CLONE) $(GITLAB)/mkxp-z/SDL_image $(DOWNLOADS)/sdl2_image -b mkxp-z
+	$(CLONE) $(GITHUB)/mkxp-z/SDL_image_old $(DOWNLOADS)/sdl2_image -b mkxp-z
 
 # SDL_sound
 sdlsound: init_dirs sdl2 libogg libvorbis $(LIBDIR)/libSDL2_sound.a
@@ -245,28 +244,24 @@ $(DOWNLOADS)/sdl_sound/cmakebuild/Makefile: $(DOWNLOADS)/sdl_sound/CMakeLists.tx
 	cd $(DOWNLOADS)/sdl_sound; mkdir -p cmakebuild; cd cmakebuild; \
 	$(CMAKE) \
 	-DSDLSOUND_BUILD_SHARED=false \
-	-DSDLSOUND_BUILD_TEST=false \
-	-DSDLSOUND_DECODER_MP3=false
+	-DSDLSOUND_BUILD_TEST=false
 
 $(DOWNLOADS)/sdl_sound/CMakeLists.txt:
-	$(CLONE) $(GITLAB)/mkxp-z/SDL_sound $(DOWNLOADS)/sdl_sound -b v2.0
+	$(CLONE) $(GITHUB)/mkxp-z/SDL_sound $(DOWNLOADS)/sdl_sound -b git
 
 # SDL2 (ttf)
 sdl2ttf: init_dirs sdl2 freetype $(LIBDIR)/libSDL2_ttf.a
 
-$(LIBDIR)/libSDL2_ttf.a: $(DOWNLOADS)/sdl2_ttf/Makefile
-	cd $(DOWNLOADS)/sdl2_ttf; \
+$(LIBDIR)/libSDL2_ttf.a: $(DOWNLOADS)/sdl2_ttf/cmakebuild/Makefile
+	cd $(DOWNLOADS)/sdl2_ttf/cmakebuild; \
 	make -j$(NPROC); make install
 
-$(DOWNLOADS)/sdl2_ttf/Makefile: $(DOWNLOADS)/sdl2_ttf/configure
-	cd $(DOWNLOADS)/sdl2_ttf; \
-	$(CONFIGURE) --enable-static=true --enable-shared=false $(SDL2_TTF_FLAGS)
+$(DOWNLOADS)/sdl2_ttf/cmakebuild/Makefile: $(DOWNLOADS)/sdl2_ttf/CMakeLists.txt
+	cd $(DOWNLOADS)/sdl2_ttf; mkdir cmakebuild; cd cmakebuild; \
+	$(CMAKE) -DBUILD_SHARED_LIBS=no
 
-$(DOWNLOADS)/sdl2_ttf/configure: $(DOWNLOADS)/sdl2_ttf/autogen.sh
-	cd $(DOWNLOADS)/sdl2_ttf; ./autogen.sh
-
-$(DOWNLOADS)/sdl2_ttf/autogen.sh:
-	$(CLONE) $(GITLAB)/mkxp-z/SDL_ttf $(DOWNLOADS)/sdl2_ttf -b mkxp-z
+$(DOWNLOADS)/sdl2_ttf/CMakeLists.txt:
+	$(CLONE) $(GITHUB)/mkxp-z/sdl_ttf $(DOWNLOADS)/sdl2_ttf
 
 # Freetype (dependency of SDL2_ttf)
 freetype: init_dirs $(LIBDIR)/libfreetype.a
@@ -283,7 +278,7 @@ $(DOWNLOADS)/freetype/configure: $(DOWNLOADS)/freetype/autogen.sh
 	cd $(DOWNLOADS)/freetype; ./autogen.sh
 
 $(DOWNLOADS)/freetype/autogen.sh:
-	$(CLONE) $(GITLAB)/mkxp-z/freetype2 $(DOWNLOADS)/freetype
+	$(CLONE) $(GITHUB)/mkxp-z/freetype2 $(DOWNLOADS)/freetype
 
 # OpenAL
 openal: init_dirs libogg $(LIBDIR)/libopenal.a
@@ -297,7 +292,7 @@ $(DOWNLOADS)/openal/cmakebuild/Makefile: $(DOWNLOADS)/openal/CMakeLists.txt
 	$(CMAKE) -DLIBTYPE=STATIC -DALSOFT_EXAMPLES=no -DALSOFT_UTILS=no $(OPENAL_FLAGS)
 
 $(DOWNLOADS)/openal/CMakeLists.txt:
-	$(CLONE) $(GITLAB)/mkxp-z/openal-soft $(DOWNLOADS)/openal
+	$(CLONE) $(GITHUB)/mkxp-z/openal-soft $(DOWNLOADS)/openal
 
 # FluidSynth
 fluidsynth: init_dirs $(LIBDIR)/libfluidsynth.a
@@ -311,7 +306,7 @@ $(DOWNLOADS)/fluidsynth/cmakebuild/Makefile: $(DOWNLOADS)/fluidsynth/CMakeLists.
 	$(CMAKE) -DBUILD_SHARED_LIBS=no -Denable-sdl2=no -Denable-readline=no
 
 $(DOWNLOADS)/fluidsynth/CMakeLists.txt:
-	$(CLONE) $(GITLAB)/mkxp-z/fluidsynth-sans-glib $(DOWNLOADS)/fluidsynth
+	$(CLONE) $(GITHUB)/mkxp-z/fluidsynth-sans-glib $(DOWNLOADS)/fluidsynth
 
 # OpenSSL
 openssl: init_dirs $(LIBDIR)/libssl.a
@@ -327,12 +322,12 @@ $(DOWNLOADS)/openssl/Makefile: $(DOWNLOADS)/openssl/Configure
 	--openssldir="$(BUILD_PREFIX)"
 
 $(DOWNLOADS)/openssl/Configure:
-	$(CLONE) $(GITHUB)/openssl/openssl $(DOWNLOADS)/openssl -c advice.detachedHead=false --branch OpenSSL_1_1_1i
+	$(CLONE) $(GITHUB)/openssl/openssl $(DOWNLOADS)/openssl --single-branch --branch OpenSSL_1_1_1i --depth 1
 
 # Standard ruby
-ruby: init_dirs openssl $(BUILD_PREFIX)/libruby.so.3.0
+ruby: init_dirs openssl $(BUILD_PREFIX)/libruby.so.3.1
 
-$(BUILD_PREFIX)/libruby.so.3.0: $(DOWNLOADS)/ruby/Makefile
+$(BUILD_PREFIX)/libruby.so.3.1: $(DOWNLOADS)/ruby/Makefile
 	cd $(DOWNLOADS)/ruby; \
 	make -j$(NPROC); make install
 
@@ -344,7 +339,7 @@ $(DOWNLOADS)/ruby/configure: $(DOWNLOADS)/ruby/*.c
 	cd $(DOWNLOADS)/ruby; autoreconf -i
 
 $(DOWNLOADS)/ruby/*.c:
-	$(CLONE) $(GITLAB)/mkxp-z/ruby $(DOWNLOADS)/ruby -b mkxp-z;
+	$(CLONE) $(GITHUB)/mkxp-z/ruby $(DOWNLOADS)/ruby --single-branch --branch mkxp-z-3.1 --depth 1;
 
 # ====
 init_dirs:

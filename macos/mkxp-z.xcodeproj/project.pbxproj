@@ -105,10 +105,10 @@
 		3B1BC0E4266F7C2800794D22 /* iniconfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B1BC0E0266F7C0C00794D22 /* iniconfig.cpp */; };
 		3B1BC0EC266F924B00794D22 /* libuchardet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1BC0EB266F924B00794D22 /* libuchardet.a */; };
 		3B1BC0ED266F924B00794D22 /* libuchardet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1BC0EB266F924B00794D22 /* libuchardet.a */; };
-		3B1C230B25A144A10075EF5D /* libruby.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.0.dylib */; };
-		3B1C230C25A144A40075EF5D /* libruby.3.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		3B1C230E25A144BF0075EF5D /* libruby.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230D25A144BF0075EF5D /* libruby.3.0.dylib */; };
-		3B1C230F25A144C90075EF5D /* libruby.3.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230D25A144BF0075EF5D /* libruby.3.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3B1C230B25A144A10075EF5D /* libruby.3.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.1.dylib */; };
+		3B1C230C25A144A40075EF5D /* libruby.3.1.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3B1C230E25A144BF0075EF5D /* libruby.3.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230D25A144BF0075EF5D /* libruby.3.1.dylib */; };
+		3B1C230F25A144C90075EF5D /* libruby.3.1.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230D25A144BF0075EF5D /* libruby.3.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3B1C233025A16CB20075EF5D /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081582568D3A60006849F /* AppKit.framework */; };
 		3B1C233525A17C670075EF5D /* Assets.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BA08EA4256641ED00449CFF /* Assets.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3B1C233925A17CB80075EF5D /* Assets.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BA08EA4256641ED00449CFF /* Assets.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -189,7 +189,6 @@
 		3B1C23CA25A19C600075EF5D /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081582568D3A60006849F /* AppKit.framework */; };
 		3B1C23CB25A19C600075EF5D /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE080FD256879FE0006849F /* libogg.a */; };
 		3B1C23CC25A19C600075EF5D /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE080EB256879FC0006849F /* libSDL2.a */; };
-		3B1C23CD25A19C600075EF5D /* libturbojpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081492568A5F60006849F /* libturbojpeg.a */; };
 		3B1C23CE25A19C600075EF5D /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081452568A5C60006849F /* libpng.a */; };
 		3B1C23CF25A19C600075EF5D /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE080E6256879FC0006849F /* libvorbis.a */; };
 		3B1C23D225A19C600075EF5D /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD2B47A256534BA003DAD8A /* IOKit.framework */; };
@@ -199,7 +198,7 @@
 		3B1C23D825A19C600075EF5D /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081532568D3A60006849F /* CoreVideo.framework */; };
 		3B1C23D925A19C600075EF5D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081562568D3A60006849F /* CoreGraphics.framework */; };
 		3B1C23DA25A19C600075EF5D /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081502568D3A50006849F /* libbz2.tbd */; };
-		3B1C23DB25A19C600075EF5D /* libruby.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.0.dylib */; };
+		3B1C23DB25A19C600075EF5D /* libruby.3.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.1.dylib */; };
 		3B1C23DC25A19C600075EF5D /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081512568D3A60006849F /* CoreAudio.framework */; };
 		3B1C23DD25A19C600075EF5D /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD2B46925651C1B003DAD8A /* AudioToolbox.framework */; };
 		3B1C23DE25A19C600075EF5D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD2B46725651C00003DAD8A /* Foundation.framework */; };
@@ -214,15 +213,15 @@
 		3B1C23E925A19C600075EF5D /* Assets.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BA08EA4256641ED00449CFF /* Assets.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3B1C23EB25A19C600075EF5D /* mkxp.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BD2B7282565B35D003DAD8A /* mkxp.json */; };
 		3B1C23ED25A19C600075EF5D /* libfluidsynth.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B522DA1259BAA13003301C4 /* libfluidsynth.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		3B1C23EE25A19C600075EF5D /* libruby.3.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3B1C23EE25A19C600075EF5D /* libruby.3.1.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230A25A144A10075EF5D /* libruby.3.1.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3B1C23FD25A19FB40075EF5D /* steamshim_mac_helpers.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3B1C23FC25A19FB40075EF5D /* steamshim_mac_helpers.mm */; };
 		3B1C241225A1A7120075EF5D /* libsteam_api.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C241125A1A7120075EF5D /* libsteam_api.dylib */; };
 		3B1C242025A1A8660075EF5D /* libsteam_api.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C241125A1A7120075EF5D /* libsteam_api.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3B1C242625A1A90B0075EF5D /* shim in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1C235625A199370075EF5D /* shim */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3B1C242B25A1AA1F0075EF5D /* steamshim_child.c in Sources */ = {isa = PBXBuildFile; fileRef = 3B1C236925A19B960075EF5D /* steamshim_child.c */; };
-		3B251DA626DA2CFA00E5D09B /* 3.0.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.0.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		3B251DA826DA2E9000E5D09B /* 3.0.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.0.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		3B251DAC26DA2EC200E5D09B /* 3.0.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.0.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3B251DA626DA2CFA00E5D09B /* 3.1.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.1.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3B251DA826DA2E9000E5D09B /* 3.1.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.1.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3B251DAC26DA2EC200E5D09B /* 3.1.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.1.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3B312843259E7DC1002EAB43 /* miniffi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B312842259E7DC1002EAB43 /* miniffi.cpp */; };
 		3B312844259E7DC1002EAB43 /* miniffi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3B312842259E7DC1002EAB43 /* miniffi.cpp */; };
 		3B3F7D1D25B19F6E00EA5F1C /* settingsmenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3B3F7D1725B19DEC00EA5F1C /* settingsmenu.xib */; };
@@ -368,13 +367,12 @@
 		3BBE87FA2705A73400A574AE /* Assets.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BA08EA4256641ED00449CFF /* Assets.bundle */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3BBE87FB2705A73400A574AE /* steam_appid.txt in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B1C243E25A1B8D20075EF5D /* steam_appid.txt */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BBE87FD2705A73400A574AE /* mkxp.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3BD2B7282565B35D003DAD8A /* mkxp.json */; };
-		3BBE87FF2705A73400A574AE /* 3.0.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.0.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		3BBE87FF2705A73400A574AE /* 3.1.0 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 3B251DA526DA2CFA00E5D09B /* 3.1.0 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BBE88012705A73400A574AE /* libfluidsynth.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B522DA1259BAA13003301C4 /* libfluidsynth.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BBE88022705A73400A574AE /* libEGL.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B5E1F0925A881FB0086FFDC /* libEGL.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BBE88042705A73400A574AE /* libsteam_api.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C241125A1A7120075EF5D /* libsteam_api.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BBE88052705A73400A574AE /* libGLESv2.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B5E1F0A25A881FB0086FFDC /* libGLESv2.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BBE880B2705AA8F00A574AE /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B522DC8259BFEDF003301C4 /* libcrypto.a */; };
-		3BBE880D2705AAC900A574AE /* libruby.3.0.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230D25A144BF0075EF5D /* libruby.3.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		3BBE880E2705AAF200A574AE /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D822584F3780063AFF1 /* libogg.a */; };
 		3BBE880F2705AAFF00A574AE /* libSDL2_ttf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D832584F3780063AFF1 /* libSDL2_ttf.a */; };
 		3BBE88102705AB0400A574AE /* libvorbisenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D7A2584F3780063AFF1 /* libvorbisenc.a */; };
@@ -383,9 +381,8 @@
 		3BBE88142705AB1A00A574AE /* libuchardet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BAEB1432673DBE700AC177B /* libuchardet.a */; };
 		3BBE88162705AC0800A574AE /* libpixman-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D882584F3780063AFF1 /* libpixman-1.a */; };
 		3BBE88172705AC0C00A574AE /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D862584F3780063AFF1 /* libSDL2.a */; };
-		3BBE88182705AC1400A574AE /* libturbojpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D7E2584F3780063AFF1 /* libturbojpeg.a */; };
 		3BBE881A2705AC2B00A574AE /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D852584F3780063AFF1 /* libvorbis.a */; };
-		3BBE881B2705AC3100A574AE /* libruby.3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230D25A144BF0075EF5D /* libruby.3.0.dylib */; };
+		3BBE881B2705AC3100A574AE /* libruby.3.1.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B1C230D25A144BF0075EF5D /* libruby.3.1.dylib */; };
 		3BBE881C2705AC3700A574AE /* libSDL2_sound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BF5B4BC2685881C00A3B240 /* libSDL2_sound.a */; };
 		3BBE881D2705AC3F00A574AE /* libvorbisfile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D812584F3780063AFF1 /* libvorbisfile.a */; };
 		3BBE881E2705AC4200A574AE /* libSDL2_image.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BEA5D7125AC3CE300B6E359 /* libSDL2_image.a */; };
@@ -458,7 +455,7 @@
 		3BC65DEB2584F3AD0063AFF1 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD2B47A256534BA003DAD8A /* IOKit.framework */; };
 		3BC65DED2584F3AD0063AFF1 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081552568D3A60006849F /* Carbon.framework */; };
 		3BC65DEF2584F3AD0063AFF1 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081582568D3A60006849F /* AppKit.framework */; };
-		3BC65DF42584F3AD0063AFF1 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081542568D3A60006849F /* Metal.framework */; };
+		3BC65DF42584F3AD0063AFF1 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081542568D3A60006849F /* Metal.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		3BC65DF52584F3AD0063AFF1 /* ForceFeedback.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081572568D3A60006849F /* ForceFeedback.framework */; };
 		3BC65DF62584F3AD0063AFF1 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081532568D3A60006849F /* CoreVideo.framework */; };
 		3BC65DFA2584F3AD0063AFF1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081562568D3A60006849F /* CoreGraphics.framework */; };
@@ -470,7 +467,6 @@
 		3BC65E022584F3AD0063AFF1 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD2B46525651BF3003DAD8A /* libz.tbd */; };
 		3BC65E062584F3AD0063AFF1 /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BD2B46825651C12003DAD8A /* libiconv.tbd */; };
 		3BC65E0E2584F3AD0063AFF1 /* icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3BDB23E22564546E00C4A63D /* icon.icns */; };
-		3BC65E1F2584F4290063AFF1 /* libturbojpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D7E2584F3780063AFF1 /* libturbojpeg.a */; };
 		3BC65E202584F4290063AFF1 /* libpixman-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D882584F3780063AFF1 /* libpixman-1.a */; };
 		3BC65E212584F4290063AFF1 /* libopenal.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D842584F3780063AFF1 /* libopenal.a */; };
 		3BC65E222584F4290063AFF1 /* libSDL2_ttf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BC65D832584F3780063AFF1 /* libSDL2_ttf.a */; };
@@ -500,12 +496,28 @@
 		3BE0811B256879FE0006849F /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE080FD256879FE0006849F /* libogg.a */; };
 		3BE0811D256879FE0006849F /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE080FF256879FE0006849F /* libphysfs.a */; };
 		3BE081462568A5C60006849F /* libpng.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081452568A5C60006849F /* libpng.a */; };
-		3BE0814A2568A5F60006849F /* libturbojpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081492568A5F60006849F /* libturbojpeg.a */; };
 		3BE081592568D3A60006849F /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BE081502568D3A50006849F /* libbz2.tbd */; };
 		3BEA5D7225AC3CE300B6E359 /* libSDL2_image.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BEA5D7125AC3CE300B6E359 /* libSDL2_image.a */; };
 		3BF5B4BD2685881D00A3B240 /* libSDL2_sound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BF5B4BC2685881C00A3B240 /* libSDL2_sound.a */; };
 		3BF5B4BF2685883B00A3B240 /* libSDL2_sound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BF5B4BE2685883B00A3B240 /* libSDL2_sound.a */; };
 		3BF5B4C02685883B00A3B240 /* libSDL2_sound.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BF5B4BE2685883B00A3B240 /* libSDL2_sound.a */; };
+		96563582279A5ABD003D6A75 /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96563581279A5ABD003D6A75 /* libtheora.a */; };
+		96563583279A5ABD003D6A75 /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96563581279A5ABD003D6A75 /* libtheora.a */; };
+		96563585279A5ADA003D6A75 /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96563584279A5ADA003D6A75 /* libtheora.a */; };
+		96563586279A5ADA003D6A75 /* libtheora.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96563584279A5ADA003D6A75 /* libtheora.a */; };
+		9656359B279A5B74003D6A75 /* theoraplay.c in Sources */ = {isa = PBXBuildFile; fileRef = 96563592279A5B74003D6A75 /* theoraplay.c */; };
+		9656359C279A5B74003D6A75 /* theoraplay.c in Sources */ = {isa = PBXBuildFile; fileRef = 96563592279A5B74003D6A75 /* theoraplay.c */; };
+		9656359D279A5B74003D6A75 /* theoraplay.c in Sources */ = {isa = PBXBuildFile; fileRef = 96563592279A5B74003D6A75 /* theoraplay.c */; };
+		9656359E279A5B74003D6A75 /* theoraplay.c in Sources */ = {isa = PBXBuildFile; fileRef = 96563592279A5B74003D6A75 /* theoraplay.c */; };
+		96573E7C27913B46002C3E77 /* TouchBar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96573E7A27913B46002C3E77 /* TouchBar.mm */; };
+		96573E7D27913B46002C3E77 /* TouchBar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96573E7A27913B46002C3E77 /* TouchBar.mm */; };
+		96573E7E27913B46002C3E77 /* TouchBar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96573E7A27913B46002C3E77 /* TouchBar.mm */; };
+		96573E7F27913B46002C3E77 /* TouchBar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 96573E7A27913B46002C3E77 /* TouchBar.mm */; };
+		96573E81279152DC002C3E77 /* TouchBar.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96573E80279152DC002C3E77 /* TouchBar.xcassets */; };
+		96573E82279152DC002C3E77 /* TouchBar.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96573E80279152DC002C3E77 /* TouchBar.xcassets */; };
+		96573E83279152DC002C3E77 /* TouchBar.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96573E80279152DC002C3E77 /* TouchBar.xcassets */; };
+		96573E84279152DC002C3E77 /* TouchBar.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96573E80279152DC002C3E77 /* TouchBar.xcassets */; };
+		96D8EDD128728DCE00A331EA /* gamecontrollerdb.txt in Resources */ = {isa = PBXBuildFile; fileRef = 96D8EDD028728DCA00A331EA /* gamecontrollerdb.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -612,7 +624,7 @@
 			files = (
 				3B1C23ED25A19C600075EF5D /* libfluidsynth.dylib in Embed Frameworks */,
 				3B5E1F1525A881FE0086FFDC /* libEGL.dylib in Embed Frameworks */,
-				3B1C23EE25A19C600075EF5D /* libruby.3.0.dylib in Embed Frameworks */,
+				3B1C23EE25A19C600075EF5D /* libruby.3.1.dylib in Embed Frameworks */,
 				3B1C242025A1A8660075EF5D /* libsteam_api.dylib in Embed Frameworks */,
 				3B5E1F1825A882000086FFDC /* libGLESv2.dylib in Embed Frameworks */,
 			);
@@ -635,7 +647,7 @@
 			dstPath = Ruby;
 			dstSubfolderSpec = 7;
 			files = (
-				3B251DA626DA2CFA00E5D09B /* 3.0.0 in CopyFiles */,
+				3B251DA626DA2CFA00E5D09B /* 3.1.0 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -645,7 +657,7 @@
 			dstPath = Ruby;
 			dstSubfolderSpec = 7;
 			files = (
-				3B251DA826DA2E9000E5D09B /* 3.0.0 in CopyFiles */,
+				3B251DA826DA2E9000E5D09B /* 3.1.0 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -655,7 +667,7 @@
 			dstPath = Ruby;
 			dstSubfolderSpec = 7;
 			files = (
-				3B251DAC26DA2EC200E5D09B /* 3.0.0 in CopyFiles */,
+				3B251DAC26DA2EC200E5D09B /* 3.1.0 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -667,7 +679,7 @@
 			files = (
 				3B5E1F1F25A8820D0086FFDC /* libEGL.dylib in Embed Frameworks */,
 				3B522DA9259BAA42003301C4 /* libfluidsynth.dylib in Embed Frameworks */,
-				3B1C230F25A144C90075EF5D /* libruby.3.0.dylib in Embed Frameworks */,
+				3B1C230F25A144C90075EF5D /* libruby.3.1.dylib in Embed Frameworks */,
 				3B5E1F2025A8820F0086FFDC /* libGLESv2.dylib in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -681,7 +693,7 @@
 			files = (
 				3B5E1F1D25A882090086FFDC /* libEGL.dylib in Embed Frameworks */,
 				3B522DAA259BAA4A003301C4 /* libfluidsynth.dylib in Embed Frameworks */,
-				3B1C230C25A144A40075EF5D /* libruby.3.0.dylib in Embed Frameworks */,
+				3B1C230C25A144A40075EF5D /* libruby.3.1.dylib in Embed Frameworks */,
 				3B5E1F1E25A8820B0086FFDC /* libGLESv2.dylib in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -778,7 +790,7 @@
 			dstPath = Ruby;
 			dstSubfolderSpec = 7;
 			files = (
-				3BBE87FF2705A73400A574AE /* 3.0.0 in CopyFiles */,
+				3BBE87FF2705A73400A574AE /* 3.1.0 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -788,7 +800,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3BBE880D2705AAC900A574AE /* libruby.3.0.dylib in Embed Frameworks */,
 				3BBE88012705A73400A574AE /* libfluidsynth.dylib in Embed Frameworks */,
 				3BBE88022705A73400A574AE /* libEGL.dylib in Embed Frameworks */,
 				3BBE88042705A73400A574AE /* libsteam_api.dylib in Embed Frameworks */,
@@ -971,11 +982,9 @@
 		3B1BC0DF266F7C0C00794D22 /* iniconfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iniconfig.h; sourceTree = "<group>"; };
 		3B1BC0E0266F7C0C00794D22 /* iniconfig.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = iniconfig.cpp; sourceTree = "<group>"; };
 		3B1BC0E6266F8E8700794D22 /* dependencies.make */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = dependencies.make; path = Dependencies/dependencies.make; sourceTree = "<group>"; };
-		3B1BC0E7266F91E100794D22 /* libuchardet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuchardet.a; path = "Dependencies/build-macosx-arm64/lib/libuchardet.a"; sourceTree = "<group>"; };
 		3B1BC0EB266F924B00794D22 /* libuchardet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuchardet.a; path = "Dependencies/build-macosx-x86_64/lib/libuchardet.a"; sourceTree = "<group>"; };
-		3B1C230625A142620075EF5D /* libruby.3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libruby.3.0.dylib; path = "Dependencies/build-macosx-arm64/lib/libruby.3.0.dylib"; sourceTree = "<group>"; };
-		3B1C230A25A144A10075EF5D /* libruby.3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libruby.3.0.dylib; path = "Dependencies/build-macosx-x86_64/lib/libruby.3.0.dylib"; sourceTree = "<group>"; };
-		3B1C230D25A144BF0075EF5D /* libruby.3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libruby.3.0.dylib; path = "Dependencies/build-macosx-universal/lib/libruby.3.0.dylib"; sourceTree = "<group>"; };
+		3B1C230A25A144A10075EF5D /* libruby.3.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libruby.3.1.dylib; path = "Dependencies/build-macosx-x86_64/lib/libruby.3.1.dylib"; sourceTree = "<group>"; };
+		3B1C230D25A144BF0075EF5D /* libruby.3.1.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libruby.3.1.dylib; path = "Dependencies/build-macosx-universal/lib/libruby.3.1.dylib"; sourceTree = "<group>"; };
 		3B1C231E25A15FB20075EF5D /* mkxp.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mkxp.xcconfig; path = config/mkxp.xcconfig; sourceTree = "<group>"; };
 		3B1C231F25A15FB20075EF5D /* mkxp.Intel.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mkxp.Intel.xcconfig; path = config/mkxp.Intel.xcconfig; sourceTree = "<group>"; };
 		3B1C232025A15FB20075EF5D /* mkxp.Universal.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = mkxp.Universal.xcconfig; path = config/mkxp.Universal.xcconfig; sourceTree = "<group>"; };
@@ -989,7 +998,7 @@
 		3B1C240C25A1A4C50075EF5D /* steamshim.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = steamshim.xcconfig; path = config/steamshim.xcconfig; sourceTree = "<group>"; };
 		3B1C241125A1A7120075EF5D /* libsteam_api.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsteam_api.dylib; path = Dependencies/Frameworks/steam/sdk/redistributable_bin/osx/libsteam_api.dylib; sourceTree = "<group>"; };
 		3B1C243E25A1B8D20075EF5D /* steam_appid.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = steam_appid.txt; path = config/steam_appid.txt; sourceTree = "<group>"; };
-		3B251DA526DA2CFA00E5D09B /* 3.0.0 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = 3.0.0; path = "Dependencies/build-macosx-x86_64/lib/ruby/3.0.0"; sourceTree = "<group>"; };
+		3B251DA526DA2CFA00E5D09B /* 3.1.0 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = 3.1.0; path = "Dependencies/build-macosx-x86_64/lib/ruby/3.1.0"; sourceTree = "<group>"; };
 		3B312841259E7DC1002EAB43 /* miniffi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = miniffi.h; sourceTree = "<group>"; };
 		3B312842259E7DC1002EAB43 /* miniffi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = miniffi.cpp; sourceTree = "<group>"; };
 		3B3F7D1725B19DEC00EA5F1C /* settingsmenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = settingsmenu.xib; path = views/settingsmenu.xib; sourceTree = "<group>"; };
@@ -1009,8 +1018,6 @@
 		3B522DBF259BD072003301C4 /* net.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = net.cpp; sourceTree = "<group>"; };
 		3B522DC8259BFEDF003301C4 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "Dependencies/build-macosx-universal/lib/libcrypto.a"; sourceTree = "<group>"; };
 		3B522DC9259BFEDF003301C4 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "Dependencies/build-macosx-universal/lib/libssl.a"; sourceTree = "<group>"; };
-		3B522DCE259BFF0B003301C4 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "Dependencies/build-macosx-arm64/lib/libcrypto.a"; sourceTree = "<group>"; };
-		3B522DCF259BFF0B003301C4 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "Dependencies/build-macosx-arm64/lib/libssl.a"; sourceTree = "<group>"; };
 		3B522DD4259BFF2D003301C4 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "Dependencies/build-macosx-x86_64/lib/libssl.a"; sourceTree = "<group>"; };
 		3B522DD5259BFF2D003301C4 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "Dependencies/build-macosx-x86_64/lib/libcrypto.a"; sourceTree = "<group>"; };
 		3B522DDB259C1E53003301C4 /* http-binding.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "http-binding.cpp"; sourceTree = "<group>"; };
@@ -1037,24 +1044,9 @@
 		3BA69453263DAB53004194EB /* libnsgif.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libnsgif.h; sourceTree = "<group>"; };
 		3BAEB1432673DBE700AC177B /* libuchardet.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libuchardet.a; path = "Dependencies/build-macosx-universal/lib/libuchardet.a"; sourceTree = "<group>"; };
 		3BBE88092705A73400A574AE /* Z-steam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Z-steam.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3BC65D4A2584EED10063AFF1 /* libvorbis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbis.a; path = "Dependencies/build-macosx-arm64/lib/libvorbis.a"; sourceTree = "<group>"; };
-		3BC65D4B2584EED10063AFF1 /* libpixman-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libpixman-1.a"; path = "Dependencies/build-macosx-arm64/lib/libpixman-1.a"; sourceTree = "<group>"; };
-		3BC65D4C2584EED10063AFF1 /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = "Dependencies/build-macosx-arm64/lib/libphysfs.a"; sourceTree = "<group>"; };
-		3BC65D4D2584EED10063AFF1 /* libvorbisenc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbisenc.a; path = "Dependencies/build-macosx-arm64/lib/libvorbisenc.a"; sourceTree = "<group>"; };
-		3BC65D4F2584EED10063AFF1 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = "Dependencies/build-macosx-arm64/lib/libfreetype.a"; sourceTree = "<group>"; };
-		3BC65D502584EED10063AFF1 /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2main.a; path = "Dependencies/build-macosx-arm64/lib/libSDL2main.a"; sourceTree = "<group>"; };
-		3BC65D512584EED10063AFF1 /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libogg.a; path = "Dependencies/build-macosx-arm64/lib/libogg.a"; sourceTree = "<group>"; };
-		3BC65D522584EED10063AFF1 /* libSDL2_image.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_image.a; path = "Dependencies/build-macosx-arm64/lib/libSDL2_image.a"; sourceTree = "<group>"; };
-		3BC65D532584EED10063AFF1 /* libSDL2_ttf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_ttf.a; path = "Dependencies/build-macosx-arm64/lib/libSDL2_ttf.a"; sourceTree = "<group>"; };
-		3BC65D542584EED10063AFF1 /* libvorbisfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbisfile.a; path = "Dependencies/build-macosx-arm64/lib/libvorbisfile.a"; sourceTree = "<group>"; };
-		3BC65D552584EED10063AFF1 /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = "Dependencies/build-macosx-arm64/lib/libSDL2.a"; sourceTree = "<group>"; };
-		3BC65D562584EED10063AFF1 /* libopenal.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libopenal.a; path = "Dependencies/build-macosx-arm64/lib/libopenal.a"; sourceTree = "<group>"; };
-		3BC65D582584EED10063AFF1 /* libturbojpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libturbojpeg.a; path = "Dependencies/build-macosx-arm64/lib/libturbojpeg.a"; sourceTree = "<group>"; };
-		3BC65D592584EED10063AFF1 /* libpng16.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng16.a; path = "Dependencies/build-macosx-arm64/lib/libpng16.a"; sourceTree = "<group>"; };
 		3BC65D7A2584F3780063AFF1 /* libvorbisenc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbisenc.a; path = "Dependencies/build-macosx-universal/lib/libvorbisenc.a"; sourceTree = "<group>"; };
 		3BC65D7B2584F3780063AFF1 /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = "Dependencies/build-macosx-universal/lib/libphysfs.a"; sourceTree = "<group>"; };
 		3BC65D7D2584F3780063AFF1 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = "Dependencies/build-macosx-universal/lib/libfreetype.a"; sourceTree = "<group>"; };
-		3BC65D7E2584F3780063AFF1 /* libturbojpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libturbojpeg.a; path = "Dependencies/build-macosx-universal/lib/libturbojpeg.a"; sourceTree = "<group>"; };
 		3BC65D812584F3780063AFF1 /* libvorbisfile.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbisfile.a; path = "Dependencies/build-macosx-universal/lib/libvorbisfile.a"; sourceTree = "<group>"; };
 		3BC65D822584F3780063AFF1 /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libogg.a; path = "Dependencies/build-macosx-universal/lib/libogg.a"; sourceTree = "<group>"; };
 		3BC65D832584F3780063AFF1 /* libSDL2_ttf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_ttf.a; path = "Dependencies/build-macosx-universal/lib/libSDL2_ttf.a"; sourceTree = "<group>"; };
@@ -1090,7 +1082,6 @@
 		3BE080FD256879FE0006849F /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libogg.a; path = "Dependencies/build-macosx-x86_64/lib/libogg.a"; sourceTree = "<group>"; };
 		3BE080FF256879FE0006849F /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = "Dependencies/build-macosx-x86_64/lib/libphysfs.a"; sourceTree = "<group>"; };
 		3BE081452568A5C60006849F /* libpng.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng.a; path = "Dependencies/build-macosx-x86_64/lib/libpng.a"; sourceTree = "<group>"; };
-		3BE081492568A5F60006849F /* libturbojpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libturbojpeg.a; path = "Dependencies/build-macosx-x86_64/lib/libturbojpeg.a"; sourceTree = "<group>"; };
 		3BE081502568D3A50006849F /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		3BE081512568D3A60006849F /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		3BE081522568D3A60006849F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
@@ -1101,10 +1092,18 @@
 		3BE081572568D3A60006849F /* ForceFeedback.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ForceFeedback.framework; path = System/Library/Frameworks/ForceFeedback.framework; sourceTree = SDKROOT; };
 		3BE081582568D3A60006849F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		3BEA5D7125AC3CE300B6E359 /* libSDL2_image.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_image.a; path = "Dependencies/build-macosx-universal/lib/libSDL2_image.a"; sourceTree = "<group>"; };
-		3BF5B4BA268587F200A3B240 /* libSDL2_sound.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_sound.a; path = "Dependencies/build-macosx-arm64/lib/libSDL2_sound.a"; sourceTree = "<group>"; };
 		3BF5B4BC2685881C00A3B240 /* libSDL2_sound.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_sound.a; path = "Dependencies/build-macosx-universal/lib/libSDL2_sound.a"; sourceTree = "<group>"; };
 		3BF5B4BE2685883B00A3B240 /* libSDL2_sound.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2_sound.a; path = "Dependencies/build-macosx-x86_64/lib/libSDL2_sound.a"; sourceTree = "<group>"; };
 		3BFABF53267787940024C7DD /* sigslot */ = {isa = PBXFileReference; lastKnownFileType = folder; path = sigslot; sourceTree = "<group>"; };
+		96563581279A5ABD003D6A75 /* libtheora.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtheora.a; path = "Dependencies/build-macosx-x86_64/lib/libtheora.a"; sourceTree = "<group>"; };
+		96563584279A5ADA003D6A75 /* libtheora.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libtheora.a; path = "Dependencies/build-macosx-universal/lib/libtheora.a"; sourceTree = "<group>"; };
+		9656358E279A5B74003D6A75 /* theoraplay_cvtrgb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = theoraplay_cvtrgb.h; sourceTree = "<group>"; };
+		9656358F279A5B74003D6A75 /* theoraplay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = theoraplay.h; sourceTree = "<group>"; };
+		96563592279A5B74003D6A75 /* theoraplay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = theoraplay.c; sourceTree = "<group>"; };
+		96573E7A27913B46002C3E77 /* TouchBar.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = TouchBar.mm; path = views/TouchBar.mm; sourceTree = "<group>"; };
+		96573E7B27913B46002C3E77 /* TouchBar.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; name = TouchBar.h; path = views/TouchBar.h; sourceTree = "<group>"; };
+		96573E80279152DC002C3E77 /* TouchBar.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = TouchBar.xcassets; path = views/TouchBar.xcassets; sourceTree = "<group>"; };
+		96D8EDD028728DCA00A331EA /* gamecontrollerdb.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = gamecontrollerdb.txt; path = ../assets/gamecontrollerdb.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1131,7 +1130,6 @@
 				3B1C23CA25A19C600075EF5D /* AppKit.framework in Frameworks */,
 				3B1C23CB25A19C600075EF5D /* libogg.a in Frameworks */,
 				3B1C23CC25A19C600075EF5D /* libSDL2.a in Frameworks */,
-				3B1C23CD25A19C600075EF5D /* libturbojpeg.a in Frameworks */,
 				3B1C23CE25A19C600075EF5D /* libpng.a in Frameworks */,
 				3B5E1F0E25A881FB0086FFDC /* libEGL.dylib in Frameworks */,
 				3B1C23CF25A19C600075EF5D /* libvorbis.a in Frameworks */,
@@ -1144,10 +1142,11 @@
 				3B1C23D925A19C600075EF5D /* CoreGraphics.framework in Frameworks */,
 				3B1C23DA25A19C600075EF5D /* libbz2.tbd in Frameworks */,
 				3B480EA125DCD176001686B4 /* GameController.framework in Frameworks */,
-				3B1C23DB25A19C600075EF5D /* libruby.3.0.dylib in Frameworks */,
+				3B1C23DB25A19C600075EF5D /* libruby.3.1.dylib in Frameworks */,
 				3B1C23DC25A19C600075EF5D /* CoreAudio.framework in Frameworks */,
 				3B1C23DD25A19C600075EF5D /* AudioToolbox.framework in Frameworks */,
 				3B1C23DE25A19C600075EF5D /* Foundation.framework in Frameworks */,
+				96563583279A5ABD003D6A75 /* libtheora.a in Frameworks */,
 				3B1C23DF25A19C600075EF5D /* CoreFoundation.framework in Frameworks */,
 				3B1C23E025A19C600075EF5D /* libz.tbd in Frameworks */,
 				3B1C23E125A19C600075EF5D /* libiconv.tbd in Frameworks */,
@@ -1179,7 +1178,6 @@
 				3BBE87D82705A73400A574AE /* AppKit.framework in Frameworks */,
 				3BBE88172705AC0C00A574AE /* libSDL2.a in Frameworks */,
 				3BBE880E2705AAF200A574AE /* libogg.a in Frameworks */,
-				3BBE88182705AC1400A574AE /* libturbojpeg.a in Frameworks */,
 				3BBE87DD2705A73400A574AE /* libEGL.dylib in Frameworks */,
 				3BBE88212705AD3D00A574AE /* libpng16.a in Frameworks */,
 				3BBE881A2705AC2B00A574AE /* libvorbis.a in Frameworks */,
@@ -1187,7 +1185,7 @@
 				3BBE87E12705A73400A574AE /* Carbon.framework in Frameworks */,
 				3BBE87E22705A73400A574AE /* Metal.framework in Frameworks */,
 				3BBE87E32705A73400A574AE /* ForceFeedback.framework in Frameworks */,
-				3BBE881B2705AC3100A574AE /* libruby.3.0.dylib in Frameworks */,
+				3BBE881B2705AC3100A574AE /* libruby.3.1.dylib in Frameworks */,
 				3BBE881C2705AC3700A574AE /* libSDL2_sound.a in Frameworks */,
 				3BBE87E52705A73400A574AE /* CoreVideo.framework in Frameworks */,
 				3BBE87E62705A73400A574AE /* CoreGraphics.framework in Frameworks */,
@@ -1197,6 +1195,7 @@
 				3BBE87EA2705A73400A574AE /* CoreAudio.framework in Frameworks */,
 				3BBE87EB2705A73400A574AE /* AudioToolbox.framework in Frameworks */,
 				3BBE87EC2705A73400A574AE /* Foundation.framework in Frameworks */,
+				96563586279A5ADA003D6A75 /* libtheora.a in Frameworks */,
 				3BBE87ED2705A73400A574AE /* CoreFoundation.framework in Frameworks */,
 				3BBE87EE2705A73400A574AE /* libz.tbd in Frameworks */,
 				3BBE87EF2705A73400A574AE /* libiconv.tbd in Frameworks */,
@@ -1211,6 +1210,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96563585279A5ADA003D6A75 /* libtheora.a in Frameworks */,
 				3BC65E2C2584F4290063AFF1 /* libvorbisenc.a in Frameworks */,
 				3BC65E2D2584F4290063AFF1 /* libogg.a in Frameworks */,
 				3BAEB1442673DBE700AC177B /* libuchardet.a in Frameworks */,
@@ -1224,7 +1224,6 @@
 				3BC65DED2584F3AD0063AFF1 /* Carbon.framework in Frameworks */,
 				3BC65DEF2584F3AD0063AFF1 /* AppKit.framework in Frameworks */,
 				3BC65E282584F4290063AFF1 /* libSDL2main.a in Frameworks */,
-				3BC65E1F2584F4290063AFF1 /* libturbojpeg.a in Frameworks */,
 				3BC65DF42584F3AD0063AFF1 /* Metal.framework in Frameworks */,
 				3BC65DF52584F3AD0063AFF1 /* ForceFeedback.framework in Frameworks */,
 				3BC65DF62584F3AD0063AFF1 /* CoreVideo.framework in Frameworks */,
@@ -1237,7 +1236,7 @@
 				3BC65DFD2584F3AD0063AFF1 /* AudioToolbox.framework in Frameworks */,
 				3B5E1F0F25A881FB0086FFDC /* libGLESv2.dylib in Frameworks */,
 				3BC65E212584F4290063AFF1 /* libopenal.a in Frameworks */,
-				3B1C230E25A144BF0075EF5D /* libruby.3.0.dylib in Frameworks */,
+				3B1C230E25A144BF0075EF5D /* libruby.3.1.dylib in Frameworks */,
 				3B97F77025E6178200A569B5 /* GameController.framework in Frameworks */,
 				3BC65DFF2584F3AD0063AFF1 /* Foundation.framework in Frameworks */,
 				3BC65E242584F4290063AFF1 /* libvorbisfile.a in Frameworks */,
@@ -1265,7 +1264,6 @@
 				3B1C233025A16CB20075EF5D /* AppKit.framework in Frameworks */,
 				3BE0811B256879FE0006849F /* libogg.a in Frameworks */,
 				3BE08109256879FE0006849F /* libSDL2.a in Frameworks */,
-				3BE0814A2568A5F60006849F /* libturbojpeg.a in Frameworks */,
 				3BE081462568A5C60006849F /* libpng.a in Frameworks */,
 				3B5E1F0C25A881FB0086FFDC /* libEGL.dylib in Frameworks */,
 				3BE08104256879FE0006849F /* libvorbis.a in Frameworks */,
@@ -1278,10 +1276,11 @@
 				3B10EC5C2568D40500372D13 /* CoreGraphics.framework in Frameworks */,
 				3BE081592568D3A60006849F /* libbz2.tbd in Frameworks */,
 				3B480E9F25DCD174001686B4 /* GameController.framework in Frameworks */,
-				3B1C230B25A144A10075EF5D /* libruby.3.0.dylib in Frameworks */,
+				3B1C230B25A144A10075EF5D /* libruby.3.1.dylib in Frameworks */,
 				3B10EC632568D40C00372D13 /* CoreAudio.framework in Frameworks */,
 				3BA08E9B256638C900449CFF /* AudioToolbox.framework in Frameworks */,
 				3BD2B6F12565AEC0003DAD8A /* Foundation.framework in Frameworks */,
+				96563582279A5ABD003D6A75 /* libtheora.a in Frameworks */,
 				3BD2B6EF2565AEC0003DAD8A /* CoreFoundation.framework in Frameworks */,
 				3BD2B6F32565AEC0003DAD8A /* libz.tbd in Frameworks */,
 				3BD2B6ED2565AEC0003DAD8A /* libiconv.tbd in Frameworks */,
@@ -1350,6 +1349,7 @@
 				3B10ED582568E95D00372D13 /* system */,
 				3B10ED5D2568E95D00372D13 /* audio */,
 				3B10ED6F2568E95D00372D13 /* display */,
+				9656358D279A5B74003D6A75 /* theoraplay */,
 				3B10ED352568E95D00372D13 /* eventthread.cpp */,
 				3B10ED492568E95D00372D13 /* eventthread.h */,
 				3B10ED432568E95D00372D13 /* config.h */,
@@ -1623,7 +1623,7 @@
 		3B251DA226DA2C8600E5D09B /* Ruby Standard Library */ = {
 			isa = PBXGroup;
 			children = (
-				3B251DA526DA2CFA00E5D09B /* 3.0.0 */,
+				3B251DA526DA2CFA00E5D09B /* 3.1.0 */,
 			);
 			name = "Ruby Standard Library";
 			sourceTree = "<group>";
@@ -1635,6 +1635,9 @@
 				3B3F7D2925B1A73A00EA5F1C /* SettingsMenuController.mm */,
 				3B3F7D3025B1A79F00EA5F1C /* SettingsMenuController.h */,
 				3B480E9325DCBDD6001686B4 /* sdl_codes.h */,
+				96573E7A27913B46002C3E77 /* TouchBar.mm */,
+				96573E7B27913B46002C3E77 /* TouchBar.h */,
+				96573E80279152DC002C3E77 /* TouchBar.xcassets */,
 			);
 			name = MacOS;
 			sourceTree = "<group>";
@@ -1701,32 +1704,6 @@
 			path = utils;
 			sourceTree = "<group>";
 		};
-		3BC65D492584EE690063AFF1 /* ARM64 */ = {
-			isa = PBXGroup;
-			children = (
-				3B1BC0E7266F91E100794D22 /* libuchardet.a */,
-				3BF5B4BA268587F200A3B240 /* libSDL2_sound.a */,
-				3BC65D4F2584EED10063AFF1 /* libfreetype.a */,
-				3BC65D512584EED10063AFF1 /* libogg.a */,
-				3BC65D562584EED10063AFF1 /* libopenal.a */,
-				3BC65D4C2584EED10063AFF1 /* libphysfs.a */,
-				3BC65D4B2584EED10063AFF1 /* libpixman-1.a */,
-				3BC65D592584EED10063AFF1 /* libpng16.a */,
-				3B1C230625A142620075EF5D /* libruby.3.0.dylib */,
-				3BC65D522584EED10063AFF1 /* libSDL2_image.a */,
-				3BC65D532584EED10063AFF1 /* libSDL2_ttf.a */,
-				3BC65D552584EED10063AFF1 /* libSDL2.a */,
-				3BC65D502584EED10063AFF1 /* libSDL2main.a */,
-				3BC65D582584EED10063AFF1 /* libturbojpeg.a */,
-				3BC65D4A2584EED10063AFF1 /* libvorbis.a */,
-				3BC65D4D2584EED10063AFF1 /* libvorbisenc.a */,
-				3BC65D542584EED10063AFF1 /* libvorbisfile.a */,
-				3B522DCE259BFF0B003301C4 /* libcrypto.a */,
-				3B522DCF259BFF0B003301C4 /* libssl.a */,
-			);
-			name = ARM64;
-			sourceTree = "<group>";
-		};
 		3BC65D792584F3030063AFF1 /* Universal */ = {
 			isa = PBXGroup;
 			children = (
@@ -1735,7 +1712,8 @@
 				3BF5B4BC2685881C00A3B240 /* libSDL2_sound.a */,
 				3BAEB1432673DBE700AC177B /* libuchardet.a */,
 				3B522DA1259BAA13003301C4 /* libfluidsynth.dylib */,
-				3B1C230D25A144BF0075EF5D /* libruby.3.0.dylib */,
+				3B1C230D25A144BF0075EF5D /* libruby.3.1.dylib */,
+				96563584279A5ADA003D6A75 /* libtheora.a */,
 				3BC65D822584F3780063AFF1 /* libogg.a */,
 				3BC65D842584F3780063AFF1 /* libopenal.a */,
 				3BC65D7B2584F3780063AFF1 /* libphysfs.a */,
@@ -1745,7 +1723,6 @@
 				3BC65D832584F3780063AFF1 /* libSDL2_ttf.a */,
 				3BC65D862584F3780063AFF1 /* libSDL2.a */,
 				3BC65D892584F3910063AFF1 /* libSDL2main.a */,
-				3BC65D7E2584F3780063AFF1 /* libturbojpeg.a */,
 				3BC65D852584F3780063AFF1 /* libvorbis.a */,
 				3BC65D7A2584F3780063AFF1 /* libvorbisenc.a */,
 				3BC65D812584F3780063AFF1 /* libvorbisfile.a */,
@@ -1825,6 +1802,7 @@
 				3B10EC8B2568E79800372D13 /* Shaders */,
 				3B10EC832568E78400372D13 /* icon.png */,
 				3B10EC842568E78400372D13 /* liberation.ttf */,
+				96D8EDD028728DCA00A331EA /* gamecontrollerdb.txt */,
 				3B10EC852568E78400372D13 /* wqymicrohei.ttf */,
 			);
 			name = Assets;
@@ -1835,7 +1813,6 @@
 			children = (
 				3B1C241F25A1A84D0075EF5D /* Steam */,
 				3BC65D792584F3030063AFF1 /* Universal */,
-				3BC65D492584EE690063AFF1 /* ARM64 */,
 				3BE080CA256829FE0006849F /* Intel */,
 				3BD2B46425651BEB003DAD8A /* System */,
 			);
@@ -1859,10 +1836,10 @@
 				3B5A8444256A0F6300BAF2E5 /* libopenal.a */,
 				3BE080FD256879FE0006849F /* libogg.a */,
 				3BE081452568A5C60006849F /* libpng.a */,
-				3BE081492568A5F60006849F /* libturbojpeg.a */,
 				3BE080FF256879FE0006849F /* libphysfs.a */,
-				3B1C230A25A144A10075EF5D /* libruby.3.0.dylib */,
+				3B1C230A25A144A10075EF5D /* libruby.3.1.dylib */,
 				3BE080E9256879FC0006849F /* libpixman-1.a */,
+				96563581279A5ABD003D6A75 /* libtheora.a */,
 				3BE080F0256879FD0006849F /* libSDL2_image.a */,
 				3BE080FA256879FE0006849F /* libSDL2_test.a */,
 				3BE080EF256879FD0006849F /* libSDL2_ttf.a */,
@@ -1876,6 +1853,16 @@
 				3B522DD4259BFF2D003301C4 /* libssl.a */,
 			);
 			name = Intel;
+			sourceTree = "<group>";
+		};
+		9656358D279A5B74003D6A75 /* theoraplay */ = {
+			isa = PBXGroup;
+			children = (
+				9656358E279A5B74003D6A75 /* theoraplay_cvtrgb.h */,
+				9656358F279A5B74003D6A75 /* theoraplay.h */,
+				96563592279A5B74003D6A75 /* theoraplay.c */,
+			);
+			path = theoraplay;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2015,7 +2002,7 @@
 		3BDB22EC25644FBF00C4A63D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1340;
 				TargetAttributes = {
 					3B1C235525A199370075EF5D = {
 						CreatedOnToolsVersion = 12.3;
@@ -2055,6 +2042,7 @@
 			files = (
 				3B1C23E725A19C600075EF5D /* icon.icns in Resources */,
 				3B3F7D2625B19F7000EA5F1C /* settingsmenu.xib in Resources */,
+				96573E84279152DC002C3E77 /* TouchBar.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2063,6 +2051,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3B10EC862568E78500372D13 /* icon.png in Resources */,
+				96D8EDD128728DCE00A331EA /* gamecontrollerdb.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2072,6 +2061,7 @@
 			files = (
 				3BBE87F52705A73400A574AE /* icon.icns in Resources */,
 				3BBE87F62705A73400A574AE /* settingsmenu.xib in Resources */,
+				96573E83279152DC002C3E77 /* TouchBar.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2081,6 +2071,7 @@
 			files = (
 				3BC65E0E2584F3AD0063AFF1 /* icon.icns in Resources */,
 				3B3F7D1D25B19F6E00EA5F1C /* settingsmenu.xib in Resources */,
+				96573E81279152DC002C3E77 /* TouchBar.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2090,6 +2081,7 @@
 			files = (
 				3BD2B6F92565AEC0003DAD8A /* icon.icns in Resources */,
 				3B3F7D2025B19F6E00EA5F1C /* settingsmenu.xib in Resources */,
+				96573E82279152DC002C3E77 /* TouchBar.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2135,6 +2127,7 @@
 				3B1C238B25A19C600075EF5D /* windowvx.cpp in Sources */,
 				3B1C238C25A19C600075EF5D /* LUrlParser.cpp in Sources */,
 				3B1C238D25A19C600075EF5D /* module_rpg.cpp in Sources */,
+				9656359E279A5B74003D6A75 /* theoraplay.c in Sources */,
 				3B1C238E25A19C600075EF5D /* miniffi.cpp in Sources */,
 				3B1C238F25A19C600075EF5D /* autotiles.cpp in Sources */,
 				3B1C239025A19C600075EF5D /* audiostream.cpp in Sources */,
@@ -2152,6 +2145,7 @@
 				3B1C239D25A19C600075EF5D /* binding-mri.cpp in Sources */,
 				3B1C239F25A19C600075EF5D /* eventthread.cpp in Sources */,
 				3B1C23A025A19C600075EF5D /* viewport.cpp in Sources */,
+				96573E7F27913B46002C3E77 /* TouchBar.mm in Sources */,
 				3B1C23A125A19C600075EF5D /* gl-debug.cpp in Sources */,
 				3B1C23A325A19C600075EF5D /* tileatlasvx.cpp in Sources */,
 				3B1C23A425A19C600075EF5D /* bitmap.cpp in Sources */,
@@ -2221,6 +2215,7 @@
 				3BBE879D2705A73400A574AE /* windowvx.cpp in Sources */,
 				3BBE879E2705A73400A574AE /* LUrlParser.cpp in Sources */,
 				3BBE879F2705A73400A574AE /* module_rpg.cpp in Sources */,
+				9656359D279A5B74003D6A75 /* theoraplay.c in Sources */,
 				3BBE87A02705A73400A574AE /* miniffi.cpp in Sources */,
 				3BBE87A12705A73400A574AE /* autotiles.cpp in Sources */,
 				3BBE87A22705A73400A574AE /* audiostream.cpp in Sources */,
@@ -2238,6 +2233,7 @@
 				3BBE87AE2705A73400A574AE /* binding-mri.cpp in Sources */,
 				3BBE87AF2705A73400A574AE /* eventthread.cpp in Sources */,
 				3BBE87B02705A73400A574AE /* viewport.cpp in Sources */,
+				96573E7E27913B46002C3E77 /* TouchBar.mm in Sources */,
 				3BBE87B12705A73400A574AE /* gl-debug.cpp in Sources */,
 				3BBE87B22705A73400A574AE /* tileatlasvx.cpp in Sources */,
 				3BBE87B32705A73400A574AE /* bitmap.cpp in Sources */,
@@ -2311,6 +2307,7 @@
 				3BC65DAD2584F3AD0063AFF1 /* etc.cpp in Sources */,
 				3BC65DAE2584F3AD0063AFF1 /* shader.cpp in Sources */,
 				3BC65DAF2584F3AD0063AFF1 /* tilemap.cpp in Sources */,
+				96573E7C27913B46002C3E77 /* TouchBar.mm in Sources */,
 				3BC65DB12584F3AD0063AFF1 /* window.cpp in Sources */,
 				3BC65DB32584F3AD0063AFF1 /* input-binding.cpp in Sources */,
 				3BC65DB42584F3AD0063AFF1 /* keybindings.cpp in Sources */,
@@ -2328,6 +2325,7 @@
 				3BC65DC12584F3AD0063AFF1 /* graphics-binding.cpp in Sources */,
 				3BC65DC22584F3AD0063AFF1 /* plane.cpp in Sources */,
 				3BC65DC32584F3AD0063AFF1 /* tilequad.cpp in Sources */,
+				9656359B279A5B74003D6A75 /* theoraplay.c in Sources */,
 				3BC65DC62584F3AD0063AFF1 /* tileatlas.cpp in Sources */,
 				3BC65DC72584F3AD0063AFF1 /* fluid-fun.cpp in Sources */,
 				3BC65DC82584F3AD0063AFF1 /* scene.cpp in Sources */,
@@ -2389,6 +2387,7 @@
 				3B10EDAB2568E95E00372D13 /* etc.cpp in Sources */,
 				3B10EDCA2568E95E00372D13 /* shader.cpp in Sources */,
 				3B10EDCE2568E95E00372D13 /* tilemap.cpp in Sources */,
+				96573E7D27913B46002C3E77 /* TouchBar.mm in Sources */,
 				3B10EDBE2568E95E00372D13 /* window.cpp in Sources */,
 				3B10EDF92568E96A00372D13 /* input-binding.cpp in Sources */,
 				3B10EDA92568E95E00372D13 /* keybindings.cpp in Sources */,
@@ -2406,6 +2405,7 @@
 				3B10EE042568E96A00372D13 /* graphics-binding.cpp in Sources */,
 				3B10EDD12568E95E00372D13 /* plane.cpp in Sources */,
 				3B10EDC32568E95E00372D13 /* tilequad.cpp in Sources */,
+				9656359C279A5B74003D6A75 /* theoraplay.c in Sources */,
 				3B10EDCB2568E95E00372D13 /* tileatlas.cpp in Sources */,
 				3B10EDB52568E95E00372D13 /* fluid-fun.cpp in Sources */,
 				3B10EDC62568E95E00372D13 /* scene.cpp in Sources */,
@@ -2523,7 +2523,6 @@
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/Dependencies/Frameworks/steam/sdk/redistributable_bin/osx";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.struma.mkxp-z";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2633,7 +2632,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -2661,11 +2660,10 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MKXPZ_EXECUTABLE_NAME = shim;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.struma.mkxp-z";
@@ -2709,7 +2707,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -2735,7 +2733,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MKXPZ_EXECUTABLE_NAME = shim;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -2917,7 +2915,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -2959,11 +2957,10 @@
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-universal/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MKXPZ_EXECUTABLE_NAME = shim;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.struma.mkxp-z";
@@ -3007,7 +3004,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -3047,7 +3044,7 @@
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-universal/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MKXPZ_EXECUTABLE_NAME = shim;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -3095,7 +3092,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -3119,8 +3116,8 @@
 					"$(DEPENDENCY_SEARCH_PATH)/include/ruby-$(MRI_VERSION)",
 					"$(DEPENDENCY_SEARCH_PATH)/include/ruby-$(MRI_VERSION)/arm64-darwin",
 					"$(DEPENDENCY_SEARCH_PATH)/include/AL",
-					"$(DEPENDENCY_SEARCH_PATH)/include/uchardet",
 					"$(DEPENDENCY_SEARCH_PATH)/include/openssl",
+					"$(DEPENDENCY_SEARCH_PATH)/include/uchardet",
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 				);
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3133,10 +3130,9 @@
 					"$(PROJECT_DIR)/Dependencies/build-macosx-universal/lib",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.struma.mkxp-z";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3179,7 +3175,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -3201,8 +3197,8 @@
 					"$(DEPENDENCY_SEARCH_PATH)/include/ruby-$(MRI_VERSION)",
 					"$(DEPENDENCY_SEARCH_PATH)/include/ruby-$(MRI_VERSION)/arm64-darwin",
 					"$(DEPENDENCY_SEARCH_PATH)/include/AL",
-					"$(DEPENDENCY_SEARCH_PATH)/include/uchardet",
 					"$(DEPENDENCY_SEARCH_PATH)/include/openssl",
+					"$(DEPENDENCY_SEARCH_PATH)/include/uchardet",
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 				);
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -3215,7 +3211,7 @@
 					"$(PROJECT_DIR)/Dependencies/build-macosx-universal/lib",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
@@ -3260,7 +3256,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -3284,10 +3280,9 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.struma.mkxp-z";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3330,7 +3325,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2.2.3;
+				CURRENT_PROJECT_VERSION = 2.4.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "";
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -3352,7 +3347,7 @@
 					"$(PROJECT_DIR)/Dependencies/Frameworks/ANGLE",
 					"$(PROJECT_DIR)/Dependencies/build-macosx-x86_64/lib",
 				);
-				MARKETING_VERSION = 2.2.3;
+				MARKETING_VERSION = 2.4.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = "";
@@ -3390,7 +3385,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					MKXPZ_BUILD_XCODE,
 					"MKXPZ_ALCDEVICE=ALCdevice",
-					"MKXPZ_VERSION=\"$(MARKETING_VERSION)\"",
+					"MKXPZ_VERSION=\"\\\"$(MARKETING_VERSION)\\\"\"",
 					MKXPZ_MINIFFI,
 					MKXPZ_DEBUG,
 					MKXPZ_SSL,
@@ -3422,12 +3417,12 @@
 					"$(DEPENDENCY_SEARCH_PATH)/lib",
 					"$(PROJECT_DIR)/Dependencies/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.12.2;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-fdeclspec";
-				OTHER_CODE_SIGN_FLAGS = "--ignore-resources";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.zoro.mkxp-z";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				WARNING_CFLAGS = "-Wno-documentation";
 			};
 			name = Debug;
@@ -3461,7 +3456,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					MKXPZ_BUILD_XCODE,
 					"MKXPZ_ALCDEVICE=ALCdevice",
-					"MKXPZ_VERSION=\"$(MARKETING_VERSION)\"",
+					"MKXPZ_VERSION=\"\\\"$(MARKETING_VERSION)\\\"\"",
 					MKXPZ_MINIFFI,
 					MKXPZ_SSL,
 					AL_LIBTYPE_STATIC,
@@ -3492,11 +3487,12 @@
 					"$(DEPENDENCY_SEARCH_PATH)/lib",
 					"$(PROJECT_DIR)/Dependencies/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.12.2;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-fdeclspec";
-				OTHER_CODE_SIGN_FLAGS = "--ignore-resources";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.zoro.mkxp-z";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
 				WARNING_CFLAGS = "-Wno-documentation";
 			};
 			name = Release;

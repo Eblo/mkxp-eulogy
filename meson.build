@@ -1,4 +1,4 @@
-project('mkxp-z', 'c', 'cpp', version: '2.2.3', meson_version: '>=0.51.0', default_options: ['cpp_std=c++14', 'buildtype=release'])
+project('mkxp-z', 'c', 'cpp', version: '2.4', meson_version: '>=0.56.0', default_options: ['cpp_std=c++14', 'buildtype=release'])
 
 host_system = host_machine.system()
 
@@ -60,9 +60,6 @@ if steamworks_path != ''
     endif
 endif
 
-# BOOST UNORDERED
-global_include_dirs += include_directories('boost-unordered')
-
 # GLES
 gfx_backend = get_option('gfx_backend')
 if gfx_backend == 'gles'
@@ -109,7 +106,7 @@ if get_option('force32') == true
 endif
 
 build_static = false
-if get_option('static_executable') == true # and host_system == 'windows'
+if get_option('static_executable') == true
     build_static = true
 endif
 
@@ -141,33 +138,45 @@ else
 endif
 
 exe_name = meson.project_name()
+
+if host_system == 'linux' and get_option('appimage') == false
+    exe_name += '.' + host_machine.cpu()
+endif
+
 if steamworks == true
-    exe_name = meson.project_name() + '_rt'
+    exe_name = 'steam_' + exe_name
     la = ''
     if build_static == true
-        la = '-static'
+        if host_system == 'windows'
+            la = '-static'
+        else
+            la = '-static-libgcc -static-libstdc++'
+        endif
     endif
-    shim_args = ['-DGAME_LAUNCH_NAME="' + exe_name + '"']
+
+    shim_args = [
+        '-DGAME_LAUNCH_NAME="' + exe_name + '"',
+        '-I' + steamworks_path + '/public'
+        ]
+
     if get_option('steam_appid') != ''
         shim_args += '-DSTEAM_APPID=' + get_option('steam_appid')
     endif
 
     if get_option('steamshim_debug') == true
         shim_args += '-DSTEAMSHIM_DEBUG'
+        shim_ws = 'console'
+    else
+        shim_ws = 'windows'
     endif
 
     executable(meson.project_name(),
         sources: files('steamshim/steamshim_parent.cpp'),
         dependencies: steamlib,
-        include_directories: (steamworks_path + '/public'),
         cpp_args: shim_args,
         link_args: la.split(),
-        gui_app: (get_option('steamshim_debug') == false),
+        win_subsystem: shim_ws,
         install: (host_system != 'windows'))
-endif
-
-if host_system == 'linux' and get_option('appimage') == false
-    exe_name += '.' + host_machine.cpu()
 endif
 
 executable(exe_name,
@@ -179,6 +188,6 @@ executable(exe_name,
     cpp_args: global_args,
     objc_args: global_args,
     objcpp_args: global_args,
-    gui_app: true,
+    win_subsystem: 'windows',
     install: (host_system != 'windows')
 )

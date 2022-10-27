@@ -164,6 +164,20 @@ RB_METHOD(graphicsHeight)
     return rb_fix_new(shState->graphics().height());
 }
 
+RB_METHOD(graphicsDisplayWidth)
+{
+    RB_UNUSED_PARAM;
+    
+    return rb_fix_new(shState->graphics().displayWidth());
+}
+
+RB_METHOD(graphicsDisplayHeight)
+{
+    RB_UNUSED_PARAM;
+    
+    return rb_fix_new(shState->graphics().displayHeight());
+}
+
 RB_METHOD(graphicsWait)
 {
     RB_UNUSED_PARAM;
@@ -241,6 +255,22 @@ RB_METHOD(graphicsResizeScreen)
     return Qnil;
 }
 
+RB_METHOD(graphicsResizeWindow)
+{
+    RB_UNUSED_PARAM;
+    
+    int width, height;
+    bool center = false;
+    rb_get_args(argc, argv, "ii|b", &width, &height, &center RB_ARG_END);
+    
+    
+    GFX_LOCK;
+    shState->graphics().resizeWindow(width, height, center);
+    GFX_UNLOCK;
+    
+    return Qnil;
+}
+
 RB_METHOD(graphicsReset)
 {
     RB_UNUSED_PARAM;
@@ -260,14 +290,46 @@ RB_METHOD(graphicsCenter)
     return Qnil;
 }
 
+typedef struct {
+    const char *filename;
+    int volume;
+    bool skippable;
+} PlayMovieArgs;
+
+void *playMovieInternal(void *args) {
+    PlayMovieArgs *a = (PlayMovieArgs*)args;
+    GFX_GUARD_EXC(
+                  shState->graphics().playMovie(a->filename, a->volume, a->skippable);
+                  
+                  // Signals for shutdown or reset only make playMovie quit early,
+                  // so check again
+                  shState->graphics().update();
+                  );
+    return 0;
+}
+
 RB_METHOD(graphicsPlayMovie)
 {
     RB_UNUSED_PARAM;
     
-    const char *filename;
-    rb_get_args(argc, argv, "z", &filename RB_ARG_END);
+    VALUE filename, volumeArg, skippable;
+    rb_scan_args(argc, argv, "12", &filename, &volumeArg, &skippable);
+    SafeStringValue(filename);
     
-    shState->graphics().playMovie(filename);
+    bool skip;
+    rb_bool_arg(skippable, &skip);
+
+    // TODO: Video control inputs (e.g. skip, pause)
+
+    PlayMovieArgs args{};
+    args.filename = RSTRING_PTR(filename);
+    args.volume = (volumeArg == Qnil) ? 100 : NUM2INT(volumeArg);;
+    args.skippable = skip;
+#if RAPI_MAJOR >= 2
+    rb_thread_call_without_gvl(playMovieInternal, &args, 0, 0);
+#else
+    playMovieInternal(&args);
+#endif
     
     return Qnil;
 }
@@ -304,6 +366,11 @@ DEF_GRA_PROP_B(Fullscreen)
 DEF_GRA_PROP_B(ShowCursor)
 DEF_GRA_PROP_F(Scale)
 DEF_GRA_PROP_B(Frameskip)
+DEF_GRA_PROP_B(FixedAspectRatio)
+DEF_GRA_PROP_B(SmoothScaling)
+DEF_GRA_PROP_B(IntegerScaling)
+DEF_GRA_PROP_B(LastMileScaling)
+DEF_GRA_PROP_B(Threadsafe)
 
 #define INIT_GRA_PROP_BIND(PropName, prop_name_s) \
 { \
@@ -330,24 +397,32 @@ void graphicsBindingInit()
 
     _rb_define_module_function(module, "width", graphicsWidth);
     _rb_define_module_function(module, "height", graphicsHeight);
+    _rb_define_module_function(module, "display_width", graphicsDisplayWidth);
+    _rb_define_module_function(module, "display_height", graphicsDisplayHeight);
     _rb_define_module_function(module, "wait", graphicsWait);
     _rb_define_module_function(module, "fadeout", graphicsFadeout);
     _rb_define_module_function(module, "fadein", graphicsFadein);
     _rb_define_module_function(module, "snap_to_bitmap", graphicsSnapToBitmap);
     _rb_define_module_function(module, "resize_screen", graphicsResizeScreen);
+    _rb_define_module_function(module, "resize_window", graphicsResizeWindow);
     _rb_define_module_function(module, "center", graphicsCenter);
         
     INIT_GRA_PROP_BIND( Brightness, "brightness" );
 
     // end
     
-    if (rgssVer >= 3)
-    {
-        _rb_define_module_function(module, "play_movie", graphicsPlayMovie);
-    }
+    //if (rgssVer >= 3)
+    //{
+    _rb_define_module_function(module, "play_movie", graphicsPlayMovie);
+    //}
     
-    INIT_GRA_PROP_BIND( Fullscreen, "fullscreen"  );
-    INIT_GRA_PROP_BIND( ShowCursor, "show_cursor" );
-    INIT_GRA_PROP_BIND( Scale,      "scale"       );
-    INIT_GRA_PROP_BIND( Frameskip,  "frameskip"   );
+    INIT_GRA_PROP_BIND( Fullscreen,       "fullscreen"         );
+    INIT_GRA_PROP_BIND( ShowCursor,       "show_cursor"        );
+    INIT_GRA_PROP_BIND( Scale,            "scale"              );
+    INIT_GRA_PROP_BIND( Frameskip,        "frameskip"          );
+    INIT_GRA_PROP_BIND( FixedAspectRatio, "fixed_aspect_ratio" );
+    INIT_GRA_PROP_BIND( SmoothScaling,    "smooth_scaling"     );
+    INIT_GRA_PROP_BIND( IntegerScaling,   "integer_scaling"    );
+    INIT_GRA_PROP_BIND( LastMileScaling,  "last_mile_scaling"  );
+    INIT_GRA_PROP_BIND( Threadsafe,       "thread_safe"        );
 }

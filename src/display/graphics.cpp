@@ -27,7 +27,6 @@
 
 #include "graphics.h"
 
-#include "theoraplay/theoraplay.h"
 #include "audio.h"
 #include "binding.h"
 #include "bitmap.h"
@@ -46,9 +45,12 @@
 #include "shader.h"
 #include "sharedstate.h"
 #include "texpool.h"
+#include "theoraplay/theoraplay.h"
 #include "util.h"
 #include "input.h"
+#include "sprite.h"
 
+#include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_timer.h>
 #include <SDL_video.h>
@@ -64,6 +66,7 @@
 //#include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
+#include <cmath>
 
 #include "rb_shader.h"
 #include "binding-types.h"
@@ -75,6 +78,307 @@
 #define DEF_FRAMERATE (rgssVer == 1 ? 40 : 60)
 
 #define DEF_MAX_VIDEO_FRAMES 30
+#define VIDEO_DELAY 10
+#define AUDIO_DELAY 100
+
+typedef struct AudioQueue
+{
+    const THEORAPLAY_AudioPacket *audio;
+    int offset;
+    struct AudioQueue *next;
+} AudioQueue;
+
+static volatile AudioQueue *movieAudioQueue;
+static volatile AudioQueue *movieAudioQueueTail;
+
+
+static long readMovie(THEORAPLAY_Io *io, void *buf, long buflen)
+{
+    SDL_RWops *f = (SDL_RWops *) io->userdata;
+    return (long) SDL_RWread(f, buf, 1, buflen);
+} // IoFopenRead
+
+
+static void closeMovie(THEORAPLAY_Io *io)
+{
+    SDL_RWops *f = (SDL_RWops *) io->userdata;
+    SDL_RWclose(f);
+    free(io);
+} // IoFopenClose
+
+
+struct Movie
+{
+    THEORAPLAY_Decoder *decoder;
+    const THEORAPLAY_AudioPacket *audio;
+    const THEORAPLAY_VideoFrame *video;
+    bool hasVideo;
+    bool hasAudio;
+    bool skippable;
+    Bitmap *videoBitmap;
+    SDL_RWops srcOps;
+    static float volume;
+    
+    Movie(int volume_, bool skippable_)
+    : decoder(0), audio(0), video(0), skippable(skippable_), videoBitmap(0)
+    {
+        volume = volume_ * 0.01f;
+    }
+    bool preparePlayback()
+    {
+        
+        // https://theora.org/doc/libtheora-1.0/codec_8h.html
+        // https://ffmpeg.org/doxygen/0.11/group__lavc__misc__pixfmt.html
+        THEORAPLAY_Io *io = (THEORAPLAY_Io *) malloc(sizeof (THEORAPLAY_Io));
+        if(!io) {
+            SDL_RWclose(&srcOps);
+            return false;
+        }
+        
+        io->read = readMovie;
+        io->close = closeMovie;
+        io->userdata = &srcOps;
+        decoder = THEORAPLAY_startDecode(io, DEF_MAX_VIDEO_FRAMES, THEORAPLAY_VIDFMT_RGBA);
+        if (!decoder) {
+            SDL_RWclose(&srcOps);
+            return false;
+        }
+        
+        // Wait until the decoder has parsed out some basic truths from the file.
+        while (!THEORAPLAY_isInitialized(decoder)) {
+            SDL_Delay(VIDEO_DELAY);
+        }
+        
+        // Once we're initialized, we can tell if this file has audio and/or video.
+        hasAudio = THEORAPLAY_hasAudioStream(decoder);
+        hasVideo = THEORAPLAY_hasVideoStream(decoder);
+        
+        // Queue up the audio
+        if (hasAudio) {
+            while ((audio = THEORAPLAY_getAudio(decoder)) == NULL) {
+                if ((THEORAPLAY_availableVideo(decoder) >= DEF_MAX_VIDEO_FRAMES)) {
+                    break;  // we'll never progress, there's no audio yet but we've prebuffered as much as we plan to.
+                }
+                SDL_Delay(VIDEO_DELAY);
+            }
+        }
+        
+        // No video, so no point in doing anything else
+        if (!hasVideo) {
+            THEORAPLAY_stopDecode(decoder);
+            return false;
+        }
+        
+        // Wait until we have video
+        while ((video = THEORAPLAY_getVideo(decoder)) == NULL) {
+            SDL_Delay(VIDEO_DELAY);
+        }
+        
+        // Wait until we have audio, if applicable
+        audio = NULL;
+        if (hasAudio) {
+            while ((audio = THEORAPLAY_getAudio(decoder)) == NULL && THEORAPLAY_availableVideo(decoder) < DEF_MAX_VIDEO_FRAMES) {
+                SDL_Delay(VIDEO_DELAY);
+            }
+        }
+        videoBitmap = new Bitmap(video->width, video->height);
+        movieAudioQueue = NULL;
+        movieAudioQueueTail = NULL;
+        
+        return true;
+    }
+    
+    static void queueAudioPacket(const THEORAPLAY_AudioPacket *audio) {
+        AudioQueue *item = NULL;
+        
+        if (!audio) {
+            return;
+        }
+        
+        item = (AudioQueue *) malloc(sizeof (AudioQueue));
+        if (!item) {
+            THEORAPLAY_freeAudio(audio);
+            return;  // oh well.
+        }
+        
+        item->audio = audio;
+        item->offset = 0;
+        item->next = NULL;
+        
+        
+        SDL_LockAudio();
+        if (movieAudioQueueTail) {
+            movieAudioQueueTail->next = item;
+        } else {
+            movieAudioQueue = item;
+        }
+        movieAudioQueueTail = item;
+        SDL_UnlockAudio();
+    }
+    
+    static void queueMoreMovieAudio(THEORAPLAY_Decoder *decoder, const Uint32 now) {
+        const THEORAPLAY_AudioPacket *audio;
+        while ((audio = THEORAPLAY_getAudio(decoder)) != NULL) {
+            queueAudioPacket(audio);
+            if (audio->playms >= now + 2000) {  // don't let this get too far ahead.
+                break;
+            }
+        }
+    }
+    
+    static void SDLCALL movieAudioCallback(void *userdata, uint8_t *stream, int len) {
+        // !!! FIXME: this should refuse to play if item->playms is in the future.
+        //const Uint32 now = SDL_GetTicks() - baseticks;
+        Sint16 *dst = (Sint16 *) stream;
+        
+        while (movieAudioQueue && (len > 0)) {
+            volatile AudioQueue *item = movieAudioQueue;
+            AudioQueue *next = item->next;
+            const int channels = item->audio->channels;
+            
+            const float *src = item->audio->samples + (item->offset * channels);
+            unsigned int cpy = (item->audio->frames - item->offset) * channels;
+            
+            if (cpy > (len / sizeof (Sint16))) {
+                cpy = len / sizeof (Sint16);
+            }
+            
+            for (unsigned int i = 0; i < cpy; i++) {
+                const float val = (*(src++)) * volume;
+                if (val < -1.0f) {
+                    *(dst++) = -32768;
+                } else if (val > 1.0f) {
+                    *(dst++) = 32767;
+                } else {
+                    *(dst++) = (Sint16) (val * 32767.0f);
+                }
+            }
+            
+            item->offset += (cpy / channels);
+            len -= cpy * sizeof (Sint16);
+            
+            if (item->offset >= item->audio->frames) {
+                THEORAPLAY_freeAudio(item->audio);
+                free((void *) item);
+                movieAudioQueue = next;
+            }
+        }
+        
+        if (!movieAudioQueue) {
+            movieAudioQueueTail = NULL;
+        }
+        
+        if (len > 0) {
+            memset(dst, '\0', len);
+        }
+    }
+    
+    bool startAudio()
+    {
+        SDL_AudioSpec spec{};
+        spec.freq = audio->freq;
+        spec.format = AUDIO_S16SYS;
+        spec.channels = audio->channels;
+        spec.samples = 2048;
+        spec.callback = movieAudioCallback;
+        if (SDL_OpenAudio(&spec, NULL) != 0) {
+            return false;
+        }
+        queueAudioPacket(audio);
+        audio = NULL;
+        queueMoreMovieAudio(decoder, 0);
+        SDL_PauseAudio(0);  // Start audio playback
+        return true;
+    }
+    
+    void play()
+    {
+        // Assuming every frame has the same duration.
+        // Uint32 frameMs = (video->fps == 0.0) ? 0 : ((Uint32) (1000.0 / video->fps));
+        Uint32 baseTicks = SDL_GetTicks();
+        bool openedAudio = false;
+        while (THEORAPLAY_isDecoding(decoder)) {
+            // Check for reset/shutdown input
+            if(shState->graphics().updateMovieInput(this)) break;
+            
+            // Check for attempted skip
+            if (skippable) {
+                shState->input().update();
+                if  (shState->input().isTriggered(Input::C) || shState->input().isTriggered(Input::B)) break;
+            }
+            
+            const Uint32 now = SDL_GetTicks() - baseTicks;
+            
+            if (!video) {
+                video = THEORAPLAY_getVideo(decoder);
+            }
+            
+            if (hasAudio) {
+                if (!audio) {
+                    audio = THEORAPLAY_getAudio(decoder);
+                }
+                
+                if (audio && !openedAudio) {
+                    if(!startAudio()){
+                        Debug() << "Error opening movie audio!";
+                        break;
+                    }
+                    openedAudio = true;
+                }
+                
+            }
+            
+            // Got a video frame, now draw it
+            if (video) {
+                videoBitmap->replaceRaw(video->pixels, video->width * video->height * 4);
+                THEORAPLAY_freeVideo(video);
+                video = NULL;
+            }
+            shState->graphics().update(false);
+            
+            if (openedAudio) {
+                queueMoreMovieAudio(decoder, now);
+            }
+        }
+    }
+    
+    ~Movie()
+    {
+        if (hasAudio) {
+            if (movieAudioQueueTail) {
+                THEORAPLAY_freeAudio(movieAudioQueueTail->audio);
+            }
+            movieAudioQueueTail = NULL;
+            
+            if (movieAudioQueue) {
+                THEORAPLAY_freeAudio(movieAudioQueue->audio);
+            }
+            movieAudioQueue = NULL;
+        }
+        if (video) THEORAPLAY_freeVideo(video);
+        if (audio) THEORAPLAY_freeAudio(audio);
+        if (decoder) THEORAPLAY_stopDecode(decoder);
+        SDL_CloseAudio();
+        delete videoBitmap;
+    }
+};
+
+float Movie::volume;
+
+struct MovieOpenHandler : FileSystem::OpenHandler
+{
+    SDL_RWops *srcOps;
+    
+    MovieOpenHandler(SDL_RWops &srcOps)
+    :   srcOps(&srcOps)
+    {}
+    
+    bool tryRead(SDL_RWops &ops, const char *ext)
+    {
+        *srcOps = ops;
+        return true;
+    }
+};
 
 struct PingPong {
     TEXFBO rt[2];
@@ -94,7 +398,7 @@ struct PingPong {
     
     ~PingPong() {
         for (int i = 0; i < 2; ++i)
-        TEXFBO::fini(rt[i]);
+            TEXFBO::fini(rt[i]);
     }
     
     TEXFBO &backBuffer() { return rt[srcInd]; }
@@ -107,7 +411,7 @@ struct PingPong {
         screenH = height;
         
         for (int i = 0; i < 2; ++i)
-        TEXFBO::allocEmpty(rt[i], width, height);
+            TEXFBO::allocEmpty(rt[i], width, height);
     }
     
     void startRender() { bind(); }
@@ -494,11 +798,19 @@ struct GraphicsPrivate {
     TEXFBO frozenScene;
     Quad screenQuad;
     
+    float backingScaleFactor;
+    
+    Vec2i integerScaleFactor;
+    TEXFBO integerScaleBuffer;
+    bool integerScaleActive;
+    bool integerLastMileScaling;
+    
     std::vector<unsigned long long> avgFPSData;
     unsigned long long last_avg_update;
     SDL_mutex *avgFPSLock;
     
     SDL_mutex *glResourceLock;
+    bool multithreadedMode;
     
     /* Global list of all live Disposables
      * (disposed on reset) */
@@ -508,13 +820,20 @@ struct GraphicsPrivate {
     : scRes(DEF_SCREEN_W, DEF_SCREEN_H), scSize(scRes),
     winSize(rtData->config.defScreenW, rtData->config.defScreenH),
     screen(scRes.x, scRes.y), threadData(rtData),
-    glCtx(SDL_GL_GetCurrentContext()), frameRate(DEF_FRAMERATE),
-    frameCount(0), brightness(255), fpsLimiter(frameRate),
-    useFrameSkip(rtData->config.frameSkip), frozen(false),
-    last_update(0), last_avg_update(0), scalingFactor(rtData->scale){
+    glCtx(SDL_GL_GetCurrentContext()), multithreadedMode(true),
+    frameRate(DEF_FRAMERATE), frameCount(0), brightness(255),
+    fpsLimiter(frameRate), useFrameSkip(rtData->config.frameSkip), frozen(false),
+    last_update(0), last_avg_update(0), backingScaleFactor(1), integerScaleFactor(0, 0),
+    integerScaleActive(rtData->config.integerScaling.active),
+    integerLastMileScaling(rtData->config.integerScaling.lastMileScaling) {
         avgFPSData = std::vector<unsigned long long>();
         avgFPSLock = SDL_CreateMutex();
         glResourceLock = SDL_CreateMutex();
+        
+        if (integerScaleActive) {
+            integerScaleFactor = Vec2i(0, 0);
+            rebuildIntegerScaleBuffer();
+        }
         
         recalculateScreenSize(rtData);
         updateScreenResoRatio(rtData);
@@ -531,24 +850,33 @@ struct GraphicsPrivate {
     
     ~GraphicsPrivate() {
         TEXFBO::fini(frozenScene);
+        TEXFBO::fini(integerScaleBuffer);
         SDL_DestroyMutex(avgFPSLock);
         SDL_DestroyMutex(glResourceLock);
     }
     
     void updateScreenResoRatio(RGSSThreadData *rtData) {
         Vec2 &ratio = rtData->sizeResoRatio;
-        ratio.x = (float)scRes.x / scSize.x;
-        ratio.y = (float)scRes.y / scSize.y;
+        ratio.x = (float)scRes.x / scSize.x * backingScaleFactor;
+        ratio.y = (float)scRes.y / scSize.y * backingScaleFactor;
         
-        rtData->screenOffset = scOffset;
+        rtData->screenOffset = scOffset / backingScaleFactor;
     }
     
     /* Enforces fixed aspect ratio, if desired */
-    void recalculateScreenSize(RGSSThreadData *rtData) {
+    void recalculateScreenSize(bool fixedAspectRatio) {
         scSize = winSize;
         
-        if (!rtData->config.fixedAspectRatio) {
+        if (!fixedAspectRatio && integerLastMileScaling) {
             scOffset = Vec2i(0, 0);
+            return;
+        }
+        
+        if (integerScaleActive && !integerLastMileScaling) {
+            scOffset.x = ((winSize.x / 2) - (scRes.x / 2) * integerScaleFactor.x);
+            scOffset.y = ((winSize.y / 2) - (scRes.y / 2) * integerScaleFactor.y);
+            
+            scSize = Vec2i(scRes.x * integerScaleFactor.x, scRes.y * integerScaleFactor.y);
             return;
         }
         
@@ -564,8 +892,68 @@ struct GraphicsPrivate {
         scOffset.y = (winSize.y - scSize.y) / 2.f;
     }
     
-    void checkResize() {
+    static int findHighestFittingScale(int base, int target) {
+        int scale = 1;
+        
+        while (base * scale <= target)
+            scale++;
+        
+        return std::max(scale - 1, 1);
+    }
+    
+    /* Returns whether a new scale was found */
+    bool findHighestIntegerScale()
+    {
+        Vec2i newScale(findHighestFittingScale(scRes.x, winSize.x),
+                       findHighestFittingScale(scRes.y, winSize.y));
+        
+        if (threadData->config.fixedAspectRatio)
+        {
+            /* Limit both factors to the smaller of the two */
+            newScale.x = newScale.y = std::min(newScale.x, newScale.y);
+        }
+        
+        if (newScale == integerScaleFactor)
+            return false;
+        
+        integerScaleFactor = newScale;
+        return true;
+    }
+    
+    void rebuildIntegerScaleBuffer()
+    {
+        TEXFBO::fini(integerScaleBuffer);
+        TEXFBO::init(integerScaleBuffer);
+        TEXFBO::allocEmpty(integerScaleBuffer, scRes.x * integerScaleFactor.x,
+                           scRes.y * integerScaleFactor.y);
+        TEXFBO::linkFBO(integerScaleBuffer);
+    }
+    
+    bool integerScaleStepApplicable() const
+    {
+        if (!integerScaleActive)
+            return false;
+        
+        if (integerScaleFactor.x < 1 || integerScaleFactor.y < 1) // XXX should be < 2, this is for testing only
+            return false;
+        
+        return true;
+    }
+    
+    void checkResize(bool skipIntScaleBuffer = false) {
         if (threadData->windowSizeMsg.poll(winSize)) {
+            /* Query the actual size in pixels, not units */
+            Vec2i drawableSize(winSize);
+            threadData->drawableSizeMsg.poll(drawableSize);
+            
+            backingScaleFactor = drawableSize.x / winSize.x;
+            winSize = drawableSize;
+            
+            /* Make sure integer buffers are rebuilt before screen offsets are
+             * calculated so we have the final allocated buffer size ready */
+            if (integerScaleActive && findHighestIntegerScale() && !skipIntScaleBuffer)
+                rebuildIntegerScaleBuffer();
+            
             /* some GL drivers change the viewport on window resize */
             glState.viewport.refresh();
             recalculateScreenSize(threadData);
@@ -607,23 +995,70 @@ struct GraphicsPrivate {
     }
     
     void metaBlitBufferFlippedScaled() {
+        metaBlitBufferFlippedScaled(scRes);
         GLMeta::blitRectangle(
                               IntRect(0, 0, scRes.x, scRes.y),
-                              IntRect(scOffset.x * scalingFactor,
-                                      (scSize.y + scOffset.y) * scalingFactor,
-                                      scSize.x * scalingFactor,
-                                      -scSize.y * scalingFactor),
+                              IntRect(scOffset.x,
+                                      (scSize.y + scOffset.y),
+                                      scSize.x,
+                                      -scSize.y),
                               threadData->config.smoothScaling);
+    }
+    
+    void metaBlitBufferFlippedScaled(const Vec2i &sourceSize, bool forceNearestNeighbor=false) {
+        GLMeta::blitRectangle(IntRect(0, 0, sourceSize.x, sourceSize.y),
+                              IntRect(scOffset.x, scSize.y+scOffset.y, scSize.x, -scSize.y),
+                              !forceNearestNeighbor && threadData->config.smoothScaling);
     }
     
     void redrawScreen() {
         screen.composite();
         
+        // maybe unspaghetti this later
+        if (integerScaleStepApplicable() && !integerLastMileScaling)
+        {
+            GLMeta::blitBeginScreen(winSize);
+            GLMeta::blitSource(screen.getPP().frontBuffer());
+            
+            FBO::clear();
+            metaBlitBufferFlippedScaled(scRes, true);
+            GLMeta::blitEnd();
+            
+            swapGLBuffer();
+            return;
+        }
+        
+        if (integerScaleStepApplicable())
+        {
+            assert(integerScaleBuffer.tex != TEX::ID(0));
+            GLMeta::blitBegin(integerScaleBuffer);
+            GLMeta::blitSource(screen.getPP().frontBuffer());
+            
+            GLMeta::blitRectangle(IntRect(0, 0, scRes.x, scRes.y),
+                                  IntRect(0, 0, integerScaleBuffer.width, integerScaleBuffer.height),
+                                  false);
+            
+            GLMeta::blitEnd();
+        }
+        
         GLMeta::blitBeginScreen(winSize);
-        GLMeta::blitSource(screen.getPP().frontBuffer());
+        //GLMeta::blitSource(screen.getPP().frontBuffer());
+        
+        Vec2i sourceSize;
+        
+        if (integerScaleActive)
+        {
+            GLMeta::blitSource(integerScaleBuffer);
+            sourceSize = Vec2i(integerScaleBuffer.width, integerScaleBuffer.height);
+        }
+        else
+        {
+            GLMeta::blitSource(screen.getPP().frontBuffer());
+            sourceSize = scRes;
+        }
         
         FBO::clear();
-        metaBlitBufferFlippedScaled();
+        metaBlitBufferFlippedScaled(sourceSize);
         
         GLMeta::blitEnd();
         
@@ -664,12 +1099,16 @@ struct GraphicsPrivate {
         return ret;
     }
     
-    void setLock() {
+    void setLock(bool force = false) {
+        if (!(force || multithreadedMode)) return;
+        
         SDL_LockMutex(glResourceLock);
         SDL_GL_MakeCurrent(threadData->window, threadData->glContext);
     }
     
-    void releaseLock() {
+    void releaseLock(bool force = false) {
+        if (!(force || multithreadedMode)) return;
+        
         SDL_UnlockMutex(glResourceLock);
     }
 };
@@ -678,13 +1117,7 @@ Graphics::Graphics(RGSSThreadData *data) {
     p = new GraphicsPrivate(data);
     if (data->config.syncToRefreshrate) {
         p->frameRate = data->refreshRate;
-#if defined(__APPLE__) && defined(GLES2_HEADER)
-        // VSync seems to be broken at the moment, could be anywhere in the
-        // GLES -> ANGLE -> OpenGL -> Metal (if Apple Silicon) translation
-        p->fpsLimiter.setDesiredFPS(data->refreshRate);
-#else
         p->fpsLimiter.disabled = true;
-#endif
     } else if (data->config.fixedFramerate > 0) {
         p->fpsLimiter.setDesiredFPS(data->config.fixedFramerate);
     } else if (data->config.fixedFramerate < 0) {
@@ -702,12 +1135,15 @@ unsigned long long Graphics::lastUpdate() {
     return p->last_update;
 }
 
-void Graphics::update() {
+void Graphics::update(bool checkForShutdown) {
     p->threadData->rqWindowAdjust.wait();
     p->last_update = shState->runTime();
-    p->checkShutDownReset();
+    
+    if (checkForShutdown)
+        p->checkShutDownReset();
+    
     p->checkSyncLock();
-
+    
     
 #ifdef MKXPZ_STEAM
     if (STEAMSHIM_alive())
@@ -932,7 +1368,7 @@ void Graphics::fadein(int duration) {
 
 Bitmap *Graphics::snapToBitmap() {
     Bitmap *bitmap = new Bitmap(width(), height());
-
+    
     p->compositeToBuffer(bitmap->getGLTypes());
     
     /* Taint entire bitmap */
@@ -944,11 +1380,22 @@ int Graphics::width() const { return p->scRes.x; }
 
 int Graphics::height() const { return p->scRes.y; }
 
+int Graphics::displayWidth() const {
+    SDL_DisplayMode dm{};
+    SDL_GetCurrentDisplayMode(SDL_GetWindowDisplayIndex(shState->sdlWindow()), &dm);
+    return dm.w / p->backingScaleFactor;
+}
+
+int Graphics::displayHeight() const {
+    SDL_DisplayMode dm{};
+    SDL_GetCurrentDisplayMode(SDL_GetWindowDisplayIndex(shState->sdlWindow()), &dm);
+    return dm.h / p->backingScaleFactor;
+}
+
 void Graphics::resizeScreen(int width, int height) {
-    // width = clamp(width, 1, 640);
-    // height = clamp(height, 1, 480);
-    
     p->threadData->rqWindowAdjust.wait();
+    p->checkResize(true);
+    
     Vec2i size(width, height);
     
     if (p->scRes == size)
@@ -958,6 +1405,9 @@ void Graphics::resizeScreen(int width, int height) {
     
     p->screen.setResolution(width, height);
     
+    if (p->integerScaleActive)
+        p->rebuildIntegerScaleBuffer();
+    
     TEXFBO::allocEmpty(p->frozenScene, width, height);
     
     FloatRect screenRect(0, 0, width, height);
@@ -965,153 +1415,67 @@ void Graphics::resizeScreen(int width, int height) {
     
     glState.scissorBox.set(IntRect(0, 0, p->scRes.x, p->scRes.y));
     
-    
-    p->threadData->rqWindowAdjust.set();
     shState->eThread().requestWindowResize(width, height);
-    update();
 }
 
-void Graphics::playMovie(const char *filename) {
-    const size_t bufferSize = 256;
-    char filePath[bufferSize] = "";
-    snprintf(filePath, bufferSize, "%s.ogg", filename);
-
-    // Try adding the .ogg and .ogv extensions
-    if (!shState->fileSystem().exists(filePath)) {
-        snprintf(filePath, bufferSize, "%s.ogg", filename);
-    }
-    if (!shState->fileSystem().exists(filePath)) {
-        snprintf(filePath, bufferSize, "%s.ogv", filename);
-    }
-
-    if (!shState->fileSystem().exists(filePath)) {
-        // Movie file not found
-        Debug() << "Unable to open movie file: " << filePath;
-        return;
-    }
+void Graphics::resizeWindow(int width, int height, bool center) {
+    p->threadData->rqWindowAdjust.wait();
+    p->checkResize();
     
-    THEORAPLAY_Decoder *decoder = THEORAPLAY_startDecodeFile(filePath, DEF_MAX_VIDEO_FRAMES, THEORAPLAY_VIDFMT_RGBA);
-    if (!decoder) { 
-        Debug() << "Failed to start decoding movie file: " << filePath;
-        return;
-    }
+    if (width == p->winSize.x / p->backingScaleFactor &&
+        height == p->winSize.y / p->backingScaleFactor)
+            return;
 
-    // Wait until the decoder has parsed out some basic truths from the file.
-    while (!THEORAPLAY_isInitialized(decoder)) {
-        SDL_Delay(10);
-    }
-
-    // Wait until we have video
-    const THEORAPLAY_VideoFrame *video = NULL;
-    while ((video = THEORAPLAY_getVideo(decoder)) == NULL) {
-        SDL_Delay(10);
-    }
-
-    /* Capture new scene */
-    p->checkSyncLock();
-    p->screen.composite();
-    TEXFBO &videoBuffer = p->screen.getPP().backBuffer();
-
-    Bitmap *videoBitmap = new Bitmap(video->width, video->height);
-    TransShader &shader = shState->shaders().trans;
-    shader.bind();
-    shader.applyViewportProj();
-    shader.setTransMap(videoBitmap->getGLTypes().tex);
-    shader.setVague(256.0f);
-    shader.setTexSize(p->scRes);    
-    glState.blend.pushSet(false);
-
-    // We can just play the audio stream directly using the movie file
-    shState->audio().bgmPlay(filePath, 100, 100, 0);
-
-    // Flags on what to do upon video end
-    bool shutDown = false;
-    bool scriptReset = false;
+    shState->eThread().requestWindowResize(width, height);
     
-    // Assuming every frame has the same duration.
-    Uint32 frameMs = (video->fps == 0.0) ? 0 : ((Uint32) (1000.0 / video->fps));
-    Uint32 baseTicks = SDL_GetTicks();
-    while(THEORAPLAY_isDecoding(decoder)) {
-        if (p->threadData->rqTerm) {
-            shutDown = true;
-            break;
-        }
+    if (center)
+        this->center();
+}
+
+bool Graphics::updateMovieInput(Movie *movie) {
+    return  p->threadData->rqTerm || p->threadData->rqReset;
+}
+
+void Graphics::playMovie(const char *filename, int volume, bool skippable) {
+    Movie *movie = new Movie(volume, skippable);
+    MovieOpenHandler handler(movie->srcOps);
+    shState->fileSystem().openRead(handler, filename);
+    
+    if (movie->preparePlayback()) {
+        int limiterDisabled = p->fpsLimiter.disabled;
+        p->fpsLimiter.disabled = false;
+        int oldFPS = getFrameRate();
+        setFrameRate(movie->video->fps);
+        bool oldframeskip = p->useFrameSkip;
+        p->useFrameSkip = false;
+        update();
         
-        if (p->threadData->rqReset) {
-            break;
-        }
-
-        if (!video) {
-            video = THEORAPLAY_getVideo(decoder);
-        }
-
-        const Uint32 now = SDL_GetTicks() - baseTicks;
-        if (video && (video->playms <= now)) {
-            if (frameMs && ((now - video->playms) >= frameMs)) { 
-                // Skip frames to catch up, but keep track of the last one
-                // in case we catch up to a series of dupe frames, which
-                // means we'd have to draw that final frame and then wait for
-                // more.
-                const THEORAPLAY_VideoFrame *previous = video;
-                while ((video = THEORAPLAY_getVideo(decoder)) != NULL) {
-                    THEORAPLAY_freeVideo(previous);
-                    previous = video;
-                    if ((now - video->playms) < frameMs) {
-                        break;
-                    }
-                }
-
-                if (!video) {
-                    video = previous;
-                }
-            }
-            
-            // Application is too far behind
-            if (!video) {
-                Debug() << "WARNING: Video playback cannot keep up!";
-                break;
-            }
-
-            // Got a video frame, now draw it
-            p->checkSyncLock();
-            videoBitmap->replaceRaw(video->pixels, video->width * video->height * 4);
-            
-            shader.bind();
-            FBO::bind(videoBuffer.fbo);
-            FBO::clear();
-            p->screenQuad.draw();
-            
-            p->checkResize();
-            
-            /* Then blit it flipped and scaled to the screen */
-            FBO::unbind();
-            FBO::clear();
-            
-            GLMeta::blitBeginScreen(Vec2i(p->winSize));
-            GLMeta::blitSource(videoBuffer);
-            p->metaBlitBufferFlippedScaled();
-            GLMeta::blitEnd();
-            
-            p->swapGLBuffer();
-
-
-            THEORAPLAY_freeVideo(video);
-            video = NULL;
-
-        } else {
-            // Next video frame not yet ready, let the CPU breathe
-            SDL_Delay(10);
-        }
-
+        Sprite movieSprite;
+        
+        // Currently this stretches to fit the screen. VX Ace behavior is to center it and let the edges run off
+        movieSprite.setBitmap(movie->videoBitmap);
+        double ratio = std::min((double)width() / movie->video->width, (double)height() / movie->video->height);
+        movieSprite.setZoomX(ratio);
+        movieSprite.setZoomY(ratio);
+        movieSprite.setX((width() / 2) - (movie->video->width * ratio / 2));
+        movieSprite.setY((height() / 2) - (movie->video->height * ratio / 2));
+        
+        Sprite letterboxSprite;
+        Bitmap letterbox(width(), height());
+        letterbox.fillRect(0, 0, width(), height(), Vec4(0,0,0,255));
+        letterboxSprite.setBitmap(&letterbox);
+        
+        letterboxSprite.setZ(4999);
+        movieSprite.setZ(5001);
+        
+        movie->play();
+        
+        p->fpsLimiter.disabled = limiterDisabled;
+        setFrameRate(oldFPS);
+        p->useFrameSkip = oldframeskip;
     }
-    if (video) THEORAPLAY_freeVideo(video);
-    if (decoder) THEORAPLAY_stopDecode(decoder);
-    glState.blend.pop();
-    videoBitmap->dispose();
-    delete videoBitmap;
-    shState->audio().bgmStop();
-    if(scriptReset) scriptBinding->reset();
-    if(shutDown) p->shutdown();
+    
+    delete movie;
 }
 
 void Graphics::screenshot(const char *filename) {
@@ -1155,10 +1519,10 @@ void Graphics::reset() {
 }
 
 void Graphics::center() {
+    p->threadData->rqWindowAdjust.wait();
     if (getFullscreen())
         return;
     
-    p->threadData->rqWindowAdjust.reset();
     p->threadData->ethread->requestWindowCenter();
 }
 
@@ -1178,7 +1542,75 @@ void Graphics::setShowCursor(bool value) {
     p->threadData->ethread->requestShowCursor(value);
 }
 
-double Graphics::getScale() const { return (double)p->scSize.y / p->scRes.y; }
+bool Graphics::getFixedAspectRatio() const
+{
+    // It's a bit hacky to expose config values as a Graphics
+    // attribute, but there's really no point in state duplication
+    return shState->config().fixedAspectRatio;
+}
+
+void Graphics::setFixedAspectRatio(bool value)
+{
+    shState->config().fixedAspectRatio = value;
+    p->recalculateScreenSize(p->threadData);
+    p->findHighestIntegerScale();
+    p->recalculateScreenSize(p->threadData->config.fixedAspectRatio);
+    p->updateScreenResoRatio(p->threadData);
+}
+
+bool Graphics::getSmoothScaling() const
+{
+    // Same deal as with fixed aspect ratio
+    return shState->config().smoothScaling;
+}
+
+void Graphics::setSmoothScaling(bool value)
+{
+    shState->config().smoothScaling = value;
+}
+
+bool Graphics::getIntegerScaling() const
+{
+    return p->integerScaleActive;
+}
+
+void Graphics::setIntegerScaling(bool value)
+{
+    p->integerScaleActive = value;
+    p->findHighestIntegerScale();
+    p->rebuildIntegerScaleBuffer();
+    
+    p->recalculateScreenSize(p->threadData->config.fixedAspectRatio);
+    p->updateScreenResoRatio(p->threadData);
+}
+
+bool Graphics::getLastMileScaling() const
+{
+    return p->integerLastMileScaling;
+}
+
+void Graphics::setLastMileScaling(bool value)
+{
+    p->integerLastMileScaling = value;
+    p->recalculateScreenSize(p->threadData->config.fixedAspectRatio);
+    p->updateScreenResoRatio(p->threadData);
+}
+
+bool Graphics::getThreadsafe() const
+{
+    return p->multithreadedMode;
+}
+
+void Graphics::setThreadsafe(bool value)
+{
+    p->multithreadedMode = value;
+}
+
+double Graphics::getScale() const {
+    p->checkResize();
+    return (double)(p->winSize.y / p->backingScaleFactor) / p->scRes.y;
+    
+}
 
 void Graphics::setScale(double factor) {
     p->threadData->rqWindowAdjust.wait();
@@ -1190,9 +1622,7 @@ void Graphics::setScale(double factor) {
     int widthpx = p->scRes.x * factor;
     int heightpx = p->scRes.y * factor;
     
-    p->threadData->rqWindowAdjust.set();
     shState->eThread().requestWindowResize(widthpx, heightpx);
-    update();
 }
 
 bool Graphics::getFrameskip() const { return p->useFrameSkip; }
@@ -1227,12 +1657,12 @@ void Graphics::repaintWait(const AtomicFlag &exitCond, bool checkReset) {
     GLMeta::blitEnd();
 }
 
-void Graphics::lock() {
-    p->setLock();
+void Graphics::lock(bool force) {
+    p->setLock(force);
 }
 
-void Graphics::unlock() {
-    p->releaseLock();
+void Graphics::unlock(bool force) {
+    p->releaseLock(force);
 }
 
 void Graphics::addDisposable(Disposable *d) { p->dispList.append(d->link); }

@@ -34,7 +34,7 @@
 #include "intern.h"
 #endif
 
-#if RAPI_MAJOR > 2
+#if RAPI_MAJOR >= 2
 #include <ruby/thread.h>
 #endif
 
@@ -74,7 +74,7 @@ static VALUE fileIntForPath(const char *path, bool rubyExc) {
     return obj;
 }
 
-#if RAPI_MAJOR > 2
+#if RAPI_MAJOR >= 2
 typedef struct {
     SDL_RWops *ops;
     void *dst;
@@ -114,13 +114,13 @@ RB_METHOD(fileIntRead) {
     
     
     
-#if RAPI_MAJOR > 2
+#if RAPI_MAJOR >= 2
     fileIntReadCbArgs cbargs {ops, RSTRING_PTR(data), length};
     rb_thread_call_without_gvl([](void* args) -> void* {
         call_RWread_cb((fileIntReadCbArgs*)args);
         return 0;
     }, (void*)&cbargs, 0, 0);
-#elif
+#else
     SDL_RWread(ops, RSTRING_PTR(data), 1, length);
 #endif
     
@@ -191,11 +191,9 @@ RB_METHOD(kernelLoadData) {
     rb_scan_args(argc, argv, "11", &filename, &raw);
     SafeStringValue(filename);
     
-    // There's gotta be an easier way to do this
-    if (raw != Qnil && raw != Qtrue && raw != Qfalse) {
-        rb_raise(rb_eTypeError, "load_data: second argument must be Boolean");
-    }
-    return kernelLoadDataInt(RSTRING_PTR(filename), true, RTEST(raw));
+    bool rawv;
+    rb_bool_arg(raw, &rawv);
+    return kernelLoadDataInt(RSTRING_PTR(filename), true, rawv);
 }
 
 RB_METHOD(kernelSaveData) {

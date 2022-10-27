@@ -13,6 +13,7 @@
 // Yes, it is still a mess, but it is working.
 
 #import <GameController/GameController.h>
+#include <Availability.h>
 
 #import <SDL_scancode.h>
 #import <SDL_keyboard.h>
@@ -33,7 +34,7 @@
 
 static const int inputMapRowToCode[] {
     Input::Down, Input::Left, Input::Right, Input::Up,
-    Input::A, Input:: B, Input::ZL, Input::X, Input::Y, Input::ZR,
+    Input::A, Input:: B, Input::C, Input::X, Input::Y, Input::Z,
     Input::L, Input::R
 };
 
@@ -82,14 +83,14 @@ typedef NSMutableArray<NSNumber*> BindingIndexArray;
     win.styleMask &= NSWindowStyleMaskTitled;
     win.title = @"Keybindings";
     [s setWindow:win];
-    [win orderFront:self];
+    [win makeKeyAndOrderFront:self];
     
     return s;
 }
 
 -(SettingsMenu*)raise {
     if (_window)
-        [_window orderFront:self];
+        [_window makeKeyAndOrderFront:self];
     return self;
 }
 
@@ -158,8 +159,8 @@ typedef NSMutableArray<NSNumber*> BindingIndexArray;
 #define checkButtonEnd else { return; }
 #define checkButtonElement(e, b, n, min) \
 else if (sysver >= min && element == gamepad.e && gamepad.b.isPressed) { \
-s.type = JButton; \
-s.d.jb = n; \
+s.type = CButton; \
+s.d.cb = n; \
 }
 
 #define checkButtonAlt(b, n, min) checkButtonElement(b, b, n, min)
@@ -168,9 +169,9 @@ s.d.jb = n; \
 
 #define setAxisData(a, n) \
 GCControllerAxisInput *axis = gamepad.a; \
-s.type = JAxis; \
-s.d.ja.axis = n; \
-s.d.ja.dir = (axis.value >= 0) ? AxisDir::Positive : AxisDir::Negative;
+s.type = CAxis; \
+s.d.ca.axis = n; \
+s.d.ca.dir = (axis.value >= 0) ? AxisDir::Positive : AxisDir::Negative;
 
 #define checkAxis(el, a, n) else if (element == gamepad.el && (gamepad.el.a.value >= 0.5 || gamepad.el.a.value <= -0.5)) { setAxisData(el.a, n); }
 
@@ -184,43 +185,55 @@ s.d.ja.dir = (axis.value >= 0) ? AxisDir::Positive : AxisDir::Negative;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability-new"
     checkButtonStart
-    checkButton(A, 0, 12)
-    checkButton(B, 1, 12)
-    checkButton(X, 2, 12)
-    checkButton(Y, 3, 12)
-    checkButtonElement(dpad, dpad.up, 11, 12)
-    checkButtonElement(dpad, dpad.down, 12, 12)
-    checkButtonElement(dpad, dpad.left, 13, 12)
-    checkButtonElement(dpad, dpad.right, 14, 12)
-    checkButtonAlt(leftShoulder, 9, 12)
-    checkButtonAlt(rightShoulder, 10, 12)
-    
+    checkButton(A, SDL_CONTROLLER_BUTTON_A, 12)
+    checkButton(B, SDL_CONTROLLER_BUTTON_B, 12)
+    checkButton(X, SDL_CONTROLLER_BUTTON_X, 12)
+    checkButton(Y, SDL_CONTROLLER_BUTTON_Y, 12)
+    checkButtonElement(dpad, dpad.up, SDL_CONTROLLER_BUTTON_DPAD_UP, 12)
+    checkButtonElement(dpad, dpad.down, SDL_CONTROLLER_BUTTON_DPAD_DOWN, 12)
+    checkButtonElement(dpad, dpad.left, SDL_CONTROLLER_BUTTON_DPAD_LEFT, 12)
+    checkButtonElement(dpad, dpad.right, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, 12)
+    checkButtonAlt(leftShoulder, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 12)
+    checkButtonAlt(rightShoulder, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, 12)
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_14_1
     // Requires macOS 10.14.1+
-    checkButtonAlt(leftThumbstickButton, 7, 14)
-    checkButtonAlt(rightThumbstickButton, 8, 14)
-    
+    checkButtonAlt(leftThumbstickButton, SDL_CONTROLLER_BUTTON_LEFTSTICK, 14)
+    checkButtonAlt(rightThumbstickButton, SDL_CONTROLLER_BUTTON_RIGHTSTICK, 14)
+#else
+#warning "This SDK doesn't support the detection of thumbstick buttons. You will not be able to rebind them from the menu on 10.14.1 or higher."
+#endif
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_10_15
     // Requires macOS 10.15+
-    checkButton(Menu, 6, 15)
-    checkButton(Options, 4, 15)
+    checkButton(Menu, SDL_CONTROLLER_BUTTON_START, 15)
+    checkButton(Options, SDL_CONTROLLER_BUTTON_BACK, 15)
+#else
+#warning "This SDK doesn't support the detection of Start and Back buttons. You will not be able to rebind them from the menu on 10.15 or higher."
+#endif
     
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= __MAC_11_0
     // Requires macOS 11.0+
-    checkButton(Home, 5, 16)
+    checkButton(Home, SDL_CONTROLLER_BUTTON_GUIDE, 16)
+#else
+#warning "This SDK doesn't support the detection of the Guide button. You will not be able to rebind it from the menu on 11.0 or higher."
+#endif
     
-    checkAxis(leftThumbstick, xAxis, 0)
-    checkAxis(leftThumbstick, yAxis, 1)
-    checkAxis(rightThumbstick, xAxis, 2)
-    checkAxis(rightThumbstick, yAxis, 3)
+    checkAxis(leftThumbstick, xAxis, SDL_CONTROLLER_AXIS_LEFTX)
+    checkAxis(leftThumbstick, yAxis, SDL_CONTROLLER_AXIS_LEFTY)
+    checkAxis(rightThumbstick, xAxis, SDL_CONTROLLER_AXIS_RIGHTX)
+    checkAxis(rightThumbstick, yAxis, SDL_CONTROLLER_AXIS_RIGHTY)
     
     else if (element == gamepad.leftTrigger && (gamepad.leftTrigger.value >= 0.5 || gamepad.leftTrigger.value <= -0.5)) {
-        s.type = JAxis;
-        s.d.ja.axis = 4;
-        s.d.ja.dir = AxisDir::Positive;
+        s.type = CAxis;
+        s.d.ca.axis = SDL_CONTROLLER_AXIS_TRIGGERLEFT;
+        s.d.ca.dir = AxisDir::Positive;
     }
     
     else if (element == gamepad.rightTrigger && (gamepad.rightTrigger.value >= 0.5 || gamepad.rightTrigger.value <= -0.5)) {
-        s.type = JAxis;
-        s.d.ja.axis = 5;
-        s.d.ja.dir = AxisDir::Positive;
+        s.type = CAxis;
+        s.d.ca.axis = SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
+        s.d.ca.dir = AxisDir::Positive;
     }
     
     checkButtonEnd;
@@ -236,30 +249,11 @@ s.d.ja.dir = (axis.value >= 0) ? AxisDir::Positive : AxisDir::Negative;
         case Key:
             if (desc.d.scan == SDL_SCANCODE_LSHIFT) return @"Shift";
             return @(SDL_GetScancodeName(desc.d.scan));
-        case JHat:
-            const char *dir;
-            switch (desc.d.jh.pos) {
-                case SDL_HAT_UP:
-                    dir = "Up";
-                    break;
-                case SDL_HAT_DOWN:
-                    dir = "Down";
-                    break;
-                case SDL_HAT_LEFT:
-                    dir = "Left";
-                    break;
-                case SDL_HAT_RIGHT:
-                    dir = "Right";
-                    break;
-                default:
-                    dir = "-";
-                    break;
-            }
-            return [NSString stringWithFormat:@"JS Hat %d:%s", desc.d.jh.hat, dir];
-        case JAxis:
-            return [NSString stringWithFormat:@"JS Axis %d%s", desc.d.ja.axis, desc.d.ja.dir == Negative ? "-" : "+"];
-        case JButton:
-            return [NSString stringWithFormat:@"JS Button %i", desc.d.jb];
+        case CAxis:
+            return [NSString stringWithFormat:@"%s%s",
+                    shState->input().getAxisName(desc.d.ca.axis), desc.d.ca.dir == Negative ? "-" : "+"];
+        case CButton:
+            return @(shState->input().getButtonName(desc.d.cb));
         default:
             return @"Invalid";
     }
@@ -280,10 +274,10 @@ s.d.ja.dir = (axis.value >= 0) ? AxisDir::Positive : AxisDir::Negative;
     SET_BINDING(Up);
     SET_BINDING(A);
     SET_BINDING(B);
-    SET_BINDING_CUSTOM(ZL, "C");
+    SET_BINDING(C);
     SET_BINDING(X);
     SET_BINDING(Y);
-    SET_BINDING_CUSTOM(ZR, "Z");
+    SET_BINDING(Z);
     SET_BINDING(L);
     SET_BINDING(R);
     
@@ -292,10 +286,10 @@ if (!data.config.kbActionNames.value.empty()) bindingNames[@(Input::code)] = \
     @(data.config.kbActionNames.value.c_str())
     SET_BINDING_CONF(A,a);
     SET_BINDING_CONF(B,b);
-    SET_BINDING_CONF(ZL,c);
+    SET_BINDING_CONF(C,c);
     SET_BINDING_CONF(X,x);
     SET_BINDING_CONF(Y,y);
-    SET_BINDING_CONF(ZR,z);
+    SET_BINDING_CONF(Z,z);
     SET_BINDING_CONF(L,l);
     SET_BINDING_CONF(R,r);
     

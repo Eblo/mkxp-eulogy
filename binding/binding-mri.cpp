@@ -22,6 +22,7 @@
 #include "audio/audio.h"
 #include "filesystem/filesystem.h"
 #include "display/graphics.h"
+#include "display/font.h"
 #include "system/system.h"
 
 #include "util/util.h"
@@ -50,7 +51,7 @@ extern "C" {
 }
 
 #ifdef __WIN32__
-#include <fcntl.h>
+#include "binding-mri-win32.h"
 #endif
 
 #include <assert.h>
@@ -62,8 +63,6 @@ extern "C" {
 #include <SDL_loadso.h>
 #include <SDL_power.h>
 
-#define MACRO_STRINGIFY(x) #x
-
 extern const char module_rpg1[];
 extern const char module_rpg2[];
 extern const char module_rpg3[];
@@ -71,9 +70,6 @@ extern const char module_rpg3[];
 static void mriBindingExecute();
 static void mriBindingTerminate();
 static void mriBindingReset();
-#ifdef __WIN32__
-static void configureWindowsStreams();
-#endif
 
 ScriptBinding scriptBindingImpl = {mriBindingExecute, mriBindingTerminate,
     mriBindingReset};
@@ -122,8 +118,6 @@ RB_METHOD(mkxpSetTitle);
 RB_METHOD(mkxpGetTitle);
 RB_METHOD(mkxpDesensitize);
 RB_METHOD(mkxpPuts);
-RB_METHOD(mkxpRawKeyStates);
-RB_METHOD(mkxpMouseInWindow);
 
 RB_METHOD(mkxpPlatform);
 RB_METHOD(mkxpIsMacHost);
@@ -147,6 +141,12 @@ RB_METHOD(mkxpAddPath);
 RB_METHOD(mkxpRemovePath);
 RB_METHOD(mkxpLaunch);
 
+RB_METHOD(mkxpGetJSONSetting);
+RB_METHOD(mkxpSetJSONSetting);
+RB_METHOD(mkxpGetAllJSONSettings);
+
+RB_METHOD(mkxpSetDefaultFontFamily);
+
 RB_METHOD(mriRgssMain);
 RB_METHOD(mriRgssStop);
 RB_METHOD(_kernelCaller);
@@ -155,6 +155,7 @@ RB_METHOD(mkxpStringToUTF8);
 RB_METHOD(mkxpStringToUTF8Bang);
 
 VALUE json2rb(json5pp::value const &v);
+json5pp::value rb2json(VALUE v);
 
 static void mriBindingInit() {
     tableBindingInit();
@@ -231,10 +232,6 @@ static void mriBindingInit() {
     _rb_define_module_function(mod, "show_settings", mkxpSettingsMenu);
     _rb_define_module_function(mod, "puts", mkxpPuts);
     _rb_define_module_function(mod, "desensitize", mkxpDesensitize);
-    _rb_define_module_function(mod, "raw_key_states", mkxpRawKeyStates);
-    _rb_define_module_function(mod, "mouse_in_window", mkxpMouseInWindow);
-    _rb_define_module_function(mod, "mouse_in_window?", mkxpMouseInWindow);
-    
     _rb_define_module_function(mod, "platform", mkxpPlatform);
     
     _rb_define_module_function(mod, "is_mac?", mkxpIsMacHost);
@@ -260,8 +257,15 @@ static void mriBindingInit() {
     _rb_define_module_function(mod, "unmount", mkxpRemovePath);
     _rb_define_module_function(mod, "launch", mkxpLaunch);
     
+    _rb_define_module_function(mod, "default_font_family=", mkxpSetDefaultFontFamily);
+    
     _rb_define_method(rb_cString, "to_utf8", mkxpStringToUTF8);
     _rb_define_method(rb_cString, "to_utf8!", mkxpStringToUTF8Bang);
+    
+    VALUE cmod = rb_define_module("CFG");
+    _rb_define_module_function(cmod, "[]", mkxpGetJSONSetting);
+    _rb_define_module_function(cmod, "[]=", mkxpSetJSONSetting);
+    _rb_define_module_function(cmod, "to_hash", mkxpGetAllJSONSettings);
     
     /* Load global constants */
     rb_gv_set("MKXP", Qtrue);
@@ -274,24 +278,16 @@ static void mriBindingInit() {
     
     rb_gv_set("BTEST", rb_bool_new(shState->config().editor.battleTest));
     
-    VALUE vers = rb_utf8_str_new_cstr(MACRO_STRINGIFY(MKXPZ_VERSION));
+    VALUE vers = rb_utf8_str_new_cstr(MKXPZ_VERSION);
     rb_str_freeze(vers);
     rb_define_const(mod, "VERSION", vers);
     
-    VALUE cfg = json2rb(shState->config().raw);
-    rb_hash_freeze(cfg);
-    rb_define_const(mod, "CONFIG", cfg);
-
     // Set $stdout and its ilk accordingly on Windows
+    // I regret teaching you that word
 #ifdef __WIN32__
-    if (shState->config().editor.debug)
+    if (shState->config().winConsole)
         configureWindowsStreams();
 #endif
-    
-    // Load zlib, if it's present. Requires --with-static-linked-ext or zlib.so.
-    // It's okay if it fails, normally it wouldn't be defined anyway.
-    // It's included with normal RGSS though, so I'd prefer if it's loaded at the start.
-    rb_eval_string("begin;require 'zlib';rescue;nil;end");
 }
 
 static void showMsg(const std::string &msg) {
@@ -376,7 +372,7 @@ RB_METHOD(mkxpDesensitize) {
     SafeStringValue(filename);
     
     return rb_utf8_str_new_cstr(
-                           shState->fileSystem().desensitize(RSTRING_PTR(filename)));
+                                shState->fileSystem().desensitize(RSTRING_PTR(filename)));
 }
 
 RB_METHOD(mkxpPuts) {
@@ -390,22 +386,6 @@ RB_METHOD(mkxpPuts) {
     return Qnil;
 }
 
-RB_METHOD(mkxpRawKeyStates) {
-    RB_UNUSED_PARAM;
-    
-    VALUE str = rb_str_new(0, sizeof(EventThread::keyStates));
-    memcpy(RSTRING_PTR(str), EventThread::keyStates,
-           sizeof(EventThread::keyStates));
-    
-    return str;
-}
-
-RB_METHOD(mkxpMouseInWindow) {
-    RB_UNUSED_PARAM;
-    
-    return rb_bool_new(EventThread::mouseState.inWindow);
-}
-
 RB_METHOD(mkxpPlatform) {
     RB_UNUSED_PARAM;
     
@@ -414,7 +394,7 @@ RB_METHOD(mkxpPlatform) {
     
     if (mkxp_sys::isRosetta())
         platform += " (Rosetta)";
-
+    
 #elif MKXPZ_PLATFORM == MKXPZ_PLATFORM_WINDOWS
     std::string platform("Windows");
     
@@ -489,8 +469,8 @@ RB_METHOD(mkxpUserLanguage) {
 RB_METHOD(mkxpUserName) {
     RB_UNUSED_PARAM;
     
-// Using the Windows API isn't working with usernames that involve Unicode
-// characters for some dumb reason
+    // Using the Windows API isn't working with usernames that involve Unicode
+    // characters for some dumb reason
 #ifdef __WIN32__
     VALUE env = rb_const_get(rb_mKernel, rb_intern("ENV"));
     return rb_funcall(env, rb_intern("[]"), 1, rb_str_new_cstr("USERNAME"));
@@ -555,15 +535,19 @@ RB_METHOD(mkxpReloadPathCache) {
 RB_METHOD(mkxpAddPath) {
     RB_UNUSED_PARAM;
     
-    VALUE path, mountpoint;
-    rb_scan_args(argc, argv, "11", &path, &mountpoint);
+    VALUE path, mountpoint, reload;
+    rb_scan_args(argc, argv, "12", &path, &mountpoint, &reload);
     SafeStringValue(path);
     if (mountpoint != Qnil) SafeStringValue(mountpoint);
     
     const char *mp = (mountpoint == Qnil) ? 0 : RSTRING_PTR(mountpoint);
     
     try {
-        shState->fileSystem().addPath(RSTRING_PTR(path), mp, 1);
+        bool rl = true;
+        if (reload != Qnil)
+            rb_bool_arg(reload, &rl);
+        
+        shState->fileSystem().addPath(RSTRING_PTR(path), mp, rl);
     } catch (Exception &e) {
         raiseRbExc(e);
     }
@@ -573,16 +557,33 @@ RB_METHOD(mkxpAddPath) {
 RB_METHOD(mkxpRemovePath) {
     RB_UNUSED_PARAM;
     
-    VALUE path;
-    rb_scan_args(argc, argv, "1", &path);
+    VALUE path, reload;
+    rb_scan_args(argc, argv, "11", &path, &reload);
     SafeStringValue(path);
     
     try {
-        shState->fileSystem().removePath(RSTRING_PTR(path), 1);
+        bool rl = true;
+        if (reload != Qnil)
+            rb_bool_arg(reload, &rl);
+        
+        shState->fileSystem().removePath(RSTRING_PTR(path), rl);
     } catch (Exception &e) {
         raiseRbExc(e);
     }
     return path;
+}
+
+RB_METHOD(mkxpSetDefaultFontFamily) {
+    RB_UNUSED_PARAM;
+    
+    VALUE familyV;
+    rb_scan_args(argc, argv, "1", &familyV);
+    SafeStringValue(familyV);
+    
+    std::string family(RSTRING_PTR(familyV));
+    shState->fontState().setDefaultFontFamily(family);
+    
+    return Qnil;
 }
 
 RB_METHOD(mkxpStringToUTF8) {
@@ -662,6 +663,70 @@ RB_METHOD(mkxpLaunch) {
     }
     
     return RUBY_Qnil;
+}
+
+json5pp::value userSettings;
+
+void loadUserSettings() {
+    if (!userSettings.is_null())
+        return;
+    
+    VALUE cpath = rb_utf8_str_new_cstr(shState->config().userConfPath.c_str());
+    
+    if (rb_funcall(rb_cFile, rb_intern("exists?"), 1, cpath) == Qtrue) {
+        VALUE f = rb_funcall(rb_cFile, rb_intern("open"), 2, cpath, rb_str_new("r", 1));
+        VALUE data = rb_funcall(f, rb_intern("read"), 0);
+        rb_funcall(f, rb_intern("close"), 0);
+        userSettings = rb2json(data);
+    }
+    
+    if (!userSettings.is_object())
+        userSettings = json5pp::object({});
+}
+
+void saveUserSettings() {
+    VALUE cpath = rb_utf8_str_new_cstr(shState->config().userConfPath.c_str());
+    VALUE f = rb_funcall(rb_cFile, rb_intern("open"), 2, cpath, rb_str_new("w", 1));
+    rb_funcall(f, rb_intern("write"), 1, rb_utf8_str_new_cstr(userSettings.stringify5(json5pp::rule::space_indent<>()).c_str()));
+    rb_funcall(f, rb_intern("close"), 0);
+}
+
+RB_METHOD(mkxpGetJSONSetting) {
+    RB_UNUSED_PARAM;
+    
+    VALUE sname;
+    rb_scan_args(argc, argv, "1", &sname);
+    SafeStringValue(sname);
+    
+    loadUserSettings();
+    auto &s = userSettings.as_object();
+    
+    if (s[RSTRING_PTR(sname)].is_null()) {
+        return json2rb(shState->config().raw.as_object()[RSTRING_PTR(sname)]);
+    }
+    
+    return json2rb(s[RSTRING_PTR(sname)]);
+    
+}
+
+RB_METHOD(mkxpSetJSONSetting) {
+    RB_UNUSED_PARAM;
+    
+    VALUE sname, svalue;
+    rb_scan_args(argc, argv, "2", &sname, &svalue);
+    SafeStringValue(sname);
+    
+    loadUserSettings();
+    userSettings.as_object()[RSTRING_PTR(sname)] = rb2json(svalue);
+    
+    saveUserSettings();
+    return Qnil;
+}
+
+RB_METHOD(mkxpGetAllJSONSettings) {
+    RB_UNUSED_PARAM;
+    
+    return json2rb(shState->config().raw);
 }
 
 static VALUE rgssMainCb(VALUE block) {
@@ -889,7 +954,7 @@ static void runRMXPScripts(BacktraceData &btData) {
     /* Execute preloaded scripts */
     for (std::vector<std::string>::const_iterator i = conf.preloadScripts.begin();
          i != conf.preloadScripts.end(); ++i)
-    runCustomScript(*i);
+        runCustomScript(*i);
     
     VALUE exc = rb_gv_get("$!");
     if (exc != Qnil)
@@ -924,21 +989,21 @@ static void runRMXPScripts(BacktraceData &btData) {
             
             // Adding a 'not' symbol means it WON'T run on that
             // platform (i.e. |!W| won't run on Windows)
-/*
-            if (scriptName[0] == '|') {
-                int len = strlen(scriptName);
-                if (len > 2) {
-                    if (scriptName[1] == '!' && len > 3 &&
-                        scriptName[3] == scriptName[0]) {
-                        if (toupper(scriptName[2]) == platform[0])
-                            continue;
-                    }
-                    if (scriptName[2] == scriptName[0] &&
-                        toupper(scriptName[1]) != platform[0])
-                        continue;
-                }
-            }
- */
+            /*
+             if (scriptName[0] == '|') {
+             int len = strlen(scriptName);
+             if (len > 2) {
+             if (scriptName[1] == '!' && len > 3 &&
+             scriptName[3] == scriptName[0]) {
+             if (toupper(scriptName[2]) == platform[0])
+             continue;
+             }
+             if (scriptName[2] == scriptName[0] &&
+             toupper(scriptName[1]) != platform[0])
+             continue;
+             }
+             }
+             */
             
             int state;
             
@@ -955,41 +1020,6 @@ static void runRMXPScripts(BacktraceData &btData) {
     }
 }
 
-// Attempts to set $stdout and $stdin accordingly on Windows. Only
-// called when debug mode is on, since that's when the console
-// should be active.
-#ifdef __WIN32__
-static void configureWindowsStreams() {
-    #define HANDLE_VALID(handle) handle && handle != INVALID_HANDLE_VALUE
-
-    const HANDLE outputHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-
-    // Configure $stdout
-    if (HANDLE_VALID(outputHandle)) {
-        const int stdoutFD = _open_osfhandle((intptr_t)outputHandle, _O_TEXT);
-
-        VALUE winStdout = rb_funcall(rb_cIO, rb_intern("new"), 2,
-            INT2NUM(stdoutFD), rb_str_new_cstr("w"));
-
-        rb_gv_set("stdout", winStdout);
-    }
-
-    const HANDLE inputHandle = GetStdHandle(STD_INPUT_HANDLE);
-
-    // Configure $stdin
-    if (HANDLE_VALID(inputHandle)) {
-        const int stdinFD = _open_osfhandle((intptr_t)inputHandle, _O_TEXT);
-
-        VALUE winStdin = rb_funcall(rb_cIO, rb_intern("new"), 2,
-            INT2NUM(stdinFD), rb_str_new_cstr("r"));
-
-        rb_gv_set("stdin", winStdin);
-    }
-
-    #undef HANDLE_VALID
-}
-#endif // #ifdef __WIN32__
-
 static void showExc(VALUE exc, const BacktraceData &btData) {
     VALUE bt = rb_funcall2(exc, rb_intern("backtrace"), 0, NULL);
     VALUE msg = rb_funcall2(exc, rb_intern("message"), 0, NULL);
@@ -1005,9 +1035,9 @@ static void showExc(VALUE exc, const BacktraceData &btData) {
 #endif
     /* omit "useless" last entry (from ruby:1:in `eval') */
     for (long i = 1, btlen = RARRAY_LEN(bt) - 1; i < btlen; ++i)
-    rb_str_catf(ds, "\n\tfrom %" PRIsVALUE,
+        rb_str_catf(ds, "\n\tfrom %" PRIsVALUE,
 #if RAPI_MAJOR >= 2
-                rb_ary_entry(bt, i));
+                    rb_ary_entry(bt, i));
 #else
     RSTRING_PTR(rb_ary_entry(bt, i)));
 #endif
@@ -1065,15 +1095,9 @@ static void mriBindingExecute() {
     /* Normally only a ruby executable would do a sysinit,
      * but not doing it will lead to crashes due to closed
      * stdio streams on some platforms (eg. Windows) */
-#ifdef __WIN32__
-    if (!conf.editor.debug) {
-#endif
     int argc = 0;
     char **argv = 0;
     ruby_sysinit(&argc, &argv);
-#ifdef __WIN32__
-    }
-#endif
     
     RUBY_INIT_STACK;
     ruby_init();
@@ -1120,7 +1144,7 @@ static void mriBindingExecute() {
     ruby_init();
     rb_eval_string("$KCODE='U'");
 #ifdef __WIN32__
-    if (!conf.editor.debug) {
+    if (!conf.winConsole) {
         VALUE iostr = rb_str_new2("NUL");
         // Sysinit isn't a thing yet, so send io to /dev/null instead
         rb_funcall(rb_gv_get("$stderr"), rb_intern("reopen"), 1, iostr);

@@ -35,6 +35,8 @@ struct Config {
     int rgssVersion;
     
     bool debugMode;
+    bool winConsole;
+    bool preferMetalRenderer;
     bool printFPS;
     
     bool winResizable;
@@ -57,9 +59,17 @@ struct Config {
     bool enableBlitting;
     int maxTextureSize;
     
+    struct {
+        bool active;
+        bool lastMileScaling;
+    } integerScaling;
+    
     std::string gameFolder;
+    bool manualFolderSelect;
+    
     bool anyAltToggleFS;
     bool enableReset;
+    bool enableSettings;
     bool allowSymlinks;
     bool pathCache;
     
@@ -125,6 +135,8 @@ struct Config {
         std::string l;
         std::string r;
     } kbActionNames;
+    
+    std::string userConfPath;
     
     /* Internal */
     std::string customDataPath;

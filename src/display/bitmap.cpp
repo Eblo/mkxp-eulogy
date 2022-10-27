@@ -177,12 +177,12 @@ struct BitmapPrivate
         unsigned long long startTime;
         unsigned long long playTime;
         
-        inline int currentFrameIRaw() {
+        inline unsigned int currentFrameIRaw() {
             if (fps <= 0) return lastFrame;
             return floor(lastFrame + (playTime / ((1 / fps) * 1000000)));
         }
         
-        int currentFrameI() {
+        unsigned int currentFrameI() {
             if (!playing || needsReset) return lastFrame;
             int i = currentFrameIRaw();
             return (loop) ? fmod(i, frames.size()) : (i > (int)frames.size() - 1) ? (int)frames.size() - 1 : i;
@@ -275,6 +275,10 @@ struct BitmapPrivate
         prepareCon.disconnect();
         SDL_FreeFormat(format);
         pixman_region_fini(&tainted);
+    }
+    
+    TEXFBO &getGLTypes() {
+        return (animation.enabled) ? animation.currentFrame() : gl;
     }
     
     void prepare()
@@ -488,7 +492,7 @@ Bitmap::Bitmap(const char *filename)
     if (handler.gif) {
         p = new BitmapPrivate(this);
         
-        if (handler.gif->width >= glState.caps.maxTexSize || handler.gif->height > glState.caps.maxTexSize)
+        if (handler.gif->width >= (uint32_t)glState.caps.maxTexSize || handler.gif->height > (uint32_t)glState.caps.maxTexSize)
         {
             throw new Exception(Exception::MKXPError, "Animation too large (%ix%i, max %ix%i)",
                                 handler.gif->width, handler.gif->height, glState.caps.maxTexSize, glState.caps.maxTexSize);
@@ -1856,7 +1860,7 @@ void Bitmap::setInitFont(Font *value)
 
 TEXFBO &Bitmap::getGLTypes() const
 {
-    return (p->animation.enabled) ? p->animation.currentFrame() : p->gl;
+    return p->getGLTypes();
 }
 
 SDL_Surface *Bitmap::surface() const
@@ -2052,7 +2056,7 @@ void Bitmap::nextFrame()
     GUARD_UNANIMATED;
     
     stop();
-    if (p->animation.lastFrame >= p->animation.frames.size() - 1)  {
+    if ((uint32_t)p->animation.lastFrame >= p->animation.frames.size() - 1)  {
         if (!p->animation.loop) return;
         p->animation.lastFrame = 0;
         return;

@@ -23,11 +23,13 @@
 #define INPUT_H
 
 #include <unordered_map>
+#include <SDL_gamecontroller.h>
 #include <string>
 #include <vector>
 
 extern std::unordered_map<int, int> vKeyToScancode;
 extern std::unordered_map<std::string, int> strToScancode;
+extern std::unordered_map<std::string, SDL_GameControllerButton> strToGCButton;
 
 struct InputPrivate;
 struct RGSSThreadData;
@@ -41,8 +43,8 @@ public:
 
 		Down = 2, Left = 4, Right = 6, Up = 8,
 
-		A = 11, B = 12, ZL = 13,
-		X = 14, Y = 15, ZR = 16,
+		A = 11, B = 12, C = 13,
+		X = 14, Y = 15, Z = 16,
 		L = 17, R = 18,
 
 		Shift = 21, Ctrl = 22, Alt = 23,
@@ -50,7 +52,8 @@ public:
 		F5 = 25, F6 = 26, F7 = 27, F8 = 28, F9 = 29,
 
 		/* Non-standard extensions */
-		MouseLeft = 38, MouseMiddle = 39, MouseRight = 40
+		MouseLeft = 38, MouseMiddle = 39, MouseRight = 40,
+        MouseX1 = 41, MouseX2 = 42
 	};
     
     void recalcRepeat(unsigned int fps);
@@ -66,23 +69,41 @@ public:
     bool isReleased(int button);
     unsigned int count(int button);
     unsigned long long repeatTime(int button);
+    
     bool isPressedEx(int code, bool isVKey);
     bool isTriggeredEx(int code, bool isVKey);
     bool isRepeatedEx(int code, bool isVKey);
     bool isReleasedEx(int code, bool isVKey);
     unsigned int repeatcount(int code, bool isVKey);
     unsigned long long repeatTimeEx(int code, bool isVKey);
+    
+    bool controllerIsPressedEx(int button);
+    bool controllerIsTriggeredEx(int button);
+    bool controllerIsRepeatedEx(int button);
+    bool controllerIsReleasedEx(int button);
+    unsigned int controllerRepeatcount(int button);
+    unsigned long long controllerRepeatTimeEx(int button);
+    
+    uint8_t *rawKeyStates();
+    unsigned int rawKeyStatesLength();
+    uint8_t *rawButtonStates();
+    unsigned int rawButtonStatesLength();
+    int16_t *rawAxes();
+    unsigned int rawAxesLength();
+    
+    short getControllerAxisValue(SDL_GameControllerAxis axis);
 
 	int dir4Value();
 	int dir8Value();
 
-	/* Non-standard extensions */
 	int mouseX();
 	int mouseY();
+    int scrollV();
+    bool mouseInWindow();
     
-    bool getJoystickConnected();
-    const char *getJoystickName();
-    int getJoystickPowerLevel();
+    bool getControllerConnected();
+    const char *getControllerName();
+    int getControllerPowerLevel();
     
     bool getTextInputMode();
     void setTextInputMode(bool mode);
@@ -91,6 +112,9 @@ public:
     
     char *getClipboardText();
     void setClipboardText(char *text);
+    
+    const char *getAxisName(SDL_GameControllerAxis axis);
+    const char *getButtonName(SDL_GameControllerButton button);
 
 	const std::string getKeyMappingString(int button);
 

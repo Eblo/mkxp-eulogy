@@ -22,7 +22,6 @@
 #include "eventthread.h"
 
 #include <SDL_events.h>
-#include <SDL_joystick.h>
 #include <SDL_messagebox.h>
 #include <SDL_timer.h>
 #include <SDL_thread.h>
@@ -39,8 +38,11 @@
 
 #ifndef MKXPZ_BUILD_XCODE
 #include "settingsmenu.h"
+#include "gamecontrollerdb.txt.xxd"
 #else
 #include "system/system.h"
+#include "filesystem/filesystem.h"
+#include "TouchBar.h"
 #endif
 
 #include "al-util.h"
@@ -82,9 +84,10 @@ initALCFunctions(ALCdevice *alcDev)
 #define HAVE_ALC_DEVICE_PAUSE alc.DevicePause
 
 uint8_t EventThread::keyStates[];
-EventThread::JoyState EventThread::joyState;
+EventThread::ControllerState EventThread::controllerState;
 EventThread::MouseState EventThread::mouseState;
 EventThread::TouchState EventThread::touchState;
+SDL_atomic_t EventThread::verticalScrollDistance;
 
 /* User event codes */
 enum
@@ -120,7 +123,7 @@ bool EventThread::allocUserEvents()
 }
 
 EventThread::EventThread()
-: js(0),
+: ctrl(0),
 fullscreen(false),
 showCursor(true)
 {
@@ -137,6 +140,7 @@ void EventThread::process(RGSSThreadData &rtData)
     SDL_Event event;
     SDL_Window *win = rtData.window;
     UnidirMessage<Vec2i> &windowSizeMsg = rtData.windowSizeMsg;
+    UnidirMessage<Vec2i> &drawableSizeMsg = rtData.drawableSizeMsg;
     
     initALCFunctions(rtData.alcDev);
     
@@ -162,8 +166,18 @@ void EventThread::process(RGSSThreadData &rtData)
     
     bool terminate = false;
     
-    if (SDL_NumJoysticks() > 0)
-        js = SDL_JoystickOpen(0);
+#ifdef MKXPZ_BUILD_XCODE
+    SDL_GameControllerAddMappingsFromFile(mkxp_fs::getPathForAsset("gamecontrollerdb", "txt").c_str());
+#else
+    SDL_GameControllerAddMappingsFromRW(
+        SDL_RWFromConstMem(___assets_gamecontrollerdb_txt, ___assets_gamecontrollerdb_txt_len),
+    1);
+#endif
+    
+    SDL_JoystickUpdate();
+    if (SDL_NumJoysticks() > 0 && SDL_IsGameController(0)) {
+            ctrl = SDL_GameControllerOpen(0);
+    }
     
     char buffer[128];
     
@@ -178,6 +192,10 @@ void EventThread::process(RGSSThreadData &rtData)
     SDL_DisplayMode dm = {0};
     
     SDL_GetWindowSize(win, &winW, &winH);
+    
+    // Just in case it's started when the window is opened
+    // for some dumb reason
+    SDL_StopTextInput();
     
     textInputBuffer.clear();
 #ifndef MKXPZ_BUILD_XCODE
@@ -237,7 +255,11 @@ void EventThread::process(RGSSThreadData &rtData)
                         winW = event.window.data1;
                         winH = event.window.data2;
                         
+                        int drwW, drwH;
+                        SDL_GL_GetDrawableSize(win, &drwW, &drwH);
+                        
                         windowSizeMsg.post(Vec2i(winW, winH));
+                        drawableSizeMsg.post(Vec2i(drwW, drwH));
                         resetInputStates();
                         break;
                         
@@ -304,7 +326,7 @@ void EventThread::process(RGSSThreadData &rtData)
                     break;
                 }
                 
-                if (event.key.keysym.scancode == SDL_SCANCODE_F1)
+                if (event.key.keysym.scancode == SDL_SCANCODE_F1 && rtData.config.enableSettings)
                 {
 #ifndef MKXPZ_BUILD_XCODE
                     if (!sMenu)
@@ -381,32 +403,28 @@ void EventThread::process(RGSSThreadData &rtData)
                 keyStates[event.key.keysym.scancode] = false;
                 break;
                 
-            case SDL_JOYBUTTONDOWN :
-                joyState.buttons[event.jbutton.button] = true;
+            case SDL_CONTROLLERBUTTONDOWN:
+                controllerState.buttons[event.cbutton.button] = true;
                 break;
                 
-            case SDL_JOYBUTTONUP :
-                joyState.buttons[event.jbutton.button] = false;
+            case SDL_CONTROLLERBUTTONUP:
+                controllerState.buttons[event.cbutton.button] = false;
                 break;
                 
-            case SDL_JOYHATMOTION :
-                joyState.hats[event.jhat.hat] = event.jhat.value;
+            case SDL_CONTROLLERAXISMOTION:
+                controllerState.axes[event.caxis.axis] = event.caxis.value;
                 break;
                 
-            case SDL_JOYAXISMOTION :
-                joyState.axes[event.jaxis.axis] = event.jaxis.value;
-                break;
-                
-            case SDL_JOYDEVICEADDED :
-                if (event.jdevice.which > 0)
+            case SDL_CONTROLLERDEVICEADDED:
+                if (event.cdevice.which > 0)
                     break;
                 
-                js = SDL_JoystickOpen(0);
+                ctrl = SDL_GameControllerOpen(0);
                 break;
                 
-            case SDL_JOYDEVICEREMOVED :
+            case SDL_CONTROLLERDEVICEREMOVED:
                 resetInputStates();
-                js = 0;
+                ctrl = 0;
                 break;
                 
             case SDL_MOUSEBUTTONDOWN :
@@ -422,6 +440,10 @@ void EventThread::process(RGSSThreadData &rtData)
                 mouseState.y = event.motion.y;
                 updateCursorState(cursorInWindow, gameScreen);
                 break;
+                
+            case SDL_MOUSEWHEEL :
+                /* Only consider vertical scrolling for now */
+                SDL_AtomicAdd(&verticalScrollDistance, event.wheel.y);
                 
             case SDL_FINGERDOWN :
                 i = event.tfinger.fingerId;
@@ -565,8 +587,8 @@ void EventThread::process(RGSSThreadData &rtData)
     /* Just in case */
     rtData.syncPoint.resumeThreads();
     
-    if (SDL_JoystickGetAttached(js))
-        SDL_JoystickClose(js);
+    if (SDL_GameControllerGetAttached(ctrl))
+        SDL_GameControllerClose(ctrl);
     
 #ifndef MKXPZ_BUILD_XCODE
     delete sMenu;
@@ -639,7 +661,7 @@ void EventThread::cleanup()
 void EventThread::resetInputStates()
 {
     memset(&keyStates, 0, sizeof(keyStates));
-    memset(&joyState, 0, sizeof(joyState));
+    memset(&controllerState, 0, sizeof(controllerState));
     memset(&mouseState.buttons, 0, sizeof(mouseState.buttons));
     memset(&touchState, 0, sizeof(touchState));
 }
@@ -683,6 +705,7 @@ void EventThread::requestFullscreenMode(bool mode)
 
 void EventThread::requestWindowResize(int width, int height)
 {
+    shState->rtData().rqWindowAdjust.set();
     SDL_Event event;
     event.type = usrIdStart + REQUEST_WINRESIZE;
     event.window.data1 = width;
@@ -692,6 +715,7 @@ void EventThread::requestWindowResize(int width, int height)
 
 void EventThread::requestWindowReposition(int x, int y)
 {
+    shState->rtData().rqWindowAdjust.set();
     SDL_Event event;
     event.type = usrIdStart + REQUEST_WINREPOSITION;
     event.window.data1 = x;
@@ -701,6 +725,7 @@ void EventThread::requestWindowReposition(int x, int y)
 
 void EventThread::requestWindowCenter()
 {
+    shState->rtData().rqWindowAdjust.set();
     SDL_Event event;
     event.type = usrIdStart + REQUEST_WINCENTER;
     SDL_PushEvent(&event);
@@ -741,6 +766,11 @@ void EventThread::showMessageBox(const char *body, int flags)
 {
     msgBoxDone.clear();
     
+    // mkxp has already been asked to quit.
+    // Don't break things if the window wants to close
+    if (shState->rtData().rqTerm)
+        return;
+    
     SDL_Event event;
     event.user.code = flags;
     event.user.data1 = strdup(body);
@@ -763,23 +793,31 @@ bool EventThread::getShowCursor() const
     return showCursor;
 }
 
-bool EventThread::getJoystickConnected() const
+bool EventThread::getControllerConnected() const
 {
-    return js != 0;
+    return ctrl != 0;
 }
 
-SDL_Joystick *EventThread::joystick() const
+SDL_GameController *EventThread::controller() const
 {
-    return js;
+    return ctrl;
 }
 
 void EventThread::notifyFrame()
 {
+#ifdef MKXPZ_BUILD_XCODE
+    uint32_t frames = round(shState->graphics().averageFrameRate());
+    updateTouchBarFPSDisplay(frames);
+#endif
     if (!fps.sendUpdates)
         return;
     
     SDL_Event event;
+#ifdef MKXPZ_BUILD_XCODE
+    event.user.code = frames;
+#else
     event.user.code = round(shState->graphics().averageFrameRate());
+#endif
     event.user.type = usrIdStart + UPDATE_FPS;
     SDL_PushEvent(&event);
 }

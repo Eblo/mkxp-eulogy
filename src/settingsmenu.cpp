@@ -29,6 +29,7 @@
 
 #include "keybindings.h"
 #include "eventthread.h"
+#include "sharedstate.h"
 #include "font.h"
 #include "input.h"
 #include "etc-internal.h"
@@ -70,13 +71,51 @@ struct VButton
 	BTN_STRING(R),
 	BTN_STRING(A),
 	BTN_STRING(B),
-    BTN_STRING_CUSTOM(ZL, "C"),
+  BTN_STRING(C),
 	BTN_STRING(X),
 	BTN_STRING(Y),
-    BTN_STRING_CUSTOM(ZR, "Z"),
+  BTN_STRING(Z)
 };
 
 static elementsN(vButtons);
+
+/* Human readable string representation */
+std::string sourceDescString(const SourceDesc &src)
+{
+	char buf[128];
+	//char pos;
+
+	switch (src.type)
+	{
+	case Invalid:
+		return std::string();
+
+	case Key:
+	{
+		if (src.d.scan == SDL_SCANCODE_LSHIFT)
+			return "Shift";
+
+		SDL_Keycode key = SDL_GetKeyFromScancode(src.d.scan);
+		const char *str = SDL_GetKeyName(key);
+
+		if (*str == '\0')
+			return "Unknown key";
+		else
+			return str;
+	}
+	case CButton:
+		snprintf(buf, sizeof(buf), "%s", shState->input().getButtonName(src.d.cb));
+		return buf;
+
+	case CAxis:
+		snprintf(buf, sizeof(buf), "%s%c",
+		         shState->input().getAxisName(src.d.ca.axis), src.d.ca.dir == Negative ? '-' : '+');
+		return buf;
+	}
+
+	assert(!"unreachable");
+	return "";
+}
 
 struct Widget
 {
@@ -576,37 +615,22 @@ struct SettingsMenuPrivate
 
 			break;
 
-		case SDL_JOYBUTTONDOWN:
-			desc.type = JButton;
-			desc.d.jb = event.jbutton.button;
+		case SDL_CONTROLLERBUTTONDOWN:
+			desc.type = CButton;
+			desc.d.cb = (SDL_GameControllerButton)event.cbutton.button;
 			break;
 
-		case SDL_JOYHATMOTION:
+		case SDL_CONTROLLERAXISMOTION:
 		{
-			int v = event.jhat.value;
-
-			/* Only register if single directional input */
-			if (v != SDL_HAT_LEFT && v != SDL_HAT_RIGHT &&
-			    v != SDL_HAT_UP   && v != SDL_HAT_DOWN)
-				return true;
-
-			desc.type = JHat;
-			desc.d.jh.hat = event.jhat.hat;
-			desc.d.jh.pos = v;
-			break;
-		}
-
-		case SDL_JOYAXISMOTION:
-		{
-			int v = event.jaxis.value;
+			int v = event.caxis.value;
 
 			/* Only register if pushed halfway through */
 			if (v > -JAXIS_THRESHOLD && v < JAXIS_THRESHOLD)
 				return true;
 
-			desc.type = JAxis;
-			desc.d.ja.axis = event.jaxis.axis;
-			desc.d.ja.dir = v < 0 ? Negative : Positive;
+			desc.type = CAxis;
+			desc.d.ca.axis = (SDL_GameControllerAxis)event.caxis.axis;
+			desc.d.ca.dir = v < 0 ? Negative : Positive;
 			break;
 		}
 		default:
@@ -747,7 +771,7 @@ void BindingWidget::drawHandler(SDL_Surface *surf)
 	/* Draw binding labels */
 	for (size_t i = 0; i < 4; ++i)
 	{
-		std::string lb = src[i].sourceDescString();
+		std::string lb = sourceDescString(src[i]);
 		if (lb.empty())
 			continue;
 
@@ -1004,9 +1028,8 @@ bool SettingsMenu::onEvent(const SDL_Event &event)
 		break;
 
 	case SDL_JOYBUTTONDOWN :
-	case SDL_JOYBUTTONUP :
-	case SDL_JOYHATMOTION :
-	case SDL_JOYAXISMOTION :
+	case SDL_CONTROLLERBUTTONUP :
+	case SDL_CONTROLLERAXISMOTION :
 		if (!p->hasFocus)
 			return false;
 		break;
@@ -1081,9 +1104,8 @@ bool SettingsMenu::onEvent(const SDL_Event &event)
 			break;
 		}
 
-	case SDL_JOYBUTTONDOWN:
-	case SDL_JOYHATMOTION:
-	case SDL_JOYAXISMOTION:
+	case SDL_CONTROLLERBUTTONDOWN:
+	case SDL_CONTROLLERAXISMOTION:
 		if (p->state != AwaitingInput)
 			return true;
 		break;

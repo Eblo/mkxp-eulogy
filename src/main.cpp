@@ -34,6 +34,7 @@
 #include <string.h>
 #include <string>
 #include <unistd.h>
+#include <regex>
 
 #include "binding.h"
 #include "sharedstate.h"
@@ -57,6 +58,7 @@
 #include <windows.h>
 extern "C" {
 __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 #endif
 
@@ -66,6 +68,7 @@ __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
 
 #ifdef MKXPZ_BUILD_XCODE
 #include <Availability.h>
+#include "TouchBar.h"
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < __MAC_10_15
 #define MKXPZ_INIT_GL_LATER
 #endif
@@ -85,9 +88,28 @@ static inline const char *glGetStringInt(GLenum name) {
 }
 
 static void printGLInfo() {
+    const std::string renderer(glGetStringInt(GL_RENDERER));
+    const std::string version(glGetStringInt(GL_VERSION));
+    std::regex rgx("ANGLE \\((.+), ANGLE Metal Renderer: (.+), Version (.+)\\)");
+        
+    std::smatch matches;
+    if (std::regex_search(renderer, matches, rgx)) {
+        
+        Debug() << "Backend           :" << "Metal";
+        Debug() << "Metal Device      :" << matches[2] << "(" + matches[1].str() + ")";
+        Debug() << "Renderer Version  :" << matches[3].str();
+        
+    std::smatch vmatches;
+        if (std::regex_search(version, vmatches, std::regex("\\(ANGLE (.+) git hash: .+\\)"))) {
+            Debug() << "ANGLE Version     :" << vmatches[1].str();
+        }
+        return;
+    }
+    
+  Debug() << "Backend      :" << "OpenGL";
   Debug() << "GL Vendor    :" << glGetStringInt(GL_VENDOR);
-  Debug() << "GL Renderer  :" << glGetStringInt(GL_RENDERER);
-  Debug() << "GL Version   :" << glGetStringInt(GL_VERSION);
+  Debug() << "GL Renderer  :" << renderer;
+  Debug() << "GL Version   :" << version;
   Debug() << "GLSL Version :" << glGetStringInt(GL_SHADING_LANGUAGE_VERSION);
 }
 
@@ -188,7 +210,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     /* initialize SDL first */
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) < 0) {
       showInitError(std::string("Error initializing SDL: ") + SDL_GetError());
       return 0;
     }
@@ -217,17 +239,19 @@ int main(int argc, char *argv[]) {
     Config conf;
     conf.read(argc, argv);
 
-    if (!conf.gameFolder.empty()) {
-
-      if (!mkxp_fs::setCurrentDirectory(conf.gameFolder.c_str()))
-      {
-        showInitError(std::string("Unable to switch into gameFolder ") +
-                      conf.gameFolder);
-        return 0;
+#if defined(__WIN32__)
+    // Create a debug console in debug mode
+    if (conf.winConsole) {
+      if (setupWindowsConsole()) {
+        reopenWindowsStreams();
+      } else {
+        char buf[200];
+        snprintf(buf, sizeof(buf), "Error allocating console: %lu",
+                GetLastError());
+        showInitError(std::string(buf));
       }
     }
-
-    conf.readGameINI();
+#endif
 
 #ifdef MKXPZ_STEAM
     if (!STEAMSHIM_init()) {
@@ -292,24 +316,10 @@ int main(int argc, char *argv[]) {
       showInitError(
           std::string(buf)); // Not an error worth ending the program over
     }
-
-    // Create a debug console in debug mode
-    if (conf.editor.debug) {
-      HANDLE winConsoleHandle;
-
-      if (setupWindowsConsole(winConsoleHandle)) {
-        reopenWindowsStreams();
-      } else {
-        char buf[200];
-        snprintf(buf, sizeof(buf), "Error allocating console: %lu",
-                GetLastError());
-        showInitError(std::string(buf));
-      }
-    }
 #endif
 
     SDL_Window *win;
-    Uint32 winFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS;
+    Uint32 winFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_ALLOW_HIGHDPI;
 
     if (conf.winResizable)
       winFlags |= SDL_WINDOW_RESIZABLE;
@@ -324,6 +334,7 @@ int main(int argc, char *argv[]) {
     // LoadLibrary properly initializes EGL, it won't work otherwise.
     // Doesn't completely do it though, needs a small patch to SDL
 #ifdef MKXPZ_BUILD_XCODE
+    SDL_setenv("ANGLE_DEFAULT_PLATFORM", (conf.preferMetalRenderer) ? "metal" : "opengl", true);
     SDL_GL_LoadLibrary("@rpath/libEGL.dylib");
 #endif
 #endif
@@ -341,18 +352,19 @@ int main(int argc, char *argv[]) {
       return 0;
     }
     
-#if defined(MKXPZ_BUILD_XCODE) && defined(MKXPZ_DEBUG)
-#define DEBUG_FSELECT_MSG "Select the folder to load game files from. This is the folder containing the INI and/or configuration JSON.\nThis prompt does not appear in release builds."
+#if defined(MKXPZ_BUILD_XCODE)
+#define DEBUG_FSELECT_MSG "Select the folder from which to load game files. This is the folder containing the game's INI."
 #define DEBUG_FSELECT_PROMPT "Load Game"
-    std::string dataDirStr = mkxp_fs::selectPath(win, DEBUG_FSELECT_MSG, DEBUG_FSELECT_PROMPT);
-    if (!dataDirStr.empty()) {
-        conf.gameFolder = dataDirStr;
-        mkxp_fs::setCurrentDirectory(dataDirStr.c_str());
-        Debug() << "DEBUG: Current directory set to" << dataDirStr;
-        conf.read(argc, argv);
-        conf.readGameINI();
+    if (conf.manualFolderSelect) {
+        std::string dataDirStr = mkxp_fs::selectPath(win, DEBUG_FSELECT_MSG, DEBUG_FSELECT_PROMPT);
+        if (!dataDirStr.empty()) {
+            conf.gameFolder = dataDirStr;
+            mkxp_fs::setCurrentDirectory(dataDirStr.c_str());
+            Debug() << "Current directory set to" << dataDirStr;
+            conf.read(argc, argv);
+            conf.readGameINI();
+        }
     }
-    
 #endif
 
     /* OSX and Windows have their own native ways of
@@ -396,12 +408,20 @@ int main(int argc, char *argv[]) {
     RGSSThreadData rtData(&eventThread, argv[0], win, alcDev, mode.refresh_rate,
                           mkxp_sys::getScalingFactor(), conf, glCtx);
 
-    int winW, winH;
+    int winW, winH, drwW, drwH;
     SDL_GetWindowSize(win, &winW, &winH);
     rtData.windowSizeMsg.post(Vec2i(winW, winH));
+    
+    SDL_GL_GetDrawableSize(win, &drwW, &drwH);
+    rtData.drawableSizeMsg.post(Vec2i(drwW, drwH));
 
     /* Load and post key bindings */
     rtData.bindingUpdateMsg.post(loadBindings(conf));
+    
+#ifdef MKXPZ_BUILD_XCODE
+    // Create Touch Bar
+    initTouchBar(win, conf);
+#endif
 
     /* Start RGSS thread */
     SDL_Thread *rgssThread = SDL_CreateThread(rgssThreadFun, "rgss", &rtData);
@@ -493,8 +513,12 @@ static SDL_GLContext initGL(SDL_Window *win, Config &conf,
     return 0;
   }
 
+// This breaks scaling for Retina screens.
+// Using Metal should be rendering this irrelevant anyway, hopefully
+#ifndef MKXPZ_BUILD_XCODE
   if (!conf.enableBlitting)
     gl.BlitFramebuffer = 0;
+#endif
 
   gl.ClearColor(0, 0, 0, 1);
   gl.Clear(GL_COLOR_BUFFER_BIT);
