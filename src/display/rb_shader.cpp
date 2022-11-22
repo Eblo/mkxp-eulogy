@@ -101,14 +101,18 @@ void CompiledShader::compileShader(const char *contents, GLuint shader, GLuint p
     gl.BindAttribLocation(program, TexCoord, "texCoord");
     gl.BindAttribLocation(program, Color, "color");
 
-    gl.LinkProgram(program);
+    // This conditional assumes that vertex shaders are handled after fragment shaders.
+    // Alternatively, one may call LinkProgram() and do the error checking in every place where this compileShader()
+    // method is called.
+    if (vert) {
+        gl.LinkProgram(program);
+        gl.GetProgramiv(program, GL_LINK_STATUS, &success);
 
-    gl.GetProgramiv(program, GL_LINK_STATUS, &success);
-
-    if (!success)
-    {
-        rb_raise(rb_eRuntimeError, "Shader linking failed with: \n%s", getShaderLog(program).c_str());
-        return;
+        if (!success)
+        {
+            rb_raise(rb_eRuntimeError, "Shader linking failed with: \n%s", getShaderLog(program).c_str());
+            return;
+        }
     }
 }
 
