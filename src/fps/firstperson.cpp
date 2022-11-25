@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <fstream>
-#include <windows.h>
 #include <math.h>
 #include "firstperson.h"
 
