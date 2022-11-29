@@ -4,14 +4,23 @@
 #include "binding-util.h"
 #include "sharedstate.h"
 #include "shader.h"
-#include "rb_simple.vert.xxd"
 #include "bitmap.h"
+
+#ifndef MKXPZ_BUILD_XCODE
+#include "rb_simple.vert.xxd"
+#endif
 
 #include <string>
 #include <map>
 
+#ifdef MKXPZ_BUILD_XCODE
+#include "filesystem/filesystem.h"
+CompiledShader::CompiledShader(const char *contents, VALUE args) : contents(contents),
+                                                                   vertContents((const char *)mkxp_fs::contentsOfAssetAsString("Shaders/rb_simple", "vert").c_str())
+#else
 CompiledShader::CompiledShader(const char *contents, VALUE args) : contents(contents),
                                                                    vertContents((const char *)___shader_rb_simple_vert)
+#endif
 {
     fragShader = gl.CreateShader(GL_FRAGMENT_SHADER);
     vertShader = gl.CreateShader(GL_VERTEX_SHADER);
