@@ -159,7 +159,8 @@ GLuint CompiledShader::getProgram()
 }
 
 CustomShader::CustomShader(CompiledShader *shader, VALUE args, VALUE texUnits) : shader(shader),
-                                                                                 args(args), texUnits(texUnits)
+                                                                                 args(args), texUnits(texUnits),
+                                                                                 phase(0)
 {
 }
 
@@ -176,6 +177,40 @@ bool CustomShader::supportsSpriteMat()
 void CustomShader::setSpriteMat(const float value[16])
 {
     gl.UniformMatrix4fv(getUniform("spriteMat"), 1, GL_FALSE, value);
+}
+
+bool CustomShader::supportsColor()
+{
+    return getUniform("color") != -1;
+}
+
+void CustomShader::setColor(const Vec4 &value)
+{
+	gl.Uniform4f(getUniform("color"), value.x, value.y, value.z, value.w);
+}
+
+bool CustomShader::supportsTone()
+{
+    return getUniform("tone") != -1;
+}
+
+void CustomShader::setTone(const Vec4 &value)
+{
+	gl.Uniform4f(getUniform("tone"), value.x, value.y, value.z, value.w);
+}
+
+bool CustomShader::supportsPhase()
+{
+    return getUniform("phase") != -1;
+}
+
+/*
+    Ideally, I would like these shaders to be based on time, but with so
+    much of RM assuming 60 FPS, this will do for now.
+*/
+void CustomShader::incrementPhase()
+{
+	gl.Uniform1i(getUniform("phase"), phase++);
 }
 
 #define IS_A(klass) if ( \

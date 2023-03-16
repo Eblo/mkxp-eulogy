@@ -684,6 +684,22 @@ void Sprite::draw()
 			if (shader->supportsSpriteMat()) 
 				shader->setSpriteMat(p->trans.getMatrix());
 
+			if (shader->supportsColor()) {
+                /* When both flashing and effective color are set,
+                * the one with higher alpha will be blended */
+                const Vec4 *blend = (flashing && flashColor.w > p->color->norm.w) ?
+                &flashColor : &p->color->norm;
+                
+                shader->setColor(*blend);
+            }
+
+			if (shader->supportsTone()) 
+                shader->setTone(p->tone->norm);
+
+			if (shader->supportsPhase()) 
+                shader->incrementPhase();
+
+
 			base = compiled;
 		}
 	}

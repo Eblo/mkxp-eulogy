@@ -37,12 +37,19 @@ public:
     GLint getUniform(const char *name);
     bool supportsSpriteMat();
     void setSpriteMat(const float value[16]);
+    bool supportsColor();
+    void setColor(const Vec4 &value);
+    bool supportsTone();
+    void setTone(const Vec4 &value);
+    bool supportsPhase();
+    void incrementPhase();
     CompiledShader* getShader();
 
 private:
     CompiledShader* shader;
     VALUE args;
     VALUE texUnits;
+    unsigned int phase;
 };
 
 #endif
