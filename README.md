@@ -10,7 +10,7 @@ Despite the fact that it was made with Essentials games in mind, there is nothin
 
 It supports Windows, Linux and both Intel and Apple Silicon versions of macOS.
 
-Releases are [here](https://github.com/mkxp-z/mkxp-z/releases). Requirements for running them are Windows 8.1+, Ubuntu 20.04+ (Fedora and Manjaro releases that age or newer *should* also be fine), or macOS 10.12.2+.
+Releases are [here](https://github.com/mkxp-z/mkxp-z/releases). Requirements for running them are Windows 8.1+, Ubuntu 20.04+ (Fedora and Manjaro releases that age or newer *should* also be fine), or macOS 10.13+.
 
 I'd highly recommend [checking the wiki](https://github.com/mkxp-z/mkxp-z/wiki) for more information than this readme contains.
 
@@ -41,6 +41,5 @@ If a requested font is not found, no error is generated. Instead, a built-in fon
 
 ## What doesn't work
 * wma audio files
-* Creating Bitmaps with sizes greater than your hardware's texture size limit (around 16384 on modern cards).^
-
-^ There is an exception to this, called *mega surface*. When a Bitmap bigger than the texture limit is created from a file, it is not stored in VRAM, but regular RAM. Its sole purpose is to be used as a tileset bitmap. Any other operation to it (besides blitting to a regular Bitmap) will result in an error.
+* Creating Bitmaps with sizes greater than your hardware's texture size limit (around 16384 on modern cards).
+  * There is an exception to this, called *mega surface*. When a Bitmap bigger than the texture limit is created from a file, it is not stored in VRAM, but regular RAM. Its sole purpose is to be used as a tileset bitmap. Any other operation to it (besides blitting to a regular Bitmap) will result in an error.

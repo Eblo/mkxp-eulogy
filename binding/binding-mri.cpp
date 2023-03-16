@@ -282,6 +282,15 @@ static void mriBindingInit() {
     rb_str_freeze(vers);
     rb_define_const(mod, "VERSION", vers);
     
+    // Automatically load zlib if it's present -- the correct way this time
+    int state;
+    rb_eval_string_protect("require('zlib') if !Kernel.const_defined?(:Zlib)", &state);
+    if (state) {
+        Debug() << "Could not load Zlib. If this is important, make sure Ruby was built with static extensions, or that"
+        << ((MKXPZ_PLATFORM == MKXPZ_PLATFORM_MACOS) ? "zlib.bundle" : "zlib.so")
+        << "is present and reachable by Ruby's loadpath.";
+    }
+    
     // Set $stdout and its ilk accordingly on Windows
     // I regret teaching you that word
 #ifdef __WIN32__
@@ -1106,13 +1115,29 @@ static void mriBindingExecute() {
     rubyArgsC.push_back("-e ");
     void *node;
     if (conf.jit.enabled) {
-        std::string verboseLevel("--jit-verbose="); verboseLevel += std::to_string(conf.jit.verboseLevel);
-        std::string maxCache("--jit-max-cache="); maxCache += std::to_string(conf.jit.maxCache);
-        std::string minCalls("--jit-min-calls="); minCalls += std::to_string(conf.jit.minCalls);
+#if RAPI_FULL >= 310
+        // Ruby v3.1.0 renamed the --jit options to --mjit.
+        std::string verboseLevel("--mjit-verbose=");
+        std::string maxCache("--mjit-max-cache=");
+        std::string minCalls("--mjit-min-calls=");
+        rubyArgsC.push_back("--mjit");
+#else
+        std::string verboseLevel("--jit-verbose=");
+        std::string maxCache("--jit-max-cache=");
+        std::string minCalls("--jit-min-calls=");
         rubyArgsC.push_back("--jit");
+#endif
+        verboseLevel += std::to_string(conf.jit.verboseLevel);
+        maxCache += std::to_string(conf.jit.maxCache);
+        minCalls += std::to_string(conf.jit.minCalls);
+
         rubyArgsC.push_back(verboseLevel.c_str());
         rubyArgsC.push_back(maxCache.c_str());
         rubyArgsC.push_back(minCalls.c_str());
+        node = ruby_options(rubyArgsC.size(), const_cast<char**>(rubyArgsC.data()));
+    } else if (conf.yjit.enabled) {
+        rubyArgsC.push_back("--yjit");
+        // TODO: Maybe support --yjit-exec-mem-size, --yjit-call-threshold
         node = ruby_options(rubyArgsC.size(), const_cast<char**>(rubyArgsC.data()));
     } else {
         node = ruby_options(rubyArgsC.size(), const_cast<char**>(rubyArgsC.data()));
