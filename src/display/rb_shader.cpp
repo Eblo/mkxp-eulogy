@@ -169,39 +169,31 @@ GLint CustomShader::getUniform(const char *name)
     return gl.GetUniformLocation(shader->getProgram(), name);
 }
 
-bool CustomShader::supportsSpriteMat()
+
+bool CustomShader::supportsVariable(const char *name)
 {
-    return getUniform("spriteMat") != -1;
+    return getUniform(name) != -1;
 }
 
-void CustomShader::setSpriteMat(const float value[16])
+void CustomShader::setMatrix4(const char *name, const float value[16])
 {
-    gl.UniformMatrix4fv(getUniform("spriteMat"), 1, GL_FALSE, value);
+    GLint u_name = getUniform(name);
+    if(u_name != -1)
+        gl.UniformMatrix4fv(u_name, 1, GL_FALSE, value);
 }
 
-bool CustomShader::supportsColor()
+void CustomShader::setVec4(const char *name, const Vec4 &value)
 {
-    return getUniform("color") != -1;
+    GLint u_name = getUniform(name);
+    if(u_name != -1)
+        gl.Uniform4f(u_name, value.x, value.y, value.z, value.w);
 }
 
-void CustomShader::setColor(const Vec4 &value)
+void CustomShader::setFloat(const char *name, const float value)
 {
-	gl.Uniform4f(getUniform("color"), value.x, value.y, value.z, value.w);
-}
-
-bool CustomShader::supportsTone()
-{
-    return getUniform("tone") != -1;
-}
-
-void CustomShader::setTone(const Vec4 &value)
-{
-	gl.Uniform4f(getUniform("tone"), value.x, value.y, value.z, value.w);
-}
-
-bool CustomShader::supportsPhase()
-{
-    return getUniform("phase") != -1;
+    GLint u_name = getUniform(name);
+    if(u_name != -1)
+        gl.Uniform1f(u_name, value);
 }
 
 /*
@@ -210,7 +202,9 @@ bool CustomShader::supportsPhase()
 */
 void CustomShader::incrementPhase()
 {
-	gl.Uniform1i(getUniform("phase"), phase++);
+    GLint u_phase = getUniform("phase");
+    if(u_phase != -1)
+	    gl.Uniform1i(u_phase, phase++);
 }
 
 #define IS_A(klass) if ( \

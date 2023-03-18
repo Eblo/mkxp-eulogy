@@ -305,14 +305,9 @@ void Plane::draw()
 			compiled->applyViewportProj();
 			shader->applyArgs();
 
-			if (shader->supportsColor()) 
-                shader->setColor(p->color->norm);
-
-			if (shader->supportsTone()) 
-                shader->setTone(p->tone->norm);
-
-			if (shader->supportsPhase()) 
-                shader->incrementPhase();
+			shader->setVec4("color", p->color->norm);
+			shader->setVec4("tone", p->tone->norm);
+			shader->incrementPhase();
 
 			base = compiled;
 		}

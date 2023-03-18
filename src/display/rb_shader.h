@@ -35,13 +35,10 @@ public:
     void applyArgs();
 
     GLint getUniform(const char *name);
-    bool supportsSpriteMat();
-    void setSpriteMat(const float value[16]);
-    bool supportsColor();
-    void setColor(const Vec4 &value);
-    bool supportsTone();
-    void setTone(const Vec4 &value);
-    bool supportsPhase();
+    bool supportsVariable(const char *name);
+    void setMatrix4(const char *name, const float value[16]);
+    void setVec4(const char *name, const Vec4 &value);
+    void setFloat(const char *name, const float value);
     void incrementPhase();
     CompiledShader* getShader();
 

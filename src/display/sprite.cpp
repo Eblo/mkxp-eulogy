@@ -670,6 +670,10 @@ void Sprite::draw()
 	
 	if (p->shaderArr) {
 		long size = rb_array_len(p->shaderArr);
+		/* When both flashing and effective color are set,
+		* the one with higher alpha will be blended */
+		const Vec4 *blend = (flashing && flashColor.w > p->color->norm.w) ?
+		&flashColor : &p->color->norm;
 
 		for (long i = 0; i < size; i++) {
 			VALUE value = rb_ary_entry(p->shaderArr, i);
@@ -681,24 +685,11 @@ void Sprite::draw()
 			compiled->applyViewportProj();
 			shader->applyArgs();
 
-			if (shader->supportsSpriteMat()) 
-				shader->setSpriteMat(p->trans.getMatrix());
-
-			if (shader->supportsColor()) {
-                /* When both flashing and effective color are set,
-                * the one with higher alpha will be blended */
-                const Vec4 *blend = (flashing && flashColor.w > p->color->norm.w) ?
-                &flashColor : &p->color->norm;
-                
-                shader->setColor(*blend);
-            }
-
-			if (shader->supportsTone()) 
-                shader->setTone(p->tone->norm);
-
-			if (shader->supportsPhase()) 
-                shader->incrementPhase();
-
+			shader->setMatrix4("spriteMat", p->trans.getMatrix());
+			shader->setVec4("color", *blend);
+			shader->setVec4("tone", p->tone->norm);
+            shader->setFloat("bushOpacity", p->bushOpacity.norm);
+			shader->incrementPhase();
 
 			base = compiled;
 		}
