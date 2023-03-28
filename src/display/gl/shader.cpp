@@ -287,6 +287,7 @@ void ShaderBase::init()
 {
 	GET_U(texSizeInv);
 	GET_U(translation);
+	GET_U(spriteMat);
 
 	projMat.u_mat = gl.GetUniformLocation(program, "projMat");
 }
@@ -305,6 +306,11 @@ void ShaderBase::setTexSize(const Vec2i &value)
 void ShaderBase::setTranslation(const Vec2i &value)
 {
 	gl.Uniform2f(u_translation, value.x, value.y);
+}
+
+void ShaderBase::setSpriteMat(const float value[16])
+{
+	gl.UniformMatrix4fv(u_spriteMat, 1, GL_FALSE, value);
 }
 
 
@@ -359,13 +365,6 @@ SimpleSpriteShader::SimpleSpriteShader()
 	INIT_SHADER(sprite, simple, SimpleSpriteShader);
 
 	ShaderBase::init();
-
-	GET_U(spriteMat);
-}
-
-void SimpleSpriteShader::setSpriteMat(const float value[16])
-{
-	gl.UniformMatrix4fv(u_spriteMat, 1, GL_FALSE, value);
 }
 
 
@@ -377,11 +376,6 @@ AlphaSpriteShader::AlphaSpriteShader()
 
 	GET_U(spriteMat);
 	GET_U(alpha);
-}
-
-void AlphaSpriteShader::setSpriteMat(const float value[16])
-{
-	gl.UniformMatrix4fv(u_spriteMat, 1, GL_FALSE, value);
 }
 
 void AlphaSpriteShader::setAlpha(float value)
@@ -477,11 +471,6 @@ SpriteShader::SpriteShader()
     GET_U(patternScroll);
     GET_U(patternZoom);
     GET_U(invert);
-}
-
-void SpriteShader::setSpriteMat(const float value[16])
-{
-	gl.UniformMatrix4fv(u_spriteMat, 1, GL_FALSE, value);
 }
 
 void SpriteShader::setTone(const Vec4 &tone)

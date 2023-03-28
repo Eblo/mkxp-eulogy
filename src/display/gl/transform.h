@@ -122,6 +122,11 @@ public:
 		return matrix;
 	}
 
+	const float *getIdentityMatrix()
+	{
+		return identityMatrix;
+	}
+
 private:
 	void updateMatrix()
 	{
@@ -159,6 +164,12 @@ private:
 	Vec2i offset;
 
 	float matrix[16];
+
+	/* Used for shader chaining */
+	const float identityMatrix[16] = { 1.0f, 0.0f, 0.0f, 0.0f,
+								 	   0.0f, 1.0f, 0.0f, 0.0f,
+								 	   0.0f, 0.0f, 1.0f, 0.0f,
+								 	   0.0f, 0.0f, 0.0f, 1.0f };
 
 	bool dirty;
 };

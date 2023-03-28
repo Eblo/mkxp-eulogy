@@ -224,6 +224,8 @@ struct BitmapPrivate
     sigslot::connection prepareCon;
     
     TEXFBO gl;
+    TEXFBO frontBuffer;
+    TEXFBO backBuffer;
     
     Font *font;
     
@@ -279,6 +281,15 @@ struct BitmapPrivate
     
     TEXFBO &getGLTypes() {
         return (animation.enabled) ? animation.currentFrame() : gl;
+    }
+
+    void pingpongBind() {
+        // Bind the output TBO of the last render
+        TEX::bind(frontBuffer.tex);
+        // Swap the two buffers, effectively pingponging
+        std::swap(frontBuffer, backBuffer);
+        // Bind the frontBuffer FBO for the next write
+        FBO::bind(frontBuffer.fbo);
     }
     
     void prepare()
@@ -599,10 +610,14 @@ Bitmap::Bitmap(const char *filename)
     {
         /* Regular surface */
         TEXFBO tex;
+        TEXFBO tex2;
+        TEXFBO tex3;
         
         try
         {
             tex = shState->texPool().request(imgSurf->w, imgSurf->h);
+            tex2 = shState->texPool().request(imgSurf->w, imgSurf->h);
+            tex3 = shState->texPool().request(imgSurf->w, imgSurf->h);
         }
         catch (const Exception &e)
         {
@@ -612,6 +627,8 @@ Bitmap::Bitmap(const char *filename)
         
         p = new BitmapPrivate(this);
         p->gl = tex;
+        p->frontBuffer = tex2;
+        p->backBuffer = tex3;
         
         TEX::bind(p->gl.tex);
         TEX::uploadImage(p->gl.width, p->gl.height, imgSurf->pixels, GL_RGBA);
@@ -628,9 +645,13 @@ Bitmap::Bitmap(int width, int height)
         throw Exception(Exception::RGSSError, "failed to create bitmap");
     
     TEXFBO tex = shState->texPool().request(width, height);
+    TEXFBO tex2 = shState->texPool().request(width, height);
+    TEXFBO tex3 = shState->texPool().request(width, height);
     
     p = new BitmapPrivate(this);
     p->gl = tex;
+    p->frontBuffer = tex2;
+    p->backBuffer = tex3;
     
     clear();
 }
@@ -658,10 +679,14 @@ Bitmap::Bitmap(void *pixeldata, int width, int height)
     else
     {
         TEXFBO tex;
+        TEXFBO tex2;
+        TEXFBO tex3;
         
         try
         {
             tex = shState->texPool().request(surface->w, surface->h);
+            tex2 = shState->texPool().request(surface->w, surface->h);
+            tex3 = shState->texPool().request(surface->w, surface->h);
         }
         catch (const Exception &e)
         {
@@ -671,6 +696,8 @@ Bitmap::Bitmap(void *pixeldata, int width, int height)
         
         p = new BitmapPrivate(this);
         p->gl = tex;
+        p->frontBuffer = tex2;
+        p->backBuffer = tex3;
         
         TEX::bind(p->gl.tex);
         TEX::uploadImage(p->gl.width, p->gl.height, surface->pixels, GL_RGBA);
@@ -693,6 +720,8 @@ Bitmap::Bitmap(const Bitmap &other, int frame)
     // TODO: Clean me up
     if (!other.isAnimated() || frame >= -1) {
         p->gl = shState->texPool().request(other.width(), other.height());
+        p->frontBuffer = shState->texPool().request(other.width(), other.height());
+        p->backBuffer = shState->texPool().request(other.width(), other.height());
         
         GLMeta::blitBegin(p->gl);
         // Blit just the current frame of the other animated bitmap
@@ -1863,6 +1892,16 @@ TEXFBO &Bitmap::getGLTypes() const
     return p->getGLTypes();
 }
 
+TEXFBO &Bitmap::frontBuffer() const
+{
+    return p->frontBuffer;
+}
+
+void Bitmap::pingpongBind()
+{
+    p->pingpongBind();
+}
+
 SDL_Surface *Bitmap::surface() const
 {
     return p->surface;
@@ -2152,8 +2191,11 @@ void Bitmap::releaseResources()
         for (TEXFBO &tex : p->animation.frames)
             shState->texPool().release(tex);
     }
-    else
+    else {
         shState->texPool().release(p->gl);
+        shState->texPool().release(p->frontBuffer);
+        shState->texPool().release(p->backBuffer);
+    }
     
     delete p;
 }

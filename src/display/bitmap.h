@@ -120,6 +120,8 @@ public:
 
 	/* <internal> */
 	TEXFBO &getGLTypes() const;
+	TEXFBO &frontBuffer() const;
+	void pingpongBind();
     SDL_Surface *surface() const;
 	SDL_Surface *megaSurface() const;
 	void ensureNonMega() const;

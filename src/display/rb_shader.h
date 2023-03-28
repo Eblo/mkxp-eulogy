@@ -40,6 +40,7 @@ public:
     void setVec4(const char *name, const Vec4 &value);
     void setFloat(const char *name, const float value);
     void incrementPhase();
+    void setTime();
     CompiledShader* getShader();
 
 private:

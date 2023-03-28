@@ -601,6 +601,8 @@ public:
 				compiled->applyViewportProj();
 				shader->applyArgs();
 				compiled->setTexSize(screenRect.size());
+                shader->incrementPhase();
+                shader->setTime();
 
 				TEX::bind(pp.backBuffer().tex);
 
