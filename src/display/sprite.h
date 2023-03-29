@@ -78,6 +78,8 @@ public:
 	DECL_ATTR( WaveSpeed,   int     )
 	DECL_ATTR( WavePhase,   float   )
 	DECL_ATTR( ShaderArr,   VALUE  )
+	DECL_ATTR( BubbleElement,   int  )
+	DECL_ATTR( MirrorShader,    bool )
 
 	void initDynAttribs();
 

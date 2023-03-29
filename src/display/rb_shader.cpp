@@ -196,6 +196,13 @@ void CustomShader::setFloat(const char *name, const float value)
         gl.Uniform1f(u_name, value);
 }
 
+void CustomShader::setInteger(const char *name, const int value)
+{
+    GLint u_name = getUniform(name);
+    if(u_name != -1)
+        gl.Uniform1i(u_name, value);
+}
+
 /*
     Ideally, I would like these shaders to be based on time, but with so
     much of RM assuming 60 FPS, this will do for now.
