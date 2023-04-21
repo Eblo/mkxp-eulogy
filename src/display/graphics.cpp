@@ -314,7 +314,7 @@ struct Movie
         queueAudioPacket(audio);
         audio = NULL;
         bufferMovieAudio(decoder, 0);
-        audioThread = createSDLThread <Movie, Movie::streamMovieAudio>(this, "movieaudio");
+        audioThread = createSDLThread <Movie, &Movie::streamMovieAudio>(this, "movieaudio");
 
         return true;
     }
