@@ -86,6 +86,8 @@ struct SpritePrivate
     Tone *tone;
 
     VALUE shaderArr;
+    int bubbleElement;
+    bool mirrorShader;
     
     struct
     {
@@ -122,7 +124,9 @@ struct SpritePrivate
     isVisible(false),
     color(&tmp.color),
     tone(&tmp.tone),
-	shaderArr(0)
+	shaderArr(0),
+    bubbleElement(0),
+    mirrorShader(false)
     
     {
         sceneRect.x = sceneRect.y = 0;
@@ -197,6 +201,8 @@ struct SpritePrivate
         shader->setFloat("opacity", opacity.norm);
 		shader->setVec4("color", color->norm);
 		shader->setVec4("tone", tone->norm);
+        shader->setInteger("bubbleElement", bubbleElement);
+        shader->setInteger("mirror", mirrorShader ? 1 : 0);
         shader->incrementPhase();
         shader->setTime();
 
@@ -391,7 +397,10 @@ DEF_ATTR_SIMPLE(Sprite, PatternScrollY, int, p->patternScroll.y)
 DEF_ATTR_SIMPLE(Sprite, PatternZoomX, float, p->patternZoom.x)
 DEF_ATTR_SIMPLE(Sprite, PatternZoomY, float, p->patternZoom.y)
 DEF_ATTR_SIMPLE(Sprite, Invert,      bool,    p->invert)
+
 DEF_ATTR_SIMPLE(Sprite, ShaderArr,  VALUE, p->shaderArr)
+DEF_ATTR_SIMPLE(Sprite, BubbleElement,int, p->bubbleElement)
+DEF_ATTR_SIMPLE(Sprite, MirrorShader, bool,p->mirrorShader)
 
 void Sprite::setBitmap(Bitmap *bitmap)
 {

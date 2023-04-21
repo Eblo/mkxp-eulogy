@@ -75,6 +75,7 @@ DEF_GFX_PROP_I(Sprite, PatternScrollY)
 DEF_GFX_PROP_I(Sprite, WaveAmp)
 DEF_GFX_PROP_I(Sprite, WaveLength)
 DEF_GFX_PROP_I(Sprite, WaveSpeed)
+DEF_GFX_PROP_I(Sprite, BubbleElement)
 
 DEF_GFX_PROP_F(Sprite, ZoomX)
 DEF_GFX_PROP_F(Sprite, ZoomY)
@@ -87,6 +88,7 @@ DEF_GFX_PROP_B(Sprite, Mirror)
 DEF_GFX_PROP_B(Sprite, VMirror)
 DEF_GFX_PROP_B(Sprite, PatternTile)
 DEF_GFX_PROP_B(Sprite, Invert)
+DEF_GFX_PROP_B(Sprite, MirrorShader)
 
 RB_METHOD(spriteWidth) {
     RB_UNUSED_PARAM;
@@ -161,4 +163,7 @@ void spriteBindingInit() {
     INIT_PROP_BIND(Sprite, WaveLength, "wave_length");
     INIT_PROP_BIND(Sprite, WaveSpeed, "wave_speed");
     INIT_PROP_BIND(Sprite, WavePhase, "wave_phase");
+
+    INIT_PROP_BIND(Sprite, BubbleElement, "bubble_element");
+    INIT_PROP_BIND(Sprite, MirrorShader, "mirror_shader");
 }
