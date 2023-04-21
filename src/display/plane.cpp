@@ -315,44 +315,47 @@ void Plane::draw()
 	glState.blendMode.pushSet(p->blendType);
 	p->bitmap->bindTex(*base);
 
-	long size = rb_array_len(p->shaderArr);
-	if (size > 0) {
-        // Store the current FBO used, as FBO::unbind() will set it to 0 which is not correct
-        GLint originalFbo = 0;
-        glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &originalFbo);
+	if(p->shaderArr)
+	{
+		long size = rb_array_len(p->shaderArr);
+		if (p->shaderArr && size > 0) {
+			// Store the current FBO used, as FBO::unbind() will set it to 0 which is not correct
+			GLint originalFbo = 0;
+			glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &originalFbo);
 
-        // Get the general purpose quad and set it to the bitmap's dimensions for shader stacking
-        // This is needed to ensure that the shaders apply to the bitmap's size and position in isolation
-        Quad &quad = shState->gpQuad();
-        int width = p->bitmap->width(), height = p->bitmap->height();
-        FloatRect rect(0, 0, width, height);
-        quad.setTexPosRect(rect, rect);        
-        glState.blend.pushSet(false);
-        glState.viewport.pushSet(IntRect(0, 0, width, height));
-        
-        // Bind the bitmap's frontBuffer FBO and use the temporary viewport to render the sprite in isolation. This
-		// will apply the plane's main shader first as the base shader.
-        FBO::bind(p->bitmap->frontBuffer().fbo);
-        base->applyViewportProj();
-        
-        CompiledShader *customShader;
-		for (long i = 0; i < size; i++) {
-            // Using the currently bound shader, draw using the general purpose quad. This writes to the frontBuffer
-            quad.draw();
-            // Now, the frontBuffer TBO contains the output of the above draw call. Swap frontBuffer and backBuffer,
-            // binding the resulting output TBO as the next input TBO.
-            p->bitmap->pingpongBind();
-            // Bind the custom shader and assign it, as the final one must be drawn differently
-            customShader = p->bindCustomShader(i, width, height);
+			// Get the general purpose quad and set it to the bitmap's dimensions for shader stacking
+			// This is needed to ensure that the shaders apply to the bitmap's size and position in isolation
+			Quad &quad = shState->gpQuad();
+			int width = p->bitmap->width(), height = p->bitmap->height();
+			FloatRect rect(0, 0, width, height);
+			quad.setTexPosRect(rect, rect);
+			glState.blend.pushSet(false);
+			glState.viewport.pushSet(IntRect(0, 0, width, height));
+			
+			// Bind the bitmap's frontBuffer FBO and use the temporary viewport to render the sprite in isolation. This
+			// will apply the plane's main shader first as the base shader.
+			FBO::bind(p->bitmap->frontBuffer().fbo);
+			base->applyViewportProj();
+			
+			CompiledShader *customShader;
+			for (long i = 0; i < size; i++) {
+				// Using the currently bound shader, draw using the general purpose quad. This writes to the frontBuffer
+				quad.draw();
+				// Now, the frontBuffer TBO contains the output of the above draw call. Swap frontBuffer and backBuffer,
+				// binding the resulting output TBO as the next input TBO.
+				p->bitmap->pingpongBind();
+				// Bind the custom shader and assign it, as the final one must be drawn differently
+				customShader = p->bindCustomShader(i, width, height);
+			}
+
+			// Restore the original viewport and blend
+			glState.viewport.pop();
+			glState.blend.pop();
+			customShader->applyViewportProj();
+
+			// Restore the original FBO for the final draw
+			gl.BindFramebuffer(GL_FRAMEBUFFER, originalFbo);
 		}
-
-        // Restore the original viewport and blend
-        glState.viewport.pop();
-        glState.blend.pop();
-        customShader->applyViewportProj();
-
-        // Restore the original FBO for the final draw
-        gl.BindFramebuffer(GL_FRAMEBUFFER, originalFbo);
 	}
 
 	if (gl.npot_repeat)
