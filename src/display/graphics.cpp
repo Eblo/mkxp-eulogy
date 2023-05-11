@@ -846,7 +846,7 @@ struct GraphicsPrivate {
             rebuildIntegerScaleBuffer();
         }
         
-        recalculateScreenSize(rtData);
+        recalculateScreenSize(rtData->config.fixedAspectRatio);
         updateScreenResoRatio(rtData);
         
         TEXFBO::init(frozenScene);
@@ -878,9 +878,11 @@ struct GraphicsPrivate {
     void recalculateScreenSize(bool fixedAspectRatio) {
         scSize = winSize;
         
-        if (!fixedAspectRatio && integerLastMileScaling) {
-            scOffset = Vec2i(0, 0);
-            return;
+        if (!fixedAspectRatio) {
+            if (!integerScaleActive || (integerScaleActive && integerLastMileScaling)) {
+                scOffset = Vec2i(0, 0);
+                return;
+            }
         }
         
         if (integerScaleActive && !integerLastMileScaling) {
@@ -967,7 +969,7 @@ struct GraphicsPrivate {
             
             /* some GL drivers change the viewport on window resize */
             glState.viewport.refresh();
-            recalculateScreenSize(threadData);
+            recalculateScreenSize(threadData->config.fixedAspectRatio);
             updateScreenResoRatio(threadData);
             
             SDL_Rect screen = {scOffset.x, scOffset.y, scSize.x, scSize.y};
@@ -1552,7 +1554,7 @@ bool Graphics::getFixedAspectRatio() const
 void Graphics::setFixedAspectRatio(bool value)
 {
     shState->config().fixedAspectRatio = value;
-    p->recalculateScreenSize(p->threadData);
+    p->recalculateScreenSize(p->threadData->config.fixedAspectRatio);
     p->findHighestIntegerScale();
     p->recalculateScreenSize(p->threadData->config.fixedAspectRatio);
     p->updateScreenResoRatio(p->threadData);
