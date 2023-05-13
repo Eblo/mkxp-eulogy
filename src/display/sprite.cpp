@@ -705,20 +705,24 @@ void Sprite::draw()
     if(p->shaderArr)
     {
         long size = rb_array_len(p->shaderArr);
-        if(p->shaderArr && size > 0)
+        if(size > 0)
         {
             // Store the current FBO used, as FBO::unbind() will set it to 0 which is not correct
             GLint originalFbo = 0;
             glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &originalFbo);
 
             // Get the general purpose quad and set it to the bitmap's dimensions for shader stacking
+            // Ensure the viewport and scissorBox are isolated to the sprite as well. Otherwise, bitmaps larger
+            // than the game's resolution will appear cut off past those dimensions
             // This is needed to ensure that the shaders apply to the bitmap's size and position in isolation
             Quad &quad = shState->gpQuad();
             int width = p->bitmap->width(), height = p->bitmap->height();
-            FloatRect rect(0, 0, width, height);
-            quad.setTexPosRect(rect, rect);    
+            FloatRect texPosRect(0, 0, width, height);
+            quad.setTexPosRect(texPosRect, texPosRect);
             glState.blend.pushSet(false);
-            glState.viewport.pushSet(IntRect(0, 0, width, height));
+            IntRect rect(0, 0, width, height);
+            glState.viewport.pushSet(rect);
+            glState.scissorBox.pushSet(rect);
         
             // Bind the bitmap's frontBuffer FBO and use the temporary viewport and identity matrix to render the sprite
             // in isolation. This will apply the sprite's main shader first as the base shader.
@@ -738,7 +742,8 @@ void Sprite::draw()
                 customShader = p->bindCustomShader(i, width, height);
             }
 
-            // Restore the original viewport and blend, then apply the sprite's transformation matrix
+            // Restore the original scissorBox, viewport and blend, then apply the sprite's transformation matrix
+            glState.scissorBox.pop();
             glState.viewport.pop();
             glState.blend.pop();
             customShader->applyViewportProj();

@@ -318,7 +318,7 @@ void Plane::draw()
 	if(p->shaderArr)
 	{
 		long size = rb_array_len(p->shaderArr);
-		if (p->shaderArr && size > 0) {
+		if (size > 0) {
 			// Store the current FBO used, as FBO::unbind() will set it to 0 which is not correct
 			GLint originalFbo = 0;
 			glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &originalFbo);
@@ -332,7 +332,7 @@ void Plane::draw()
 			glState.blend.pushSet(false);
 			glState.viewport.pushSet(IntRect(0, 0, width, height));
 			
-			// Bind the bitmap's frontBuffer FBO and use the temporary viewport to render the sprite in isolation. This
+			// Bind the bitmap's frontBuffer FBO and use the temporary viewport to render the plane in isolation. This
 			// will apply the plane's main shader first as the base shader.
 			FBO::bind(p->bitmap->frontBuffer().fbo);
 			base->applyViewportProj();
