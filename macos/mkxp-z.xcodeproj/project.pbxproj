@@ -1894,6 +1894,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3B1C23EF25A19C600075EF5D /* Build configuration list for PBXNativeTarget "Z-steam" */;
 			buildPhases = (
+				FE4F72FE2A179EE0004FED68 /* ShellScript */,
 				3B1C237025A19C600075EF5D /* Sources */,
 				3B1C23C225A19C600075EF5D /* Frameworks */,
 				3B1C23E625A19C600075EF5D /* Resources */,
@@ -1937,6 +1938,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3BBE88062705A73400A574AE /* Build configuration list for PBXNativeTarget "Z-steam-universal" */;
 			buildPhases = (
+				FE4F72FD2A179ED5004FED68 /* ShellScript */,
 				3BBE87852705A73400A574AE /* Sources */,
 				3BBE87CE2705A73400A574AE /* Frameworks */,
 				3BBE87F42705A73400A574AE /* Resources */,
@@ -1961,6 +1963,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3BC65E122584F3AD0063AFF1 /* Build configuration list for PBXNativeTarget "Z-universal" */;
 			buildPhases = (
+				FE4F72FB2A179D9E004FED68 /* ShellScript */,
 				3BC65D8D2584F3AD0063AFF1 /* Sources */,
 				3BC65DDB2584F3AD0063AFF1 /* Frameworks */,
 				3BC65E0D2584F3AD0063AFF1 /* Resources */,
@@ -1983,6 +1986,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3BD2B7222565AEC0003DAD8A /* Build configuration list for PBXNativeTarget "Z-intel" */;
 			buildPhases = (
+				FE4F72FC2A179ECC004FED68 /* ShellScript */,
 				3BD2B64C2565AEC0003DAD8A /* Sources */,
 				3BD2B6E12565AEC0003DAD8A /* Frameworks */,
 				3BD2B6F82565AEC0003DAD8A /* Resources */,
@@ -2092,6 +2096,77 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		FE4F72FB2A179D9E004FED68 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nCOMMIT_HASH=`git rev-parse --short HEAD`\n/usr/libexec/PlistBuddy -c \"Set :GIT_COMMIT_HASH $COMMIT_HASH\" \"${INFOPLIST_FILE}\"\n";
+		};
+		FE4F72FC2A179ECC004FED68 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nCOMMIT_HASH=`git rev-parse --short HEAD`\n/usr/libexec/PlistBuddy -c \"Set :GIT_COMMIT_HASH $COMMIT_HASH\" \"${INFOPLIST_FILE}\"\n";
+		};
+		FE4F72FD2A179ED5004FED68 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nCOMMIT_HASH=`git rev-parse --short HEAD`\n/usr/libexec/PlistBuddy -c \"Set :GIT_COMMIT_HASH $COMMIT_HASH\" \"${INFOPLIST_FILE}\"\n";
+		};
+		FE4F72FE2A179EE0004FED68 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nCOMMIT_HASH=`git rev-parse --short HEAD`\n/usr/libexec/PlistBuddy -c \"Set :GIT_COMMIT_HASH $COMMIT_HASH\" \"${INFOPLIST_FILE}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3B1C235225A199370075EF5D /* Sources */ = {

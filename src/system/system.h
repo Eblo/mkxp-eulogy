@@ -40,6 +40,7 @@ WineHostType getRealHostType();
 }
 
 #ifdef MKXPZ_BUILD_XCODE
+std::string getPlistValue(const char *key);
 void openSettingsWindow();
 bool isMetalSupported();
 #endif

@@ -62,3 +62,11 @@ bool isMetalSupported() {
     }
     return false;
 }
+
+std::string getPlistValue(const char *key) {
+    NSString *hash = [[NSBundle mainBundle] objectForInfoDictionaryKey:@(key)];
+    if (hash != nil) {
+        return std::string(hash.UTF8String);
+    }
+    return "";
+}

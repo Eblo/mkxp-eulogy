@@ -8,6 +8,8 @@ endif
 
 xxd = find_program('xxd', native: true)
 
+git_hash = run_command('git', 'rev-parse', '--short', 'HEAD').stdout().strip()
+
 compilers = {'cpp': meson.get_compiler('cpp')}
 
 global_sources = []
@@ -23,6 +25,7 @@ win64 = (sizeof['void*'] != sizeof['long'])
 
 global_args += '-DMKXPZ_BUILD_MESON'
 global_args += '-DMKXPZ_VERSION="@0@"'.format(meson.project_version())
+global_args += '-DMKXPZ_GIT_HASH="@0@"'.format(git_hash)
 global_args += '-DHAVE_NANOSLEEP'
 # ====================
 # Ext libs

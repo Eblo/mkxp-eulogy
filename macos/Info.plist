@@ -18,6 +18,8 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>GIT_COMMIT_HASH</key>
+	<string>81616eb</string>
 	<key>IFMajorVersion</key>
 	<integer>0</integer>
 	<key>IFMinorVersion</key>
