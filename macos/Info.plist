@@ -19,7 +19,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>GIT_COMMIT_HASH</key>
-	<string>81616eb</string>
+	<string>fa0e60b</string>
 	<key>IFMajorVersion</key>
 	<integer>0</integer>
 	<key>IFMinorVersion</key>
