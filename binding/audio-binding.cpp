@@ -94,7 +94,7 @@ RB_METHOD(audio_bgmPlay)
     int volume = 100;
     int pitch = 100;
     double pos = 0.0;
-    VALUE track;
+    VALUE track = Qnil;
     rb_get_args(argc, argv, "z|iifo", &filename, &volume, &pitch, &pos, &track RB_ARG_END);
     GUARD_EXC( shState->audio().bgmPlay(filename, volume, pitch, pos, MAYBE_NIL_TRACK(track)); )
     return Qnil;
@@ -103,7 +103,7 @@ RB_METHOD(audio_bgmPlay)
 RB_METHOD(audio_bgmStop)
 {
     RB_UNUSED_PARAM;
-    VALUE track;
+    VALUE track = Qnil;
     rb_get_args(argc, argv, "|o", &track RB_ARG_END);
     shState->audio().bgmStop(MAYBE_NIL_TRACK(track));
     return Qnil;
@@ -112,7 +112,7 @@ RB_METHOD(audio_bgmStop)
 RB_METHOD(audio_bgmPos)
 {
     RB_UNUSED_PARAM;
-    VALUE track;
+    VALUE track = Qnil;
     rb_get_args(argc, argv, "|o", &track RB_ARG_END);
     return rb_float_new(shState->audio().bgmPos(MAYBE_NIL_TRACK(track)));
 }
@@ -120,7 +120,7 @@ RB_METHOD(audio_bgmPos)
 RB_METHOD(audio_bgmGetVolume)
 {
     RB_UNUSED_PARAM;
-    VALUE track;
+    VALUE track = Qnil;
     rb_get_args(argc, argv, "|o", &track RB_ARG_END);
     int ret = 0;
     GUARD_EXC( ret = shState->audio().bgmGetVolume(MAYBE_NIL_TRACK(track)); )
@@ -131,7 +131,7 @@ RB_METHOD(audio_bgmSetVolume)
 {
     RB_UNUSED_PARAM;
     int volume;
-    VALUE track;
+    VALUE track = Qnil;
     rb_get_args(argc, argv, "i|o", &volume, &track RB_ARG_END);
     GUARD_EXC( shState->audio().bgmSetVolume(volume, MAYBE_NIL_TRACK(track)); )
     return Qnil;
@@ -146,7 +146,7 @@ RB_METHOD(audio_bgmFade)
 {
     RB_UNUSED_PARAM;
     int time;
-    VALUE track;
+    VALUE track = Qnil;
     rb_get_args(argc, argv, "i|o", &time, &track RB_ARG_END);
     shState->audio().bgmFade(time, MAYBE_NIL_TRACK(track));
     return Qnil;

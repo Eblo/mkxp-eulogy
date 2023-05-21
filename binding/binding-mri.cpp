@@ -875,12 +875,12 @@ static void runRMXPScripts(BacktraceData &btData) {
     const std::string &scriptPack = conf.game.scripts;
     
     if (scriptPack.empty()) {
-        showMsg("No game scripts specified (missing Game.ini?)");
+        showMsg("No script file has been specified. Check the game's INI and try again.");
         return;
     }
     
     if (!shState->fileSystem().exists(scriptPack.c_str())) {
-        showMsg("Unable to open '" + scriptPack + "'");
+        showMsg("Unable to load scripts from '" + scriptPack + "'");
         return;
     }
     
