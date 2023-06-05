@@ -4,6 +4,7 @@ name: Automatic Build
 on:
   push:
     branches: ['dev', 'autobuild']
+    paths-ignore: ['*.md', '*.json', '*.png']
 
 jobs:
   build-windows:
