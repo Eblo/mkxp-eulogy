@@ -88,6 +88,7 @@ EventThread::ControllerState EventThread::controllerState;
 EventThread::MouseState EventThread::mouseState;
 EventThread::TouchState EventThread::touchState;
 SDL_atomic_t EventThread::verticalScrollDistance;
+uint8_t EventThread::lastInputDevice;
 
 /* User event codes */
 enum
@@ -108,6 +109,13 @@ enum
     UPDATE_SCREEN_RECT,
     
     EVENT_COUNT
+};
+
+/* Last device to register an input */
+enum
+{
+    LAST_INPUT_DEVICE_KBM,
+    LAST_INPUT_DEVICE_GAMEPAD
 };
 
 static uint32_t usrIdStart;
@@ -386,7 +394,8 @@ void EventThread::process(RGSSThreadData &rtData)
                     break;
                 }
                 
-                keyStates[event.key.keysym.scancode] = true;
+                keyStates[event.key.keysym.scancode] = true;                
+                lastInputDevice = LAST_INPUT_DEVICE_KBM;
                 break;
                 
             case SDL_KEYUP :
@@ -405,6 +414,7 @@ void EventThread::process(RGSSThreadData &rtData)
                 
             case SDL_CONTROLLERBUTTONDOWN:
                 controllerState.buttons[event.cbutton.button] = true;
+                lastInputDevice = LAST_INPUT_DEVICE_GAMEPAD;
                 break;
                 
             case SDL_CONTROLLERBUTTONUP:
@@ -413,6 +423,7 @@ void EventThread::process(RGSSThreadData &rtData)
                 
             case SDL_CONTROLLERAXISMOTION:
                 controllerState.axes[event.caxis.axis] = event.caxis.value;
+                lastInputDevice = LAST_INPUT_DEVICE_GAMEPAD;
                 break;
                 
             case SDL_CONTROLLERDEVICEADDED:
@@ -429,6 +440,7 @@ void EventThread::process(RGSSThreadData &rtData)
                 
             case SDL_MOUSEBUTTONDOWN :
                 mouseState.buttons[event.button.button] = true;
+                lastInputDevice = LAST_INPUT_DEVICE_KBM;
                 break;
                 
             case SDL_MOUSEBUTTONUP :
@@ -439,6 +451,7 @@ void EventThread::process(RGSSThreadData &rtData)
                 mouseState.x = event.motion.x;
                 mouseState.y = event.motion.y;
                 updateCursorState(cursorInWindow, gameScreen);
+                lastInputDevice = LAST_INPUT_DEVICE_KBM;
                 break;
                 
             case SDL_MOUSEWHEEL :
@@ -838,6 +851,17 @@ void EventThread::notifyGameScreenChange(const SDL_Rect &screen)
 void EventThread::lockText(bool lock)
 {
     lock ? SDL_LockMutex(textInputLock) : SDL_UnlockMutex(textInputLock);
+}
+
+const std::string EventThread::getLastInputDevice()
+{
+    switch(lastInputDevice) {
+        case LAST_INPUT_DEVICE_GAMEPAD:
+            return "GAMEPAD";
+        case LAST_INPUT_DEVICE_KBM:
+            return "KBM";
+    }
+    return "unknown";
 }
 
 void SyncPoint::haltThreads()

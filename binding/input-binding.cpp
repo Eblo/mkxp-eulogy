@@ -351,6 +351,53 @@ RB_METHOD(inputControllerPowerLevel) {
     return ret;
 }
 
+RB_METHOD(inputKeyMapping) {
+    RB_UNUSED_PARAM;
+    
+    rb_check_argc(argc, 1);
+    
+    VALUE button;
+    rb_scan_args(argc, argv, "1", &button);
+
+    VALUE keyHash = rb_hash_new();
+    VALUE kbmKeys = rb_ary_new();
+    VALUE gamepadKeys = rb_ary_new();
+    rb_hash_aset(keyHash, M_SYMBOL("KBM"), kbmKeys);
+    rb_hash_aset(keyHash, M_SYMBOL("GAMEPAD"), gamepadKeys);
+
+    BDescVec binds;
+	shState->rtData().bindingUpdateMsg.get(binds);
+    int num = getButtonArg(&button);
+    for (size_t i = 0; i < binds.size(); ++i)
+    {
+        if(binds[i].target == num) {
+            switch(binds[i].src.type) {
+                case Invalid:
+                    break;
+                case Key:
+                    rb_ary_push(kbmKeys, rb_str_new_cstr(SDL_GetScancodeName(binds[i].src.d.scan)));
+                    break;
+                case CButton:
+                    rb_ary_push(gamepadKeys, rb_str_new_cstr(shState->input().getButtonName(binds[i].src.d.cb)));
+                    break;
+                case CAxis:
+                    rb_ary_push(gamepadKeys, rb_str_new_cstr(shState->input().getAxisName(binds[i].src.d.ca.axis)));
+                    break;
+                default:
+                    break;
+            }
+        }
+    } 
+    
+    return keyHash;
+}
+
+RB_METHOD(inputLastDevice) {
+    RB_UNUSED_PARAM;    
+    
+    return M_SYMBOL(shState->eThread().getLastInputDevice().c_str());
+}
+
 #define AXISFUNC(n, ax1, ax2) \
 RB_METHOD(inputControllerGet##n##Axis) {\
 RB_UNUSED_PARAM;\
@@ -531,19 +578,6 @@ RB_METHOD(inputSetClipboard) {
     return str;
 }
 
-RB_METHOD(inputKeyMapping) {
-    RB_UNUSED_PARAM;
-    
-    rb_check_argc(argc, 1);
-    
-    VALUE button;
-    rb_scan_args(argc, argv, "1", &button);
-    
-    int num = getButtonArg(&button);   
-    
-    return rb_str_new_cstr(shState->input().getKeyMappingString(num).c_str());
-}
-
 struct {
     const char *str;
     Input::ButtonCode val;
@@ -629,6 +663,7 @@ void inputBindingInit() {
     _rb_define_module_function(module, "clipboard=", inputSetClipboard);
 
     _rb_define_module_function(module, "key_mapping", inputKeyMapping);
+    _rb_define_module_function(module, "last_device", inputLastDevice);
     
     if (rgssVer >= 3) {
         VALUE symHash = rb_hash_new();

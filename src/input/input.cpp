@@ -1506,32 +1506,6 @@ void Input::setClipboardText(char *text)
         throw Exception(Exception::SDLError, "Failed to set clipboard text: %s", SDL_GetError());
 }
 
-const std::string Input::getKeyMappingString(int button)
-{
-    BDescVec binds;
-	shState->rtData().bindingUpdateMsg.get(binds);
-    // TODO: Difference depending on if last used input (i.e. keyboard vs controller)
-    // Alternatively, concatenate things together?
-    for (size_t i = 0; i < binds.size(); ++i)
-    {
-        if(binds[i].target == button) {
-            switch(binds[i].src.type) {
-                case Invalid:
-                    return "Invalid";
-                case Key:
-                    return SDL_GetScancodeName(binds[i].src.d.scan);
-                case CButton:
-                    return getButtonName(binds[i].src.d.cb);
-                case CAxis:
-                    return getAxisName(binds[i].src.d.ca.axis);
-                default:
-                    break;
-            }
-        }
-    }
-    return "Unknown Input";
-}
-
 const char *Input::getAxisName(SDL_GameControllerAxis axis) {
     if (axis < 0 || axis >= SDL_CONTROLLER_AXIS_MAX)
         return "Invalid";

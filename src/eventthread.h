@@ -76,6 +76,7 @@ public:
 	static MouseState mouseState;
 	static TouchState touchState;
     static SDL_atomic_t verticalScrollDistance;
+	static uint8_t lastInputDevice;
     
     std::string textInputBuffer;
     void lockText(bool lock);
@@ -116,6 +117,8 @@ public:
 
 	/* Called on game screen (size / offset) changes */
 	void notifyGameScreenChange(const SDL_Rect &screen);
+
+	const std::string getLastInputDevice();
 
 private:
 	static int eventFilter(void *, SDL_Event*);

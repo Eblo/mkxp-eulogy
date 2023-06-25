@@ -116,8 +116,6 @@ public:
     const char *getAxisName(SDL_GameControllerAxis axis);
     const char *getButtonName(SDL_GameControllerButton button);
 
-	const std::string getKeyMappingString(int button);
-
 private:
 	Input(const RGSSThreadData &rtData);
 	~Input();
