@@ -84,7 +84,7 @@ typedef NSMutableArray<NSNumber*> BindingIndexArray;
     win.title = @"Keybindings";
     [s setWindow:win];
     [win makeKeyAndOrderFront:self];
-    
+    [s checkController];
     return s;
 }
 
@@ -491,6 +491,10 @@ if (!data.config.kbActionNames.value.empty()) bindingNames[@(Input::code)] = \
     src.enabled = true;
     isListening = true;
     
+    [self checkController];
+}
+
+- (void)checkController {
     NSArray<GCController*>* controllers = [GCController controllers];
     if (controllers.count <= 0) return;
     GCController *gamepad = controllers[0];

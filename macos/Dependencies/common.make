@@ -1,14 +1,13 @@
-SDKROOT := $(shell xcrun -sdk $(SDK) --show-sdk-path)
-TARGETFLAGS := $(TARGETFLAGS) -m$(SDK)-version-min=$(MINIMUM_REQUIRED)
-DEPLOYMENT_TARGET_ENV := $(shell ruby -e 'puts "$(SDK)".upcase')_DEPLOYMENT_TARGET=$(MINIMUM_REQUIRED)
-BUILD_PREFIX := ${PWD}/build-$(SDK)-$(ARCH)
+TARGETFLAGS := $(TARGETFLAGS) -mmacosx-version-min=$(MINIMUM_REQUIRED)
+DEPLOYMENT_TARGET_ENV := MACOSX_DEPLOYMENT_TARGET=$(MINIMUM_REQUIRED)
+BUILD_PREFIX := ${PWD}/build-macosx-$(ARCH)
 LIBDIR := $(BUILD_PREFIX)/lib
 INCLUDEDIR := $(BUILD_PREFIX)/include
 DOWNLOADS := ${PWD}/downloads/$(HOST)
 NPROC := $(shell sysctl -n hw.ncpu)
 CFLAGS := -I$(INCLUDEDIR) $(TARGETFLAGS) $(DEFINES) -O3
 LDFLAGS := -L$(LIBDIR)
-CC      := xcrun -sdk $(SDK) clang -arch $(ARCH) -isysroot $(SDKROOT)
+CC      := clang -arch $(ARCH)
 PKG_CONFIG_LIBDIR := $(BUILD_PREFIX)/lib/pkgconfig
 GIT := git
 CLONE := $(GIT) clone -q
@@ -34,7 +33,6 @@ CONFIGURE_ARGS := \
 CMAKE_ARGS := \
 	-DCMAKE_INSTALL_PREFIX="$(BUILD_PREFIX)" \
 	-DCMAKE_PREFIX_PATH="$(BUILD_PREFIX)" \
-	-DCMAKE_OSX_SYSROOT=$(SDKROOT) \
 	-DCMAKE_OSX_ARCHITECTURES=$(ARCH) \
 	-DCMAKE_OSX_DEPLOYMENT_TARGET=$(MINIMUM_REQUIRED) \
 	-DCMAKE_C_FLAGS="$(CFLAGS)" \
@@ -127,7 +125,7 @@ $(DOWNLOADS)/uchardet/cmakebuild/Makefile: $(DOWNLOADS)/uchardet/CMakeLists.txt
 	$(CMAKE) -DBUILD_SHARED_LIBS=no
 
 $(DOWNLOADS)/uchardet/CMakeLists.txt:
-	$(CLONE) $(GITHUB)/freedesktop/uchardet $(DOWNLOADS)/uchardet
+	$(CLONE) $(GITHUB)/mkxp-z/uchardet $(DOWNLOADS)/uchardet
 
 
 # Pixman
@@ -161,7 +159,7 @@ $(DOWNLOADS)/physfs/cmakebuild/Makefile: $(DOWNLOADS)/physfs/CMakeLists.txt
 	$(CMAKE) -DPHYSFS_BUILD_STATIC=true -DPHYSFS_BUILD_SHARED=false
 
 $(DOWNLOADS)/physfs/CMakeLists.txt:
-	$(CLONE) $(GITHUB)/mkxp-z/physfs $(DOWNLOADS)/physfs
+	$(CLONE) $(GITHUB)/mkxp-z/physfs -b release-3.2.0 $(DOWNLOADS)/physfs
 
 # libpng
 libpng: init_dirs $(LIBDIR)/libpng.a
@@ -194,7 +192,7 @@ $(DOWNLOADS)/sdl2/configure: $(DOWNLOADS)/sdl2/autogen.sh
 	cd $(DOWNLOADS)/sdl2; ./autogen.sh
 
 $(DOWNLOADS)/sdl2/autogen.sh:
-	$(CLONE) $(GITHUB)/mkxp-z/SDL $(DOWNLOADS)/sdl2 -b mkxp-z; cd $(DOWNLOADS)/sdl2
+	$(CLONE) $(GITHUB)/mkxp-z/SDL $(DOWNLOADS)/sdl2 -b mkxp-z
 	
 # SDL_image
 sdl2image: init_dirs sdl2 $(LIBDIR)/libSDL2_image.a
@@ -311,12 +309,15 @@ $(LIBDIR)/libruby.3.1.dylib: $(DOWNLOADS)/ruby/Makefile
 
 $(DOWNLOADS)/ruby/Makefile: $(DOWNLOADS)/ruby/configure
 	cd $(DOWNLOADS)/ruby; \
-	$(CONFIGURE) $(RUBY_CONFIGURE_ARGS) $(RUBY_FLAGS)
+	export $(CONFIGURE_ENV); \
+	export CFLAGS="-flto=full -DRUBY_FUNCTION_NAME_STRING=__func__ $$CFLAGS"; \
+	export LDFLAGS="-flto=full $$LDFLAGS"; \
+	./configure $(CONFIGURE_ARGS) $(RUBY_CONFIGURE_ARGS) $(RUBY_FLAGS)
 
-$(DOWNLOADS)/ruby/configure: $(DOWNLOADS)/ruby/*.c
+$(DOWNLOADS)/ruby/configure: $(DOWNLOADS)/ruby/configure.ac
 	cd $(DOWNLOADS)/ruby; autoreconf -i
 
-$(DOWNLOADS)/ruby/*.c:
+$(DOWNLOADS)/ruby/configure.ac:
 	$(CLONE) $(GITHUB)/mkxp-z/ruby $(DOWNLOADS)/ruby --single-branch -b mkxp-z-3.1.3 --depth 1;
 
 # ====
@@ -331,7 +332,7 @@ clean-downloads:
 	-rm -rf downloads/$(HOST)
 
 clean-compiled:
-	-rm -rf build-$(SDK)-$(ARCH)
+	-rm -rf build-macosx-$(ARCH)
 
 deps-core: libtheora libvorbis pixman libpng physfs uchardet sdl2 sdl2image sdlsound sdl2ttf openal openssl
 everything: deps-core ruby

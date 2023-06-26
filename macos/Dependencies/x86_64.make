@@ -1,4 +1,3 @@
-SDK := macosx
 ARCH := x86_64
 HOST := $(ARCH)-apple-darwin
 MINIMUM_REQUIRED := 10.13
@@ -12,4 +11,4 @@ RUBY_FLAGS := ${RUBY_FLAGS}
 
 
 
-include dependencies.make
+include common.make

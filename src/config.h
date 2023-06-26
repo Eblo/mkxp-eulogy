@@ -43,6 +43,7 @@ struct Config {
     bool fullscreen;
     bool fixedAspectRatio;
     bool smoothScaling;
+    bool lanczos3Scaling;
     bool vsync;
     
     int defScreenW;
@@ -53,7 +54,7 @@ struct Config {
     bool frameSkip;
     bool syncToRefreshrate;
     
-    bool solidFonts;
+    std::vector<std::string> solidFonts;
     
     bool subImageFix;
     bool enableBlitting;
@@ -89,6 +90,10 @@ struct Config {
     struct {
         int sourceCount;
     } SE;
+    
+    struct {
+        int trackCount;
+    } BGM;
     
     bool useScriptNames;
     
@@ -156,6 +161,8 @@ struct Config {
     } encryption;
     
     Config();
+    
+    bool fontIsSolid(const char *fontName) const;
     
     void read(int argc, char *argv[]);
     void readGameINI();

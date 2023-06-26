@@ -1,4 +1,4 @@
-project('mkxp-z', 'c', 'cpp', version: '2.4', meson_version: '>=0.56.0', default_options: ['cpp_std=c++14', 'buildtype=release'])
+project('mkxp-z', 'c', 'cpp', version: '2.4.2', meson_version: '>=0.56.0', default_options: ['cpp_std=c++14', 'buildtype=release'])
 
 host_system = host_machine.system()
 
@@ -7,6 +7,8 @@ if host_system == 'darwin'
 endif
 
 xxd = find_program('xxd', native: true)
+
+git_hash = run_command('git', 'rev-parse', '--short', 'HEAD').stdout().strip()
 
 compilers = {'cpp': meson.get_compiler('cpp')}
 
@@ -23,6 +25,7 @@ win64 = (sizeof['void*'] != sizeof['long'])
 
 global_args += '-DMKXPZ_BUILD_MESON'
 global_args += '-DMKXPZ_VERSION="@0@"'.format(meson.project_version())
+global_args += '-DMKXPZ_GIT_HASH="@0@"'.format(git_hash)
 global_args += '-DHAVE_NANOSLEEP'
 # ====================
 # Ext libs

@@ -83,12 +83,75 @@ RB_METHOD(audio_##entity##Fade) \
 		return rb_float_new(shState->audio().entity##Pos()); \
 	}
 
-DEF_PLAY_STOP_POS( bgm )
+// DEF_PLAY_STOP_POS( bgm )
+
+#define MAYBE_NIL_TRACK(t) t == Qnil ? -127 : NUM2INT(t)
+
+RB_METHOD(audio_bgmPlay)
+{
+    RB_UNUSED_PARAM;
+    const char *filename;
+    int volume = 100;
+    int pitch = 100;
+    double pos = 0.0;
+    VALUE track = Qnil;
+    rb_get_args(argc, argv, "z|iifo", &filename, &volume, &pitch, &pos, &track RB_ARG_END);
+    GUARD_EXC( shState->audio().bgmPlay(filename, volume, pitch, pos, MAYBE_NIL_TRACK(track)); )
+    return Qnil;
+}
+
+RB_METHOD(audio_bgmStop)
+{
+    RB_UNUSED_PARAM;
+    VALUE track = Qnil;
+    rb_get_args(argc, argv, "|o", &track RB_ARG_END);
+    shState->audio().bgmStop(MAYBE_NIL_TRACK(track));
+    return Qnil;
+}
+
+RB_METHOD(audio_bgmPos)
+{
+    RB_UNUSED_PARAM;
+    VALUE track = Qnil;
+    rb_get_args(argc, argv, "|o", &track RB_ARG_END);
+    return rb_float_new(shState->audio().bgmPos(MAYBE_NIL_TRACK(track)));
+}
+
+RB_METHOD(audio_bgmGetVolume)
+{
+    RB_UNUSED_PARAM;
+    VALUE track = Qnil;
+    rb_get_args(argc, argv, "|o", &track RB_ARG_END);
+    int ret = 0;
+    GUARD_EXC( ret = shState->audio().bgmGetVolume(MAYBE_NIL_TRACK(track)); )
+    return rb_fix_new(ret);
+}
+
+RB_METHOD(audio_bgmSetVolume)
+{
+    RB_UNUSED_PARAM;
+    int volume;
+    VALUE track = Qnil;
+    rb_get_args(argc, argv, "i|o", &volume, &track RB_ARG_END);
+    GUARD_EXC( shState->audio().bgmSetVolume(volume, MAYBE_NIL_TRACK(track)); )
+    return Qnil;
+}
+
 DEF_PLAY_STOP_POS( bgs )
 
 DEF_PLAY_STOP( me )
 
-DEF_FADE( bgm )
+//DEF_FADE( bgm )
+RB_METHOD(audio_bgmFade)
+{
+    RB_UNUSED_PARAM;
+    int time;
+    VALUE track = Qnil;
+    rb_get_args(argc, argv, "i|o", &time, &track RB_ARG_END);
+    shState->audio().bgmFade(time, MAYBE_NIL_TRACK(track));
+    return Qnil;
+}
+
 DEF_FADE( bgs )
 DEF_FADE( me )
 
@@ -134,6 +197,8 @@ audioBindingInit()
 	VALUE module = rb_define_module("Audio");
 
 	BIND_PLAY_STOP_FADE( bgm );
+    _rb_define_module_function(module, "bgm_volume", audio_bgmGetVolume);
+    _rb_define_module_function(module, "bgm_set_volume", audio_bgmSetVolume);
 	BIND_PLAY_STOP_FADE( bgs );
 	BIND_PLAY_STOP_FADE( me  );
 

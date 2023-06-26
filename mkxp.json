@@ -8,8 +8,12 @@
     // working directory (when compiled with
     // -DWORKDIR_CURRENT). All other paths are resolved
     // relative to gameFolder and ignoring both RTPs and
-    // encrypted archives.
-    
+    // encrypted archives. Since this is JSON, any
+    // backslashes in paths need to be escaped (i.e. a
+    // single backslash becomes a double backslash). If
+    // that's too much hassle, you can use a single forward
+    // slash instead (even on Windows).
+
     // Some influential environment variables, set them to either "1" or "0":
     // "MKXPZ_WINDOWS_CONSOLE"
     //     - Enables/disables the extra console window on Windows. It appears by
@@ -73,6 +77,13 @@
     // "smoothScaling": false,
 
 
+    // Apply Lanczos3 interpolation when game screen
+    // is upscaled (typically higher quality than linear)
+    // (default: disabled)
+    //
+    // "lanczos3Scaling": false,
+
+
     // Sync screen redraws to the monitor refresh rate
     // (default: disabled)
     //
@@ -129,10 +140,10 @@
     // "syncToRefreshrate": false,
 
 
-    // Don't use alpha blending when rendering text
-    // (default: disabled)
+    // A list of fonts to render without alpha blending.
+    // (default: none)
     //
-    // "solidFonts": false,
+    // "solidFonts": ["Arial", "Times New Roman"]
 
 
     // Prefer the use of Metal over OpenGL on macOS.
@@ -372,6 +383,12 @@
     // this number. Maximum: 64.
     //
     // "SESourceCount": 6
+    
+    // Number of streams to open for BGM tracks. If the game
+    // needs multitrack audio, this should be set to as many
+    // available tracks as the game needs. Maximum: 16.
+    //
+    // "BGMTrackCount": 1
 
 
     // The Windows game executable name minus ".exe". By default

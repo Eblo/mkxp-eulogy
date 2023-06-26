@@ -34,7 +34,7 @@
 RB_METHOD(inputDelta) {
     RB_UNUSED_PARAM;
     
-    return ULL2NUM(shState->input().getDelta());
+    return rb_float_new(shState->input().getDelta());
 }
 
 RB_METHOD(inputUpdate) {
@@ -169,7 +169,7 @@ RB_METHOD(inputRepeatTime) {
     
     int num = getButtonArg(&button);
     
-    return ULL2NUM(shState->input().repeatTime(num));
+    return rb_float_new(shState->input().repeatTime(num));
 }
 
 RB_METHOD(inputPressEx) {
@@ -250,10 +250,10 @@ RB_METHOD(inputRepeatTimeEx) {
     
     if (SYMBOL_P(button)) {
         int num = getScancodeArg(&button);
-        return ULL2NUM(shState->input().repeatTimeEx(num, 0));
+        return rb_float_new(shState->input().repeatTimeEx(num, 0));
     }
     
-    return ULL2NUM(shState->input().repeatTimeEx(NUM2INT(button), 1));
+    return rb_float_new(shState->input().repeatTimeEx(NUM2INT(button), 1));
 }
 
 RB_METHOD(inputDir4) {
@@ -495,10 +495,10 @@ RB_METHOD(inputControllerRepeatTimeEx) {
     
     if (SYMBOL_P(button)) {
         int num = getControllerButtonArg(&button);
-        return rb_bool_new(shState->input().controllerRepeatTimeEx(num));
+        return rb_float_new(shState->input().controllerRepeatTimeEx(num));
     }
     
-    return rb_bool_new(shState->input().controllerRepeatTimeEx(NUM2INT(button)));
+    return rb_float_new(shState->input().controllerRepeatTimeEx(NUM2INT(button)));
 }
 
 RB_METHOD(inputControllerRawButtonStates) {

@@ -226,6 +226,9 @@ struct SpritePrivate
         if (nullOrDisposed(bitmap))
             return;
         
+        if (bitmap->invalid())
+            return;
+        
         if (!opacity)
             return;
         
