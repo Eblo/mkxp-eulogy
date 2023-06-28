@@ -23,8 +23,8 @@
 #include "boost-hash.h"
 
 #include <regex>
-
-#include <string>
+#include <stdint.h>
+#include <string.h>
 
 /* Equivalent Linear Congruential Generator (LCG) constants for iteration 2^n
  * all the way up to 2^32/4 (the largest dword offset possible in

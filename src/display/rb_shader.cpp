@@ -215,15 +215,15 @@ void CustomShader::incrementPhase()
 }
 
 /*
-    Assuming a target frame rate of 60, we multiply the time by a constant to convert the current time in microseconds
-    to an approximation of the number of frames that should have passed. This lets this time variable work in lieu of
-    the phase variable above.
+    Assuming a target frame rate of 60, we multiply the time by a constant to convert the current time in seconds
+    to the number of frames that should have passed. This lets this time variable work in lieu of the phase variable
+    above.
 */
 void CustomShader::setTime()
 {
     GLint u_time = getUniform("timeStep");
     if(u_time != -1)
-	    gl.Uniform1i(u_time, shState->runTime() * 0.0000625);
+	    gl.Uniform1i(u_time, shState->runTime() * 60);
 }
 
 #define IS_A(klass) if ( \
