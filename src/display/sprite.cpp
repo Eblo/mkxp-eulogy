@@ -712,7 +712,7 @@ void Sprite::draw()
         {
             // Store the current FBO used, as FBO::unbind() will set it to 0 which is not correct
             GLint originalFbo = 0;
-            glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &originalFbo);
+            glGetIntegerv(GL_FRAMEBUFFER_BINDING, &originalFbo);
 
             // Get the general purpose quad and set it to the bitmap's dimensions for shader stacking
             // Ensure the viewport and scissorBox are isolated to the sprite as well. Otherwise, bitmaps larger
